@@ -160,6 +160,50 @@ impl Disassembler {
                 op.reg = instruction >> 3 & 0b111;
             }
             // Xchg
+            0b1000_0110 | 0b1000_0111 => {
+                // Register/Memory with Register
+                op.operation_type = OperationType::Xchg;
+                op.set_mod_reg_rm(self.next_byte());
+                op.w = instruction & 1;
+            }
+            0b1001_0000..=0b1001_0111 => {
+                // Register with Accumulator
+                op.operation_type = OperationType::Xchg;
+                op.reg = instruction & 0b111;
+            }
+            // In
+            0b1110_0100 | 0b1110_0101 => {
+                // Fixed Port
+                op.operation_type = OperationType::In;
+                op.w = instruction & 1;
+                op.port = self.next_byte();
+            }
+            0b1110_1100 | 0b1110_1101 => {
+                // Variable Port
+                op.operation_type = OperationType::In;
+                op.w = instruction & 1;
+            }
+            // Out
+            0b1110_0110 | 0b1110_0111 => {
+                // Fixed Port
+                op.operation_type = OperationType::Out;
+                op.w = instruction & 1;
+                op.port = self.next_byte();
+            }
+            0b1110_1110 | 0b1110_1111 => {
+                // Variable Port
+                op.operation_type = OperationType::Out;
+                op.w = instruction & 1;
+            }
+            // Xlat
+            0b1101_0111 => {
+                op.operation_type = OperationType::Xlat;
+            }
+            // Lea
+            0b1000_1101 => {
+                op.operation_type = OperationType::Lea;
+                op.set_mod_reg_rm(self.next_byte());
+            }
             _ => {
                 // println!("Unknown operation: {:#X}", op);
             }
