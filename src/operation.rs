@@ -24,7 +24,7 @@ pub enum OperationType {
     Aaa,
     Baa,
     Sub,
-    Ssb,
+    Sbb,
     Dec,
     Neg,
     Cmp,
