@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
+        "Idiv",
+        "Imul",
+        "Lahf",
+        "Popf",
+        "Pushf",
+        "Sahf",
         "setuptools",
         "syms",
         "Xchg",
