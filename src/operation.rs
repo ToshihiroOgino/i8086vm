@@ -61,6 +61,25 @@ pub enum OperationType {
     Stos,
     //Control Transfer
     Call,
+    Jmp,
+    Ret,
+    Jump,
+    Loop,
+    Int,
+    Into,
+    Iret,
+    // Processor Control
+    Clc,
+    Cmc,
+    Stc,
+    Cld,
+    Std,
+    Cli,
+    Sti,
+    Hlt,
+    Wait,
+    Esc,
+    Lock,
 }
 
 #[allow(dead_code)]
@@ -73,15 +92,16 @@ pub struct Operation {
     pub w: u8,
     pub s: u8,
     pub z: u8,
+    pub v: u8,
     pub mod_rm: u8,
     pub rm: u8,
     pub reg: u8,
     pub data: u16,
-    // Mov
-    pub addr_low: u8,
-    pub addr_high: u8,
-    // In/Out
+    pub low: u8,
+    pub high: u8,
     pub port: u8,
+    pub disp: u8,
+    pub int_type: u8,
 }
 
 impl Operation {
