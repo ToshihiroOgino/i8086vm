@@ -69,10 +69,8 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 op.w = instruction & 1;
                 if op.w == 1 {
-                    // 16-bit immediate
                     op.data = u16::from_le_bytes([self.next_byte(), self.next_byte()]);
                 } else {
-                    // 8-bit immediate
                     op.data = self.next_byte() as u16;
                 }
             }
@@ -82,10 +80,8 @@ impl Disassembler {
                 op.w = instruction >> 3 & 1;
                 op.reg = instruction & 0b111;
                 if op.w == 1 {
-                    // 16-bit immediate
                     op.data = u16::from_le_bytes([self.next_byte(), self.next_byte()]);
                 } else {
-                    // 8-bit immediate
                     op.data = self.next_byte() as u16;
                 }
             }
@@ -94,8 +90,8 @@ impl Disassembler {
                 // Accumulator to Memory
                 op.operation_type = OperationType::Mov;
                 op.w = instruction & 1;
-                op.addr_low = self.next_byte();
-                op.addr_high = self.next_byte();
+                op.low = self.next_byte();
+                op.high = self.next_byte();
             }
             0b1000_1110 | 0b1000_1100 => {
                 // Register to Segment Register
@@ -207,6 +203,7 @@ impl Disassembler {
             0b1001_1101 => {
                 op.operation_type = OperationType::Popf;
             }
+
             // --- Arithmetic ---
             // Add
             0b0000_0000..=0b0000_0011 => {
@@ -221,10 +218,8 @@ impl Disassembler {
                 op.operation_type = OperationType::Add;
                 op.w = instruction & 1;
                 if op.w == 1 {
-                    // 16-bit immediate
                     op.data = u16::from_le_bytes([self.next_byte(), self.next_byte()]);
                 } else {
-                    // 8-bit immediate
                     op.data = self.next_byte() as u16;
                 }
             }
@@ -241,10 +236,8 @@ impl Disassembler {
                 op.operation_type = OperationType::Adc;
                 op.w = instruction & 1;
                 op.data = if op.w == 1 {
-                    // 16-bit immediate
                     u16::from_le_bytes([self.next_byte(), self.next_byte()])
                 } else {
-                    // 8-bit immediate
                     self.next_byte() as u16
                 };
             }
@@ -281,10 +274,8 @@ impl Disassembler {
                 op.operation_type = OperationType::Sub;
                 op.w = instruction & 1;
                 op.data = if op.w == 1 {
-                    // 16-bit immediate
                     u16::from_le_bytes([self.next_byte(), self.next_byte()])
                 } else {
-                    // 8-bit immediate
                     self.next_byte() as u16
                 };
             }
@@ -303,10 +294,8 @@ impl Disassembler {
                 op.operation_type = OperationType::Sbb;
                 op.w = instruction & 1;
                 op.data = if op.w == 1 {
-                    // 16-bit immediate
                     u16::from_le_bytes([self.next_byte(), self.next_byte()])
                 } else {
-                    // 8-bit immediate
                     self.next_byte() as u16
                 };
             }
@@ -316,19 +305,266 @@ impl Disassembler {
                 op.operation_type = OperationType::Dec;
                 op.reg = instruction & 0b111;
             }
+            // Cmp
+            0b0011_1000..=0b0011_1011 => {
+                // Register/Memory and Register
+                op.operation_type = OperationType::Cmp;
+                op.set_mod_reg_rm(self.next_byte());
+                op.d = (instruction >> 1) & 1;
+                op.w = instruction & 1;
+            }
+            0b0011_1100 | 0b0011_1101 => {
+                // Immediate with Accumulator
+                op.operation_type = OperationType::Cmp;
+                op.w = instruction & 1;
+                op.data = if op.w == 1 {
+                    u16::from_le_bytes([self.next_byte(), self.next_byte()])
+                } else {
+                    self.next_byte() as u16
+                }
+            }
+            // Aas
+            0b0011_1111 => {
+                op.operation_type = OperationType::Aas;
+            }
+            // Das
+            0b0010_1111 => {
+                op.operation_type = OperationType::Das;
+            }
+            // Cbw
+            0b1001_1000 => {
+                op.operation_type = OperationType::Cbw;
+            }
+            // Cwd
+            0b1001_1001 => {
+                op.operation_type = OperationType::Cwd;
+            }
 
-            // --- Duplicate ---
-            // Add/Adc/Sub/Ssb/Cmp
+            // --- Logic ---
+            // And
+            0b0010_0000..=0b0010_0011 => {
+                // Register/Memory and Register to Either
+                op.operation_type = OperationType::And;
+                op.set_mod_reg_rm(self.next_byte());
+                op.d = (instruction >> 1) & 1;
+                op.w = instruction & 1;
+            }
+            0b0010_0100 | 0b0010_0101 => {
+                // Immediate with Accumulator
+                op.operation_type = OperationType::And;
+                op.w = instruction & 1;
+                op.data = if op.w == 1 {
+                    u16::from_le_bytes([self.next_byte(), self.next_byte()])
+                } else {
+                    self.next_byte() as u16
+                };
+            }
+            // Test
+            0b1000_0100 | 0b1000_0101 => {
+                // Register/Memory and Register
+                op.operation_type = OperationType::Test;
+                op.set_mod_reg_rm(self.next_byte());
+            }
+            0b1010_1000 | 0b1010_1001 => {
+                // Immediate Data and Accumulator
+                op.operation_type = OperationType::Test;
+                op.w = instruction & 1;
+                op.data = if op.w == 1 {
+                    u16::from_le_bytes([self.next_byte(), self.next_byte()])
+                } else {
+                    self.next_byte() as u16
+                };
+            }
+            // Or
+            0b0000_1000..=0b0000_1011 => {
+                // Register/Memory and Register to Either
+                op.operation_type = OperationType::Or;
+                op.set_mod_reg_rm(self.next_byte());
+                op.d = (instruction >> 1) & 1;
+                op.w = instruction & 1;
+            }
+            0b0000_1100 | 0b0000_1101 => {
+                // Immediate with Accumulator
+                op.operation_type = OperationType::Or;
+                op.w = instruction & 1;
+                op.data = if op.w == 1 {
+                    u16::from_le_bytes([self.next_byte(), self.next_byte()])
+                } else {
+                    self.next_byte() as u16
+                };
+            }
+            // Xor
+            0b0011_0000..=0b0011_0011 => {
+                // Register/Memory and Register to Either
+                op.operation_type = OperationType::Xor;
+                op.set_mod_reg_rm(self.next_byte());
+                op.d = (instruction >> 1) & 1;
+                op.w = instruction & 1;
+            }
+            0b0011_0100 | 0b0011_0101 => {
+                // Immediate with Accumulator
+                op.operation_type = OperationType::Xor;
+                op.w = instruction & 1;
+                op.data = if op.w == 1 {
+                    u16::from_le_bytes([self.next_byte(), self.next_byte()])
+                } else {
+                    self.next_byte() as u16
+                };
+            }
+
+            // --- String Manipulation ---
+            // Rep
+            0b1111_0010 | 0b1111_0011 => {
+                op.operation_type = OperationType::Rep;
+                op.z = instruction & 1;
+            }
+            // Movs/Cmps/Scas/Lods/Stos
+            0b1010_0100..=0b1010_1111 => {
+                op.w = instruction & 1;
+                op.operation_type = match instruction >> 1 & 0b111 {
+                    0b010 => OperationType::Movs,
+                    0b011 => OperationType::Cmps,
+                    0b111 => OperationType::Scas,
+                    0b110 => OperationType::Lods,
+                    0b101 => OperationType::Stos,
+                    _ => {
+                        panic!("Invalid operation. reg is invalid");
+                    }
+                };
+            }
+
+            // --- Control Transfer ---
+            // Call
+            0b1110_1000 => {
+                // Direct within Segment
+                op.operation_type = OperationType::Call;
+                op.low = self.next_byte();
+                op.high = self.next_byte();
+            }
+            0b1001_1010 => {
+                // Direct Intersegment
+                op.operation_type = OperationType::Call;
+                // offset-low offset-high
+                // seg-low seg-high
+                op.low = self.next_byte();
+                op.high = self.next_byte();
+            }
+            // Jmp
+            0b1110_1001 => {
+                // Direct within Segment
+                op.operation_type = OperationType::Jmp;
+                op.low = self.next_byte();
+                op.high = self.next_byte();
+            }
+            0b1110_1011 => {
+                // Direct within Segment-Short
+                op.operation_type = OperationType::Jmp;
+                op.disp = self.next_byte();
+            }
+            0b1110_1010 => {
+                op.operation_type = OperationType::Jmp;
+                op.low = self.next_byte();
+                op.high = self.next_byte();
+            }
+            // Ret
+            0b1100_0011 | 0b1100_1011 => {
+                // Within Segment
+                // Intersegment
+                op.operation_type = OperationType::Ret;
+            }
+            0b1100_0010 | 0b1100_1010 => {
+                // Within Segment Adding Immed to Sp
+                // Within Segment Adding Immediate to Sp
+                op.operation_type = OperationType::Ret;
+                op.low = self.next_byte();
+                op.high = self.next_byte();
+            }
+            // Jump
+            0b0111_0000..=0b0111_1111 => {
+                op.operation_type = OperationType::Jump;
+                op.disp = self.next_byte();
+            }
+            // Loop
+            0b1110_0000..=0b1110_0010 => {
+                op.operation_type = OperationType::Loop;
+                op.disp = self.next_byte();
+            }
+            // Jump
+            0b1110_0011 => {
+                // Jump on CX Zero
+                op.operation_type = OperationType::Jump;
+                op.disp = self.next_byte();
+            }
+            // Int
+            0b1100_1101 => {
+                // Type Specified
+                op.operation_type = OperationType::Int;
+                op.int_type = self.next_byte();
+            }
+            0b11001100 => {
+                // Type 3
+                op.operation_type = OperationType::Int;
+            }
+            // Into
+            0b1100_1110 => {
+                op.operation_type = OperationType::Into;
+            }
+            // Iret
+            0b1100_1111 => {
+                op.operation_type = OperationType::Iret;
+            }
+
+            // --- Processor Control ---
+            0b1111_1000 => {
+                op.operation_type = OperationType::Clc;
+            }
+            0b1111_0101 => {
+                op.operation_type = OperationType::Cmc;
+            }
+            0b1111_1001 => {
+                op.operation_type = OperationType::Stc;
+            }
+            0b1111_1100 => {
+                op.operation_type = OperationType::Cld;
+            }
+            0b1111_1101 => {
+                op.operation_type = OperationType::Std;
+            }
+            0b1111_1010 => {
+                op.operation_type = OperationType::Cli;
+            }
+            0b1111_1011 => {
+                op.operation_type = OperationType::Sti;
+            }
+            0b1111_0100 => {
+                op.operation_type = OperationType::Hlt;
+            }
+            0b1001_1011 => {
+                op.operation_type = OperationType::Wait;
+            }
+            0b1101_1000..=0b1101_1111 => {
+                op.operation_type = OperationType::Esc;
+                op.reg = instruction & 0b111;
+            }
+            0b1111_0000 => {
+                op.operation_type = OperationType::Lock;
+            }
+
+            // --- Common ---
+            // Add/Adc/Sub/Ssb/Cmp/And
             0b1000_0000..=0b1000_0011 => {
                 // Immediate to Register/Memory
                 op.set_mod_reg_rm(self.next_byte());
                 op.operation_type = OperationType::Add;
                 op.operation_type = match op.reg {
                     0b000 => OperationType::Add,
-                    0b001 => OperationType::Adc,
+                    0b010 => OperationType::Adc,
                     0b101 => OperationType::Sub,
                     0b011 => OperationType::Sbb,
                     0b111 => OperationType::Cmp,
+                    0b100 => OperationType::And,
+                    0b001 => OperationType::Or,
+                    0b110 => OperationType::Xor,
                     _ => {
                         panic!("Invalid operation. reg is invalid");
                     }
@@ -336,10 +572,8 @@ impl Disassembler {
                 op.s = (instruction >> 1) & 1;
                 op.w = instruction & 1;
                 if op.w == 1 {
-                    // 16-bit immediate
                     op.data = u16::from_le_bytes([self.next_byte(), self.next_byte()]);
                 } else {
-                    // 8-bit immediate
                     op.data = self.next_byte() as u16;
                 }
             }
@@ -352,6 +586,7 @@ impl Disassembler {
                     0b000 => OperationType::Inc,
                     0b001 => OperationType::Dec,
                     0b010 | 0b011 => OperationType::Call,
+                    0b100 | 0b101 => OperationType::Jmp,
                     _ => {
                         panic!("Invalid operation. reg is invalid");
                     }
@@ -384,9 +619,47 @@ impl Disassembler {
                     }
                 };
             }
+            // Aam
+            0b1101_0100 => {
+                let next = self.next_byte();
+                op.operation_type = match next {
+                    0b0000_1010 => OperationType::Aam,
+                    _ => {
+                        panic!("Invalid operation");
+                    }
+                }
+            }
+            // Aad
+            0b1101_0101 => {
+                let next = self.next_byte();
+                op.operation_type = match next {
+                    0b0000_1010 => OperationType::Aad,
+                    _ => {
+                        panic!("Invalid operation");
+                    }
+                }
+            }
+            // Shl/Sal/Shr/Sar/Rol/Ror/Rcl/Rcr
+            0b1101_0000..=0b1101_0011 => {
+                op.set_mod_reg_rm(self.next_byte());
+                op.v = instruction >> 1 & 1;
+                op.w = instruction & 1;
+                op.operation_type = match op.reg {
+                    0b100 => OperationType::ShlSal,
+                    0b101 => OperationType::Shr,
+                    0b111 => OperationType::Sar,
+                    0b000 => OperationType::Rol,
+                    0b001 => OperationType::Ror,
+                    0b010 => OperationType::Rcl,
+                    0b011 => OperationType::Rcr,
+                    _ => {
+                        panic!("Invalid operation. reg is invalid");
+                    }
+                };
+            }
 
             _ => {
-                // println!("Unknown operation: {:#X}", op);
+                panic!("Unknown operation: {:02x}", instruction);
             }
         }
         op
