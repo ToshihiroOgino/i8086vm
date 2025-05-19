@@ -1,8 +1,9 @@
 mod args;
 mod disassembler;
+mod dump;
 mod metadata;
-mod register;
 mod operation;
+mod register;
 
 fn main() {
     let config = args::parse_args();
