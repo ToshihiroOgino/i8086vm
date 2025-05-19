@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#[allow(unused)]
 #[derive(Debug)]
 pub struct Metadata {
     pub magic: [u8; 2],
