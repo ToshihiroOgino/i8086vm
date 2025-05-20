@@ -49,14 +49,14 @@ impl Disassembler {
         match op.mod_rm {
             0b00 => {
                 if op.rm == 0b110 {
-                    op.disp = u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]);
+                    op.disp = Some(u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]));
                 }
             }
             0b01 => {
-                op.disp = self.next_byte(op) as u16;
+                op.disp = Some(self.next_byte(op) as u16);
             }
             0b10 => {
-                op.disp = u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]);
+                op.disp = Some(u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]));
             }
             0b11 => {
                 // No displacement
@@ -528,7 +528,7 @@ impl Disassembler {
             0b1110_1011 => {
                 // Direct within Segment-Short
                 op.operation_type = OperationType::Jmp;
-                op.disp = self.next_byte(&mut op) as u16;
+                op.disp = Some(self.next_byte(&mut op) as u16);
             }
             0b1110_1010 => {
                 op.operation_type = OperationType::Jmp;
@@ -551,18 +551,18 @@ impl Disassembler {
             // Jump
             0b0111_0000..=0b0111_1111 => {
                 op.operation_type = OperationType::Jump;
-                op.disp = self.next_byte(&mut op) as u16;
+                op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Loop
             0b1110_0000..=0b1110_0010 => {
                 op.operation_type = OperationType::Loop;
-                op.disp = self.next_byte(&mut op) as u16;
+                op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Jump
             0b1110_0011 => {
                 // Jump on CX Zero
                 op.operation_type = OperationType::Jump;
-                op.disp = self.next_byte(&mut op) as u16;
+                op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Int
             0b1100_1101 => {
