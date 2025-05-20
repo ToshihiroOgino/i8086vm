@@ -180,7 +180,7 @@ pub struct Operation {
     pub low: u8,
     pub high: u8,
     pub port: u8,
-    pub disp: u16,
+    pub disp: Option<u16>,
     pub int_type: u8,
 }
 

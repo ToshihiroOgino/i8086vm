@@ -34,25 +34,7 @@ fn dump_reg(reg: u8, w: u8) {
 }
 
 fn dump_ea(op: &Operation) {
-    match op.mod_rm {
-        0b00 => {
-            if op.rm == 0b110 {
-                print!("[{:04x}]", op.disp)
-            } else {
-                let ea = effective_address(op.rm);
-                print!("[{ea}]")
-            }
-        }
-        0b01 | 0b10 => {
-            let ea = effective_address(op.rm);
-            print!("[{ea}+{disp}]", disp = op.disp)
-        }
-        0b11 => {
-            let reg = Register::new(op.rm, op.w);
-            print!("{reg}")
-        }
-        _ => panic!("Invalid mod"),
-    };
+    print!("{}", effective_address(op.rm, op.mod_rm, op.disp, op.w));
 }
 
 fn dump_immediate(op: &Operation) {

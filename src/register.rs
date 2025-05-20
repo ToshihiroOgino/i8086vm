@@ -110,17 +110,66 @@ impl Display for Register8Bit {
     }
 }
 
-pub fn effective_address(rm: u8) -> String {
-    match rm {
+fn get_some_disp(disp: Option<u16>) -> u16 {
+    match disp {
+        Some(d) => d,
+        None => panic!("Invalid displacement"),
+    }
+}
+
+pub fn effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8) -> String {
+    let base = match rm {
         0b000 => "BX+SI",
         0b001 => "BX+DI",
         0b010 => "BP+SI",
         0b011 => "BP+DI",
         0b100 => "SI",
         0b101 => "DI",
-        0b110 => "BX",
-        0b111 => "BP",
+        0b110 => "BP",
+        0b111 => "BX",
         _ => panic!("Invalid effective address"),
+    };
+    match mod_rm {
+        0b00 => {
+            if rm == 0b110 {
+                format!("[{disp:04x}]", disp = get_some_disp(disp))
+            } else {
+                if base.contains('+') {
+                    format!("[{base}]")
+                } else {
+                    format!("{base}")
+                }
+            }
+        }
+        0b01 => {
+            let disp = get_some_disp(disp);
+            if disp > 0xff {
+                panic!("Displacement is out of range")
+            }
+            let disp_signed = (0xff00 | disp) as i16;
+            format!("[{base}-{disp:x}]", disp = disp_signed.abs())
+        }
+        0b10 => format!("[{base}+{disp:x}]", disp = get_some_disp(disp)),
+        0b11 => format!("{reg}", reg = Register::new(rm, w)),
+        _ => panic!("Invalid mod"),
     }
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case(0b000, 0b11, None, 0, "AL" ; "REG 1")]
+    #[test_case(0b001, 0b11, None, 1, "CX" ; "REG 2")]
+    #[test_case(0b100, 0b00, None, 0, "SI"; "No disp 1")]
+    #[test_case(0b000, 0b00, None, 0, "[BX+SI]"; "No disp 2")]
+    #[test_case(0b000, 0b01, Some(0x0f), 0, "[BX+SI-f1]" ; "Sign-extended disp")]
+    #[test_case(0b110, 0b10, Some(0x0f), 0, "[BP+f]" ; "r/m + Disp")]
+    #[test_case(0b110, 0b00, Some(0x0f), 0, "[000f]" ; "only Disp")]
+    fn test_effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8, expected: &str) {
+        let result = effective_address(rm, mod_rm, disp, w);
+        assert_eq!(result, expected);
+    }
 }
