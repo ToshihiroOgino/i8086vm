@@ -1,6 +1,6 @@
 use core::panic;
 
-use crate::register::{effective_address, Register};
+use crate::register::{effective_address, Register, SegmentRegister};
 
 use super::operation::Operation;
 
@@ -49,6 +49,10 @@ fn dump_immediate(op: &Operation) {
     }
 }
 
+fn dump_segment_register(seg_reg: u8) {
+    print!("{}:", SegmentRegister::from_u8(seg_reg));
+}
+
 pub fn move1(op: &Operation) {
     dump_common(op);
     dump_space();
@@ -80,6 +84,27 @@ pub fn move3(op: &Operation) {
     dump_reg(op.reg, op.w);
     dump_comma();
     dump_immediate(&op);
+}
+
+pub fn push1(op: &Operation) {
+    // Register/Memory
+    dump_common(op);
+    dump_space();
+    dump_ea(op);
+}
+
+pub fn push2(op: &Operation) {
+    // Register
+    dump_common(op);
+    dump_space();
+    dump_reg(op.reg, 1);
+}
+
+pub fn push3(op: &Operation) {
+    // Segment Register
+    dump_common(op);
+    dump_space();
+    dump_segment_register(op.reg);
 }
 
 pub fn add1(op: &Operation) {

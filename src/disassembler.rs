@@ -32,8 +32,6 @@ impl Disassembler {
         let metadata =
             Metadata::from_bytes(header.try_into().expect("Failed to read metadata section"));
 
-        dbg!(&metadata);
-
         let text = read_bytes(&mut reader, metadata.text as usize);
         Disassembler { text, text_pos: 0 }
     }
@@ -139,15 +137,18 @@ impl Disassembler {
                     panic!("Invalid operation. reg must be 0b0xx in this operation");
                 }
             }
-            0b101_0000..=0b101_0111 => {
+            // Push
+            0b0101_0000..=0b0101_0111 => {
                 // Register
                 op.operation_type = OperationType::Push;
                 op.reg = instruction & 0b111;
+                dump::push2(&op);
             }
             0b0000_0110 | 0b0000_1110 | 0b0001_0110 | 0b0001_1110 => {
                 // Segment Register
                 op.operation_type = OperationType::Push;
                 op.reg = instruction >> 3 & 0b111;
+                dump::push3(&op);
             }
             // Pop
             0b1000_1111 => {
@@ -672,12 +673,15 @@ impl Disassembler {
                 let mod_reg_rm = self.next_byte(&mut op);
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
-                op.operation_type = match op.reg {
-                    0b110 => OperationType::Push,
-                    0b000 => OperationType::Inc,
-                    0b001 => OperationType::Dec,
-                    0b010 | 0b011 => OperationType::Call,
-                    0b100 | 0b101 => OperationType::Jmp,
+                match op.reg {
+                    0b110 => {
+                        op.operation_type = OperationType::Push;
+                        dump::push1(&op);
+                    }
+                    0b000 => op.operation_type = OperationType::Inc,
+                    0b001 => op.operation_type = OperationType::Dec,
+                    0b010 | 0b011 => op.operation_type = OperationType::Call,
+                    0b100 | 0b101 => op.operation_type = OperationType::Jmp,
                     _ => {
                         panic!("Invalid operation. reg is invalid");
                     }

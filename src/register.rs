@@ -24,7 +24,7 @@ impl Display for Register {
     }
 }
 
-enum Register16Bit {
+pub enum Register16Bit {
     AX,
     CX,
     DX,
@@ -67,7 +67,7 @@ impl Display for Register16Bit {
     }
 }
 
-enum Register8Bit {
+pub enum Register8Bit {
     AL,
     CL,
     DL,
@@ -171,5 +171,36 @@ mod tests {
     fn test_effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8, expected: &str) {
         let result = effective_address(rm, mod_rm, disp, w);
         assert_eq!(result, expected);
+    }
+}
+
+pub enum SegmentRegister {
+    ES,
+    CS,
+    SS,
+    DS,
+}
+
+impl SegmentRegister {
+    pub fn from_u8(value: u8) -> Self {
+        match value {
+            0b00 => SegmentRegister::ES,
+            0b01 => SegmentRegister::CS,
+            0b10 => SegmentRegister::SS,
+            0b11 => SegmentRegister::DS,
+            _ => panic!("Invalid segment register value"),
+        }
+    }
+}
+
+impl Display for SegmentRegister {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            SegmentRegister::ES => "ES",
+            SegmentRegister::CS => "CS",
+            SegmentRegister::SS => "SS",
+            SegmentRegister::DS => "DS",
+        };
+        write!(f, "{}", name)
     }
 }
