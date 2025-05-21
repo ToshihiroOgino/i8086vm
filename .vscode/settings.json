@@ -12,6 +12,7 @@
         "Jnge",
         "Lahf",
         "Lods",
+        "mmvm",
         "Movs",
         "Popf",
         "Pushf",
