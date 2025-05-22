@@ -1,10 +1,29 @@
 use core::panic;
 
-use crate::register::{
-    calc_relative_disp, effective_address, Register, Register16Bit, SegmentRegister,
+use crate::{
+    operation::OperationType,
+    register::{
+        calc_relative_disp, effective_address, Register, Register16Bit, Register8Bit,
+        SegmentRegister,
+    },
 };
 
 use super::operation::Operation;
+
+fn dump_type(op_type: &OperationType, w: u8) {
+    let type_str = match op_type {
+        OperationType::Movs => {
+            let str = op_type.to_string();
+            if w == 0 {
+                format!("{str}B")
+            } else {
+                format!("{str}W")
+            }
+        }
+        _ => format!("{op_type}"),
+    };
+    print!("{type_str}");
+}
 
 fn dump_op_info(op: &Operation) {
     let mut bytes = String::new();
@@ -15,11 +34,8 @@ fn dump_op_info(op: &Operation) {
     for _ in bytes.len()..14 {
         bytes.push(' ');
     }
-    print!(
-        "{pos:04x}: {bytes}{op_type}",
-        pos = op.pos,
-        op_type = op.operation_type
-    );
+    print!("{pos:04x}: {bytes}", pos = op.pos);
+    dump_type(&op.operation_type, op.w);
 }
 
 fn dump_comma() {
@@ -41,10 +57,17 @@ fn dump_ea(op: &Operation) {
 
 fn dump_immediate(op: &Operation) {
     match op.w {
-        0 => print!("{:02x}", op.data),
+        0 => print!("{:x}", op.data),
         1 => match op.s {
             0 => print!("{:04x}", op.data),
-            1 => print!("{:x}", op.data as i16),
+            1 => {
+                let data = op.data as i8;
+                if data >= 0 {
+                    print!("{:x}", data)
+                } else {
+                    print!("-{:x}", data.abs())
+                }
+            }
             _ => panic!("Invalid s"),
         },
         _ => panic!("Invalid w"),
@@ -64,9 +87,30 @@ fn dump_port(port: u8) {
     print!("{:02x}", port);
 }
 
-// --- Dump Operation ---
+fn dump_byte() {
+    print!("Byte");
+}
 
-pub fn move1(op: &Operation) {
+fn dump_short() {
+    print!("Short");
+}
+
+fn dump_count(v: u8) {
+    match v {
+        0 => print!("1"),
+        1 => print!("{}", Register8Bit::CL),
+        _ => panic!("Invalid v"),
+    }
+}
+
+// --- Dump Operation ---
+pub fn name(op: &Operation) {
+    dump_op_info(op);
+}
+
+pub fn simple_calc1(op: &Operation) {
+    // Add, Sub, etc...
+    // Reg./Memory with Register to Either
     dump_op_info(op);
     dump_space();
     match op.d {
@@ -84,15 +128,23 @@ pub fn move1(op: &Operation) {
     }
 }
 
-pub fn move2(op: &Operation) {
+pub fn simple_calc2(op: &Operation) {
+    // Add, Sub, etc...
+    // Immediate to Register/Memory
     dump_op_info(op);
     dump_space();
+    if op.w == 0 {
+        dump_byte();
+        dump_space();
+    }
     dump_ea(op);
     dump_comma();
     dump_immediate(op);
 }
 
-pub fn move3(op: &Operation) {
+pub fn simple_calc3(op: &Operation) {
+    // Add, Sub, etc...
+    // Immediate to Accumulator
     dump_op_info(op);
     dump_space();
     dump_reg(op.reg, op.w);
@@ -100,38 +152,22 @@ pub fn move3(op: &Operation) {
     dump_immediate(&op);
 }
 
-pub fn push1(op: &Operation) {
+pub fn stack1(op: &Operation) {
     // Register/Memory
     dump_op_info(op);
     dump_space();
     dump_ea(op);
 }
 
-pub fn push2(op: &Operation) {
+pub fn stack2(op: &Operation) {
+    // Register
     dump_op_info(op);
     dump_space();
     dump_reg(op.reg, 1);
 }
 
-pub fn push3(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_segment_register(op.reg);
-}
-
-pub fn pop1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-}
-
-pub fn pop2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, 1);
-}
-
-pub fn pop3(op: &Operation) {
+pub fn stack3(op: &Operation) {
+    // Segment Register
     dump_op_info(op);
     dump_space();
     dump_segment_register(op.reg);
@@ -161,103 +197,43 @@ pub fn lea(op: &Operation) {
     dump_ea(op);
 }
 
-pub fn add1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
-    }
-}
-
-pub fn add2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-    dump_comma();
-    dump_immediate(op);
-}
-
-pub fn inc1(op: &Operation) {
+pub fn inc_dec1(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_ea(op);
 }
 
-pub fn inc2(op: &Operation) {
+pub fn inc_dec2(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_reg(op.reg, op.w);
 }
 
-pub fn sub1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
-    }
-}
-
-pub fn sub2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(&op);
-    dump_comma();
-    dump_immediate(&op);
-}
-
-pub fn sub3(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_segment_register(op.reg);
-    dump_comma();
-    dump_immediate(op);
-}
-
-pub fn ssb1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
-    }
-}
-
-pub fn neg(op: &Operation) {
+pub fn complicate_calc(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_ea(op);
 }
 
-pub fn cmp2(op: &Operation) {
+pub fn bit_op1(op: &Operation) {
+    dump_op_info(op);
+    dump_space();
+    match op.d {
+        0 => {
+            dump_ea(op);
+            dump_comma();
+            dump_reg(op.reg, op.w);
+        }
+        1 => {
+            dump_reg(op.reg, op.w);
+            dump_comma();
+            dump_ea(op);
+        }
+        _ => panic!("Invalid d"),
+    }
+}
+
+pub fn bit_op2(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_ea(op);
@@ -265,48 +241,42 @@ pub fn cmp2(op: &Operation) {
     dump_immediate(op);
 }
 
-pub fn cbw(op: &Operation) {
-    dump_op_info(op);
-}
-
-pub fn cwd(op: &Operation) {
-    dump_op_info(op);
-}
-
-pub fn or1(op: &Operation) {
+pub fn bit_op3(op: &Operation) {
     dump_op_info(op);
     dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
-    }
+    dump_reg(op.reg, op.w);
+    dump_comma();
+    dump_immediate(op);
 }
 
-pub fn xor1(op: &Operation) {
+pub fn rep(op: &Operation) {
     dump_op_info(op);
     dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
+    let repeat = match op.repeat {
+        Some(ref repeat) => repeat,
+        None => panic!("Invalid repeat"),
+    };
+    dump_type(&repeat.operation_type, repeat.w);
+}
+
+pub fn shift_rotate(op: &Operation) {
+    dump_op_info(op);
+    dump_space();
+    dump_ea(op);
+    dump_comma();
+    dump_count(op.v);
+}
+
+pub fn test2(op: &Operation) {
+    dump_op_info(op);
+    dump_space();
+    if op.w == 0 {
+        dump_byte();
+        dump_space();
     }
+    dump_ea(op);
+    dump_comma();
+    dump_immediate(op);
 }
 
 pub fn call1(op: &Operation) {
@@ -324,13 +294,9 @@ pub fn jmp1(op: &Operation) {
 pub fn jmp2(op: &Operation) {
     dump_op_info(op);
     dump_space();
-    print!("short");
+    dump_short();
     dump_space();
     dump_relative_disp(op, false);
-}
-
-pub fn ret1(op: &Operation) {
-    dump_op_info(op);
 }
 
 pub fn jump(op: &Operation) {

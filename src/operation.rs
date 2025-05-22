@@ -139,7 +139,7 @@ impl Display for OperationType {
             OperationType::Cbw => "CBW",
             OperationType::Cwd => "CWD",
             OperationType::Not => "NOT",
-            OperationType::ShlSal => "SHL/SAL",
+            OperationType::ShlSal => "SHL",
             OperationType::Shr => "SHR",
             OperationType::Sar => "SAR",
             OperationType::Rol => "ROL",
@@ -214,6 +214,7 @@ pub struct Operation {
     pub port: u8,
     pub disp: Option<u16>,
     pub int_type: u8,
+    pub repeat: Option<Box<Operation>>,
 }
 
 impl Operation {
@@ -234,6 +235,7 @@ impl Operation {
             port: 0,
             disp: None,
             int_type: 0,
+            repeat: None,
         }
     }
 
