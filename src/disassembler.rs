@@ -123,8 +123,10 @@ impl Disassembler {
                 // Accumulator to Memory
                 op.operation_type = OperationType::Mov;
                 op.w = instruction & 1;
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
             }
             0b1000_1110 | 0b1000_1100 => {
                 // Register to Segment Register
@@ -160,16 +162,19 @@ impl Disassembler {
                 if op.reg != 0b110 {
                     panic!("Invalid operation. reg must be 0b110 in this operation");
                 }
+                dump::pop1(&op);
             }
             0b0101_1000..=0b0101_1111 => {
                 // Register
                 op.operation_type = OperationType::Pop;
                 op.reg = instruction & 0b111;
+                dump::pop2(&op);
             }
             0b0000_0111 | 0b0000_1111 | 0b0001_0111 | 0b0001_1111 => {
                 // Segment Register
                 op.operation_type = OperationType::Pop;
                 op.reg = instruction >> 3 & 0b111;
+                dump::pop3(&op);
             }
             // Xchg
             0b1000_0110 | 0b1000_0111 => {
@@ -191,11 +196,13 @@ impl Disassembler {
                 op.operation_type = OperationType::In;
                 op.w = instruction & 1;
                 op.port = self.next_byte(&mut op);
+                dump::in1(&op);
             }
             0b1110_1100 | 0b1110_1101 => {
                 // Variable Port
                 op.operation_type = OperationType::In;
                 op.w = instruction & 1;
+                dump::in2(&op);
             }
             // Out
             0b1110_0110 | 0b1110_0111 => {
@@ -219,6 +226,7 @@ impl Disassembler {
                 let mod_reg_rm = self.next_byte(&mut op);
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
+                dump::lea(&op);
             }
             // Lds
             0b1100_0101 => {
@@ -303,11 +311,13 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
                 op.w = instruction & 1;
+                dump::inc1(&op);
             }
             0b0100_0000..=0b0100_0111 => {
                 // Register
                 op.operation_type = OperationType::Inc;
                 op.reg = instruction & 0b111;
+                dump::inc2(&op);
             }
             // Aaa
             0b0011_0111 => {
@@ -326,6 +336,7 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                dump::sub1(&op);
             }
             0b0010_1100 | 0b0010_1101 => {
                 // Immediate from Accumulator
@@ -336,8 +347,9 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                dump::sub3(&op);
             }
-            // Sbb
+            // Ssb
             0b0001_1000..=0b0001_1011 => {
                 // Register/Memory with Register to Either
                 op.operation_type = OperationType::Sbb;
@@ -346,6 +358,7 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                dump::ssb1(&op);
             }
             0b0001_1100 | 0b0001_1101 => {
                 // データシートの誤植
@@ -396,10 +409,12 @@ impl Disassembler {
             // Cbw
             0b1001_1000 => {
                 op.operation_type = OperationType::Cbw;
+                dump::cbw(&op);
             }
             // Cwd
             0b1001_1001 => {
                 op.operation_type = OperationType::Cwd;
+                dump::cwd(&op);
             }
 
             // --- Logic ---
@@ -450,6 +465,7 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                dump::or1(&op);
             }
             0b0000_1100 | 0b0000_1101 => {
                 // Immediate with Accumulator
@@ -470,6 +486,7 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                dump::xor1(&op);
             }
             0b0011_0100 | 0b0011_0101 => {
                 // Immediate with Accumulator
@@ -508,61 +525,103 @@ impl Disassembler {
             0b1110_1000 => {
                 // Direct within Segment
                 op.operation_type = OperationType::Call;
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
+                dump::call1(&op);
             }
             0b1001_1010 => {
                 // Direct Intersegment
                 op.operation_type = OperationType::Call;
                 // offset-low offset-high
                 // seg-low seg-high
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
             }
             // Jmp
             0b1110_1001 => {
                 // Direct within Segment
                 op.operation_type = OperationType::Jmp;
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
+                dump::jmp1(&op);
             }
             0b1110_1011 => {
                 // Direct within Segment-Short
                 op.operation_type = OperationType::Jmp;
                 op.disp = Some(self.next_byte(&mut op) as u16);
+                dump::jmp2(&op);
             }
             0b1110_1010 => {
                 op.operation_type = OperationType::Jmp;
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
             }
             // Ret
             0b1100_0011 | 0b1100_1011 => {
                 // Within Segment
                 // Intersegment
                 op.operation_type = OperationType::Ret;
+                dump::ret1(&op);
             }
             0b1100_0010 | 0b1100_1010 => {
                 // Within Segment Adding Immed to Sp
                 // Within Segment Adding Immediate to Sp
                 op.operation_type = OperationType::Ret;
-                op.low = self.next_byte(&mut op);
-                op.high = self.next_byte(&mut op);
+                op.disp = Some(u16::from_le_bytes([
+                    self.next_byte(&mut op),
+                    self.next_byte(&mut op),
+                ]));
             }
             // Jump
             0b0111_0000..=0b0111_1111 => {
-                op.operation_type = OperationType::Jump;
+                op.operation_type = match instruction & 0b1111 {
+                    0b0000 => OperationType::Jo,
+                    0b0001 => OperationType::Jno,
+                    0b0010 => OperationType::JbJnae,
+                    0b0011 => OperationType::JnbJae,
+                    0b0100 => OperationType::JeJz,
+                    0b0101 => OperationType::JneJnz,
+                    0b0110 => OperationType::JbeJna,
+                    0b0111 => OperationType::JnbeJa,
+                    0b1000 => OperationType::Js,
+                    0b1001 => OperationType::Jns,
+                    0b1010 => OperationType::JpJpe,
+                    0b1011 => OperationType::JnpJpo,
+                    0b1100 => OperationType::JlJnge,
+                    0b1101 => OperationType::JnlJge,
+                    0b1110 => OperationType::JleJng,
+                    0b1111 => OperationType::JnleJg,
+                    _ => {
+                        panic!("This code is not reachable");
+                    }
+                };
                 op.disp = Some(self.next_byte(&mut op) as u16);
+                dump::jump(&op);
             }
             // Loop
             0b1110_0000..=0b1110_0010 => {
-                op.operation_type = OperationType::Loop;
+                op.operation_type = match instruction & 0b11 {
+                    0b00 => OperationType::LoopnzLoopne,
+                    0b01 => OperationType::LoopzLoope,
+                    0b10 => OperationType::Loop,
+                    _ => {
+                        panic!("This code is not reachable");
+                    }
+                };
                 op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Jump
             0b1110_0011 => {
                 // Jump on CX Zero
-                op.operation_type = OperationType::Jump;
+                op.operation_type = OperationType::Jcxz;
                 op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Int
@@ -639,6 +698,7 @@ impl Disassembler {
                 match op.reg {
                     0b000 => {
                         op.operation_type = OperationType::Add;
+                        dump::add2(&op);
                     }
                     0b010 => {
                         op.operation_type = OperationType::Adc;
@@ -652,6 +712,7 @@ impl Disassembler {
                     }
                     0b111 => {
                         op.operation_type = OperationType::Cmp;
+                        dump::cmp2(&op);
                     }
                     0b100 => {
                         op.operation_type = OperationType::And;
@@ -693,13 +754,16 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
                 op.w = instruction & 1;
-                op.operation_type = match op.reg {
-                    0b011 => OperationType::Neg,
-                    0b100 => OperationType::Mul,
-                    0b101 => OperationType::Imul,
-                    0b110 => OperationType::Div,
-                    0b111 => OperationType::Idiv,
-                    0b010 => OperationType::Not,
+                match op.reg {
+                    0b011 => {
+                        op.operation_type = OperationType::Neg;
+                        dump::neg(&op);
+                    }
+                    0b100 => op.operation_type = OperationType::Mul,
+                    0b101 => op.operation_type = OperationType::Imul,
+                    0b110 => op.operation_type = OperationType::Div,
+                    0b111 => op.operation_type = OperationType::Idiv,
+                    0b010 => op.operation_type = OperationType::Not,
                     0b000 => {
                         // Immediate Data and Register/Memory
                         op.data = if op.w == 1 {
@@ -709,7 +773,7 @@ impl Disassembler {
                             // 8-bit immediate
                             self.next_byte(&mut op) as u16
                         };
-                        OperationType::Test
+                        op.operation_type = OperationType::Test;
                     }
                     _ => {
                         panic!("Invalid operation. reg is invalid");
