@@ -20,6 +20,7 @@
         "Loopz",
         "mmvm",
         "Movs",
+        "MOVSW",
         "Popf",
         "Pushf",
         "Sahf",
