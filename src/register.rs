@@ -146,7 +146,14 @@ pub fn effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8) -> String
                 format!("[{base}-{disp_signed:x}]", disp_signed = disp_signed.abs())
             }
         }
-        0b10 => format!("[{base}+{disp:x}]", disp = get_some_disp(disp)),
+        0b10 => {
+            let disp_signed = get_some_disp(disp) as i16;
+            if disp_signed >= 0 {
+                format!("[{base}+{disp:x}]", disp = disp_signed)
+            } else {
+                format!("[{base}-{disp:x}]", disp = disp_signed.abs())
+            }
+        }
         0b11 => format!("{reg}", reg = Register::new(rm, w)),
         _ => panic!("Invalid mod"),
     }

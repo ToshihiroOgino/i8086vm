@@ -70,7 +70,7 @@ impl Disassembler {
         op.pos = self.text_pos;
         let instruction = self.next_byte(&mut op);
 
-        if self.text_pos >= self.text.len() {
+        if self.text_pos >= self.text.len() && instruction == 0 {
             op.operation_type = OperationType::Undefined;
             dump::none(&op);
             return op;
@@ -87,7 +87,6 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
-
                 dump::simple_calc1(&op);
             }
             0b1100_0110 | 0b1100_0111 => {
@@ -118,15 +117,21 @@ impl Disassembler {
                 }
                 dump::simple_calc3(&op);
             }
-            0b1010_0000 | 0b1010_0001 => {
+            0b1010_0000..=0b1010_0011 => {
                 // Memory to Accumulator
                 // Accumulator to Memory
                 op.operation_type = OperationType::Mov;
                 op.w = instruction & 1;
+                op.rm = 0b110;
                 op.disp = Some(u16::from_le_bytes([
                     self.next_byte(&mut op),
                     self.next_byte(&mut op),
                 ]));
+                match (instruction >> 1) & 1 {
+                    0 => dump::mov4(&op),
+                    1 => dump::mov5(&op),
+                    _ => panic!("Invalid operation"),
+                }
             }
             0b1000_1110 | 0b1000_1100 => {
                 // Register to Segment Register
@@ -184,11 +189,13 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
                 op.w = instruction & 1;
+                dump::xchg1(&op);
             }
             0b1001_0000..=0b1001_0111 => {
                 // Register with Accumulator
                 op.operation_type = OperationType::Xchg;
                 op.reg = instruction & 0b111;
+                dump::xchg2(&op);
             }
             // In
             0b1110_0100 | 0b1110_0101 => {
@@ -269,7 +276,6 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
-
                 dump::simple_calc1(&op);
             }
             0b0000_0100 | 0b0000_0101 => {
@@ -282,6 +288,7 @@ impl Disassembler {
                 } else {
                     op.data = self.next_byte(&mut op) as u16;
                 }
+                dump::simple_calc3(&op);
             }
             // Adc
             0b0001_0000..=0b0001_0011 => {
@@ -517,11 +524,18 @@ impl Disassembler {
             0b1111_0010 | 0b1111_0011 => {
                 op.operation_type = OperationType::Rep;
                 op.z = instruction & 1;
-                let repeat_op: Operation = self.next_operation();
-                for raw in repeat_op.raws.iter() {
-                    op.raws.push(*raw);
-                }
-                op.repeat = Some(Box::new(repeat_op));
+                let next_op = self.next_byte(&mut op);
+                op.rep_operation_type = match next_op >> 1 & 0b111 {
+                    0b010 => OperationType::Movs,
+                    0b011 => OperationType::Cmps,
+                    0b111 => OperationType::Scas,
+                    0b110 => OperationType::Lods,
+                    0b101 => OperationType::Stos,
+                    _ => {
+                        panic!("Invalid operation. {next_op:04x}");
+                    }
+                };
+                op.w = next_op & 1;
                 dump::rep(&op);
             }
             // Movs/Cmps/Scas/Lods/Stos
@@ -537,6 +551,7 @@ impl Disassembler {
                         panic!("Invalid operation. reg is invalid");
                     }
                 };
+                dump::name(&op);
             }
 
             // --- Control Transfer ---
@@ -598,6 +613,11 @@ impl Disassembler {
                     self.next_byte(&mut op),
                     self.next_byte(&mut op),
                 ]));
+                if instruction & 0b1000 == 1 {
+                    panic!("Not implemented yet");
+                } else {
+                    dump::ret2(&op);
+                }
             }
             // Jump
             0b0111_0000..=0b0111_1111 => {
@@ -627,15 +647,18 @@ impl Disassembler {
             }
             // Loop
             0b1110_0000..=0b1110_0010 => {
-                op.operation_type = match instruction & 0b11 {
-                    0b00 => OperationType::LoopnzLoopne,
-                    0b01 => OperationType::LoopzLoope,
-                    0b10 => OperationType::Loop,
+                op.disp = Some(self.next_byte(&mut op) as u16);
+                match instruction & 0b11 {
+                    0b10 => {
+                        op.operation_type = OperationType::Loop;
+                        dump::loop1(&op);
+                    }
+                    0b01 => op.operation_type = OperationType::LoopzLoope,
+                    0b00 => op.operation_type = OperationType::LoopnzLoopne,
                     _ => {
                         panic!("This code is not reachable");
                     }
                 };
-                op.disp = Some(self.next_byte(&mut op) as u16);
             }
             // Jump
             0b1110_0011 => {
