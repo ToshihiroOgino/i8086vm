@@ -214,7 +214,7 @@ pub struct Operation {
     pub port: u8,
     pub disp: Option<u16>,
     pub int_type: u8,
-    pub repeat: Option<Box<Operation>>,
+    pub rep_operation_type: OperationType,
 }
 
 impl Operation {
@@ -235,7 +235,7 @@ impl Operation {
             port: 0,
             disp: None,
             int_type: 0,
-            repeat: None,
+            rep_operation_type: OperationType::Undefined,
         }
     }
 

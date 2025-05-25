@@ -12,7 +12,11 @@ use super::operation::Operation;
 
 fn dump_type(op_type: &OperationType, w: u8) {
     let type_str = match op_type {
-        OperationType::Movs => {
+        OperationType::Movs
+        | OperationType::Cmps
+        | OperationType::Scas
+        | OperationType::Lods
+        | OperationType::Stos => {
             let str = op_type.to_string();
             if w == 0 {
                 format!("{str}B")
@@ -78,6 +82,16 @@ fn dump_segment_register(seg_reg: u8) {
     print!("{}", SegmentRegister::from_u8(seg_reg));
 }
 
+fn dump_absolute_disp(disp: Option<u16>) {
+    print!(
+        "{:04x}",
+        match disp {
+            Some(d) => d,
+            None => panic!("Invalid displacement"),
+        }
+    );
+}
+
 fn dump_relative_disp(op: &Operation, is_2byte_disp: bool) {
     let offset = op.get_next_operation_pos();
     print!("{:04x}", calc_relative_disp(offset, op.disp, is_2byte_disp));
@@ -108,6 +122,24 @@ pub fn name(op: &Operation) {
     dump_op_info(op);
 }
 
+pub fn mov4(op: &Operation) {
+    // Memory to Accumulator
+    dump_op_info(op);
+    dump_space();
+    print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
+    dump_comma();
+    dump_ea(op);
+}
+
+pub fn mov5(op: &Operation) {
+    // Accumulator to Memory
+    dump_op_info(op);
+    dump_space();
+    dump_ea(op);
+    dump_comma();
+    print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
+}
+
 pub fn simple_calc1(op: &Operation) {
     // Add, Sub, etc...
     // Reg./Memory with Register to Either
@@ -133,7 +165,7 @@ pub fn simple_calc2(op: &Operation) {
     // Immediate to Register/Memory
     dump_op_info(op);
     dump_space();
-    if op.w == 0 {
+    if op.mod_rm != 0b11 && op.w == 0 {
         dump_byte();
         dump_space();
     }
@@ -171,6 +203,24 @@ pub fn stack3(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_segment_register(op.reg);
+}
+
+pub fn xchg1(op: &Operation) {
+    // Register/Memory with Register
+    dump_op_info(op);
+    dump_space();
+    dump_ea(op);
+    dump_comma();
+    dump_reg(op.reg, op.w);
+}
+
+pub fn xchg2(op: &Operation) {
+    // Register with Accumulator
+    dump_op_info(op);
+    dump_space();
+    dump_reg(op.reg, 1);
+    dump_comma();
+    print!("{acc_reg}", acc_reg = Register16Bit::AX);
 }
 
 pub fn in1(op: &Operation) {
@@ -233,14 +283,6 @@ pub fn bit_op1(op: &Operation) {
     }
 }
 
-pub fn bit_op2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-    dump_comma();
-    dump_immediate(op);
-}
-
 pub fn bit_op3(op: &Operation) {
     dump_op_info(op);
     dump_space();
@@ -252,11 +294,7 @@ pub fn bit_op3(op: &Operation) {
 pub fn rep(op: &Operation) {
     dump_op_info(op);
     dump_space();
-    let repeat = match op.repeat {
-        Some(ref repeat) => repeat,
-        None => panic!("Invalid repeat"),
-    };
-    dump_type(&repeat.operation_type, repeat.w);
+    dump_type(&op.rep_operation_type, op.w);
 }
 
 pub fn shift_rotate(op: &Operation) {
@@ -299,7 +337,19 @@ pub fn jmp2(op: &Operation) {
     dump_relative_disp(op, false);
 }
 
+pub fn ret2(op: &Operation) {
+    dump_op_info(op);
+    dump_space();
+    dump_absolute_disp(op.disp);
+}
+
 pub fn jump(op: &Operation) {
+    dump_op_info(op);
+    dump_space();
+    dump_relative_disp(op, false);
+}
+
+pub fn loop1(op: &Operation) {
     dump_op_info(op);
     dump_space();
     dump_relative_disp(op, false);
