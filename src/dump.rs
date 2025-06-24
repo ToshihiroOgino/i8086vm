@@ -117,256 +117,391 @@ fn dump_count(v: u8) {
     }
 }
 
-// --- Dump Operation ---
-pub fn name(op: &Operation) {
-    dump_op_info(op);
+pub struct Dump {
+    pub enabled: bool,
 }
 
-pub fn mov4(op: &Operation) {
-    // Memory to Accumulator
-    dump_op_info(op);
-    dump_space();
-    print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
-    dump_comma();
-    dump_ea(op);
-}
-
-pub fn mov5(op: &Operation) {
-    // Accumulator to Memory
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-    dump_comma();
-    print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
-}
-
-pub fn simple_calc1(op: &Operation) {
-    // Add, Sub, etc...
-    // Reg./Memory with Register to Either
-    dump_op_info(op);
-    dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
-        }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
+impl Dump {
+    pub fn new(enabled: bool) -> Self {
+        Self { enabled }
     }
-}
 
-pub fn simple_calc2(op: &Operation) {
-    // Add, Sub, etc...
-    // Immediate to Register/Memory
-    dump_op_info(op);
-    dump_space();
-    if op.mod_rm != 0b11 && op.w == 0 {
-        dump_byte();
+    fn is_enabled(&self) -> bool {
+        self.enabled
+    }
+
+    // --- Dump Operation ---
+    pub fn name(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+        dump_op_info(op);
+    }
+
+    pub fn mov4(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+        // Memory to Accumulator
+        dump_op_info(op);
         dump_space();
+        print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
+        dump_comma();
+        dump_ea(op);
     }
-    dump_ea(op);
-    dump_comma();
-    dump_immediate(op);
-}
 
-pub fn simple_calc3(op: &Operation) {
-    // Add, Sub, etc...
-    // Immediate to Accumulator
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, op.w);
-    dump_comma();
-    dump_immediate(&op);
-}
-
-pub fn stack1(op: &Operation) {
-    // Register/Memory
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-}
-
-pub fn stack2(op: &Operation) {
-    // Register
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, 1);
-}
-
-pub fn stack3(op: &Operation) {
-    // Segment Register
-    dump_op_info(op);
-    dump_space();
-    dump_segment_register(op.reg);
-}
-
-pub fn xchg1(op: &Operation) {
-    // Register/Memory with Register
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-    dump_comma();
-    dump_reg(op.reg, op.w);
-}
-
-pub fn xchg2(op: &Operation) {
-    // Register with Accumulator
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, 1);
-    dump_comma();
-    print!("{acc_reg}", acc_reg = Register16Bit::AX);
-}
-
-pub fn in1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(0b000, op.w);
-    dump_comma();
-    dump_port(op.port);
-}
-
-pub fn in2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(0b000, op.w);
-    dump_comma();
-    print!("{dx_reg}", dx_reg = Register16Bit::DX);
-}
-
-pub fn lea(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, 1);
-    dump_comma();
-    dump_ea(op);
-}
-
-pub fn inc_dec1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-}
-
-pub fn inc_dec2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, op.w);
-}
-
-pub fn complicate_calc(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-}
-
-pub fn bit_op1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    match op.d {
-        0 => {
-            dump_ea(op);
-            dump_comma();
-            dump_reg(op.reg, op.w);
+    pub fn mov5(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
         }
-        1 => {
-            dump_reg(op.reg, op.w);
-            dump_comma();
-            dump_ea(op);
-        }
-        _ => panic!("Invalid d"),
-    }
-}
 
-pub fn bit_op3(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_reg(op.reg, op.w);
-    dump_comma();
-    dump_immediate(op);
-}
-
-pub fn rep(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_type(&op.rep_operation_type, op.w);
-}
-
-pub fn shift_rotate(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_ea(op);
-    dump_comma();
-    dump_count(op.v);
-}
-
-pub fn test2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    if op.w == 0 {
-        dump_byte();
+        // Accumulator to Memory
+        dump_op_info(op);
         dump_space();
+        dump_ea(op);
+        dump_comma();
+        print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
     }
-    dump_ea(op);
-    dump_comma();
-    dump_immediate(op);
-}
 
-pub fn call1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_relative_disp(op, true);
-}
+    pub fn simple_calc1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
 
-pub fn jmp1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_relative_disp(op, true);
-}
+        // Add, Sub, etc...
+        // Reg./Memory with Register to Either
+        dump_op_info(op);
+        dump_space();
+        match op.d {
+            0 => {
+                dump_ea(op);
+                dump_comma();
+                dump_reg(op.reg, op.w);
+            }
+            1 => {
+                dump_reg(op.reg, op.w);
+                dump_comma();
+                dump_ea(op);
+            }
+            _ => panic!("Invalid d"),
+        }
+    }
 
-pub fn jmp2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_short();
-    dump_space();
-    dump_relative_disp(op, false);
-}
+    pub fn simple_calc2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
 
-pub fn ret2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_absolute_disp(op.disp);
-}
+        // Add, Sub, etc...
+        // Immediate to Register/Memory
+        dump_op_info(op);
+        dump_space();
+        if op.mod_rm != 0b11 && op.w == 0 {
+            dump_byte();
+            dump_space();
+        }
+        dump_ea(op);
+        dump_comma();
+        dump_immediate(op);
+    }
 
-pub fn jump(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_relative_disp(op, false);
-}
+    pub fn simple_calc3(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
 
-pub fn loop1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    dump_relative_disp(op, false);
-}
+        // Add, Sub, etc...
+        // Immediate to Accumulator
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, op.w);
+        dump_comma();
+        dump_immediate(&op);
+    }
 
-pub fn int1(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    print!("{:02x}", op.int_type);
-}
+    pub fn stack1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
 
-pub fn int2(op: &Operation) {
-    dump_op_info(op);
-    dump_space();
-    print!("3");
-}
+        // Register/Memory
+        dump_op_info(op);
+        dump_space();
+        dump_ea(op);
+    }
 
-pub fn none(op: &Operation) {
-    dump_op_info(op);
+    pub fn stack2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        // Register
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, 1);
+    }
+
+    pub fn stack3(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        // Segment Register
+        dump_op_info(op);
+        dump_space();
+        dump_segment_register(op.reg);
+    }
+
+    pub fn xchg1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        // Register/Memory with Register
+        dump_op_info(op);
+        dump_space();
+        dump_ea(op);
+        dump_comma();
+        dump_reg(op.reg, op.w);
+    }
+
+    pub fn xchg2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        // Register with Accumulator
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, 1);
+        dump_comma();
+        print!("{acc_reg}", acc_reg = Register16Bit::AX);
+    }
+
+    pub fn in1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_reg(0b000, op.w);
+        dump_comma();
+        dump_port(op.port);
+    }
+
+    pub fn in2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_reg(0b000, op.w);
+        dump_comma();
+        print!("{dx_reg}", dx_reg = Register16Bit::DX);
+    }
+
+    pub fn lea(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, 1);
+        dump_comma();
+        dump_ea(op);
+    }
+
+    pub fn inc_dec1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_ea(op);
+    }
+
+    pub fn inc_dec2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, op.w);
+    }
+
+    pub fn complicate_calc(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_ea(op);
+    }
+
+    pub fn bit_op1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        match op.d {
+            0 => {
+                dump_ea(op);
+                dump_comma();
+                dump_reg(op.reg, op.w);
+            }
+            1 => {
+                dump_reg(op.reg, op.w);
+                dump_comma();
+                dump_ea(op);
+            }
+            _ => panic!("Invalid d"),
+        }
+    }
+
+    pub fn bit_op3(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_reg(op.reg, op.w);
+        dump_comma();
+        dump_immediate(op);
+    }
+
+    pub fn rep(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_type(&op.rep_operation_type, op.w);
+    }
+
+    pub fn shift_rotate(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_ea(op);
+        dump_comma();
+        dump_count(op.v);
+    }
+
+    pub fn test2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        if op.w == 0 {
+            dump_byte();
+            dump_space();
+        }
+        dump_ea(op);
+        dump_comma();
+        dump_immediate(op);
+    }
+
+    pub fn call1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_relative_disp(op, true);
+    }
+
+    pub fn jmp1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_relative_disp(op, true);
+    }
+
+    pub fn jmp2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_short();
+        dump_space();
+        dump_relative_disp(op, false);
+    }
+
+    pub fn ret2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_absolute_disp(op.disp);
+    }
+
+    pub fn jump(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_relative_disp(op, false);
+    }
+
+    pub fn loop1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        dump_relative_disp(op, false);
+    }
+
+    pub fn int1(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        print!("{:02x}", op.int_type);
+    }
+
+    pub fn int2(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+
+        dump_op_info(op);
+        dump_space();
+        print!("3");
+    }
+
+    pub fn none(&self, op: &Operation) {
+        if !self.is_enabled() {
+            return;
+        }
+        dump_op_info(op);
+    }
 }

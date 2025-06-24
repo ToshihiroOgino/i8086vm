@@ -12,9 +12,10 @@ fn main() {
         args::AppMode::Disassemble => {
             // disassembler::disassemble(&config.target);
             let mut disassembler = disassembler::Disassembler::new(&config.target);
+            disassembler.enable_dump();
             disassembler.disassemble();
         }
-        args::AppMode::ExecuteWithLogs => {
+        args::AppMode::Interpreter => {
             println!("Not implemented yet");
         }
         args::AppMode::None => {

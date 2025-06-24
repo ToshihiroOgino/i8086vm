@@ -2,7 +2,7 @@
 pub enum AppMode {
     None,
     Disassemble,
-    ExecuteWithLogs,
+    Interpreter,
 }
 
 pub struct ArgsConfig {
@@ -18,7 +18,7 @@ pub fn parse_args() -> ArgsConfig {
     for arg in args.iter() {
         match arg.as_str() {
             "-d" => mode = AppMode::Disassemble,
-            "-m" => mode = AppMode::ExecuteWithLogs,
+            "-m" => mode = AppMode::Interpreter,
             _ => target = arg.clone(),
         }
     }
