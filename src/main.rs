@@ -15,7 +15,7 @@ fn main() {
             disassembler.enable_dump();
             disassembler.disassemble();
         }
-        args::AppMode::Interpreter => {
+        args::AppMode::Execute => {
             println!("Not implemented yet");
         }
         args::AppMode::None => {
