@@ -2,6 +2,9 @@
 TARGET=$1
 FILES=$(find ./setuptools/tests -maxdepth 1 -name '*.c' -type f | xargs -I x basename x)
 
+# Suppress warnings from the Rust compiler
+export RUSTFLAGS="-Awarnings"
+
 if [ -z "$TARGET" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage:"
     echo "  $0 <target>"
@@ -31,6 +34,6 @@ EXPECTED_FILE="./test/mmvm/$TARGET.out.txt"
 /usr/local/core/bin/mmvm -d $BIN_FILE 2>$EXPECTED_FILE
 
 RES_FILE="./test/res/$TARGET.out.txt"
-cargo run -- -d $BIN_FILE >$RES_FILE
+cargo run --quiet -- -d $BIN_FILE >$RES_FILE
 
 diff -i $RES_FILE $EXPECTED_FILE
