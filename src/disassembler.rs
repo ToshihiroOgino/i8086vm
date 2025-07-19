@@ -1,48 +1,49 @@
-use core::panic;
-use std::{
-    fs::File,
-    io::{stdout, BufReader, Read, Write},
-};
-
 use crate::{
     dump::Dump,
     metadata::Metadata,
-    operation::{Operation, OperationType},
+    operation::{OperandType, Operation, OperationType},
 };
-
-fn read_bytes(reader: &mut BufReader<File>, bytes: usize) -> Vec<u8> {
-    let mut buffer = vec![0; bytes];
-    reader
-        .read_exact(&mut buffer)
-        .expect("Failed to read bytes");
-    buffer
-}
+use core::panic;
+use std::mem::swap;
 
 pub struct Disassembler {
     text: Vec<u8>,
     text_pos: usize,
     dump: Dump,
+    operations: Vec<Operation>,
+}
+
+pub fn disassemble<R: std::io::Read>(
+    mut stream: R,
+    metadata: &Metadata,
+    dump_enabled: bool,
+) -> Vec<Operation> {
+    let mut text: Vec<u8> = vec![0; metadata.text as usize];
+    stream
+        .read_exact(&mut text)
+        .expect("Failed to read text segment from stream");
+
+    let mut disassembler = Disassembler {
+        text,
+        text_pos: 0,
+        dump: Dump::new(dump_enabled),
+        operations: Vec::new(),
+    };
+    disassembler.disassemble_all();
+    disassembler.operations
 }
 
 impl Disassembler {
-    pub fn new(target_path: &str) -> Self {
-        let file = File::open(target_path).expect("Failed to open file");
-        let mut reader = BufReader::new(file);
-
-        let header = read_bytes(&mut reader, 32);
-        let metadata =
-            Metadata::from_bytes(header.try_into().expect("Failed to read metadata section"));
-
-        let text = read_bytes(&mut reader, metadata.text as usize);
+    pub fn new(text: Vec<u8>, metadata: &Metadata, dump_enabled: bool) -> Self {
+        if text.len() != metadata.text as usize {
+            panic!("Text segment size does not match metadata");
+        }
         Disassembler {
             text,
             text_pos: 0,
-            dump: Dump::new(false),
+            dump: Dump::new(dump_enabled),
+            operations: Vec::new(),
         }
-    }
-
-    pub fn enable_dump(&mut self) {
-        self.dump.enabled = true;
     }
 
     fn next_byte(&mut self, op: &mut Operation) -> u8 {
@@ -56,14 +57,14 @@ impl Disassembler {
         match op.mod_rm {
             0b00 => {
                 if op.rm == 0b110 {
-                    op.disp = Some(u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]));
+                    op.disp = u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]);
                 }
             }
             0b01 => {
-                op.disp = Some(self.next_byte(op) as u16);
+                op.disp = self.next_byte(op) as u16;
             }
             0b10 => {
-                op.disp = Some(u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]));
+                op.disp = u16::from_le_bytes([self.next_byte(op), self.next_byte(op)]);
             }
             0b11 => {
                 // No displacement
@@ -96,6 +97,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b1100_0110 | 0b1100_0111 => {
@@ -111,6 +117,8 @@ impl Disassembler {
                 } else {
                     op.data = self.next_byte(&mut op) as u16;
                 }
+                op.first = OperandType::EA;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc2(&op);
             }
             0b1011_0000..=0b1011_1111 => {
@@ -124,6 +132,8 @@ impl Disassembler {
                 } else {
                     op.data = self.next_byte(&mut op) as u16;
                 }
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc3(&op);
             }
             0b1010_0000..=0b1010_0011 => {
@@ -132,13 +142,17 @@ impl Disassembler {
                 op.operation_type = OperationType::Mov;
                 op.w = instruction & 1;
                 op.rm = 0b110;
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
+
+                op.first = OperandType::Reg;
+                op.second = OperandType::EA;
+
                 match (instruction >> 1) & 1 {
                     0 => self.dump.mov4(&op),
-                    1 => self.dump.mov5(&op),
+                    1 => {
+                        swap(&mut op.first, &mut op.second);
+                        self.dump.mov5(&op);
+                    }
                     _ => panic!("Invalid operation"),
                 }
             }
@@ -285,6 +299,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b0000_0100 | 0b0000_0101 => {
@@ -297,6 +316,8 @@ impl Disassembler {
                 } else {
                     op.data = self.next_byte(&mut op) as u16;
                 }
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc3(&op);
             }
             // Adc
@@ -308,6 +329,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b0001_0100 | 0b0001_0101 => {
@@ -319,6 +345,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc3(&op);
             }
             // Inc
@@ -354,6 +382,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b0010_1100 | 0b0010_1101 => {
@@ -365,6 +398,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc3(&op);
             }
             // Ssb
@@ -376,6 +411,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b0001_1100 | 0b0001_1101 => {
@@ -406,6 +446,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.simple_calc1(&op);
             }
             0b0011_1100 | 0b0011_1101 => {
@@ -417,6 +462,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc3(&op);
             }
             // Aas
@@ -568,10 +615,7 @@ impl Disassembler {
             0b1110_1000 => {
                 // Direct within Segment
                 op.operation_type = OperationType::Call;
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
                 self.dump.call1(&op);
             }
             0b1001_1010 => {
@@ -579,33 +623,24 @@ impl Disassembler {
                 op.operation_type = OperationType::Call;
                 // offset-low offset-high
                 // seg-low seg-high
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
             }
             // Jmp
             0b1110_1001 => {
                 // Direct within Segment
                 op.operation_type = OperationType::Jmp;
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
                 self.dump.jmp1(&op);
             }
             0b1110_1011 => {
                 // Direct within Segment-Short
                 op.operation_type = OperationType::Jmp;
-                op.disp = Some(self.next_byte(&mut op) as u16);
+                op.disp = self.next_byte(&mut op) as u16;
                 self.dump.jmp2(&op);
             }
             0b1110_1010 => {
                 op.operation_type = OperationType::Jmp;
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
             }
             // Ret
             0b1100_0011 | 0b1100_1011 => {
@@ -618,10 +653,7 @@ impl Disassembler {
                 // Within Segment Adding Immed to Sp
                 // Within Segment Adding Immediate to Sp
                 op.operation_type = OperationType::Ret;
-                op.disp = Some(u16::from_le_bytes([
-                    self.next_byte(&mut op),
-                    self.next_byte(&mut op),
-                ]));
+                op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
                 if instruction & 0b1000 == 1 {
                     panic!("Not implemented yet");
                 } else {
@@ -651,19 +683,25 @@ impl Disassembler {
                         panic!("This code is not reachable");
                     }
                 };
-                op.disp = Some(self.next_byte(&mut op) as u16);
+                op.disp = self.next_byte(&mut op) as u16;
                 self.dump.jump(&op);
             }
             // Loop
             0b1110_0000..=0b1110_0010 => {
-                op.disp = Some(self.next_byte(&mut op) as u16);
+                op.disp = self.next_byte(&mut op) as u16;
                 match instruction & 0b11 {
                     0b10 => {
                         op.operation_type = OperationType::Loop;
                         self.dump.loop1(&op);
                     }
-                    0b01 => op.operation_type = OperationType::LoopzLoope,
-                    0b00 => op.operation_type = OperationType::LoopnzLoopne,
+                    0b01 => {
+                        op.operation_type = OperationType::LoopzLoope;
+                        panic!("Not implemented yet");
+                    }
+                    0b00 => {
+                        op.operation_type = OperationType::LoopnzLoopne;
+                        panic!("Not implemented yet");
+                    }
                     _ => {
                         panic!("This code is not reachable");
                     }
@@ -673,7 +711,7 @@ impl Disassembler {
             0b1110_0011 => {
                 // Jump on CX Zero
                 op.operation_type = OperationType::Jcxz;
-                op.disp = Some(self.next_byte(&mut op) as u16);
+                op.disp = self.next_byte(&mut op) as u16;
             }
             // Int
             0b1100_1101 => {
@@ -769,6 +807,8 @@ impl Disassembler {
                         panic!("Invalid operation. reg is invalid");
                     }
                 };
+                op.first = OperandType::EA;
+                op.second = OperandType::Imm;
                 self.dump.simple_calc2(&op)
             }
             // Push/Inc/Dec/Call
@@ -872,11 +912,21 @@ impl Disassembler {
         op
     }
 
-    pub fn disassemble(&mut self) {
+    fn disassemble_all(&mut self) {
         while self.text_pos < self.text.len() {
-            self.next_operation();
-            print!("\n");
-            stdout().flush().unwrap();
+            let op = self.next_operation();
+            self.operations.push(op);
+            self.dump.eol();
         }
+    }
+
+    pub fn next(&mut self) -> Option<&Operation> {
+        if self.text_pos >= self.text.len() {
+            return None;
+        }
+        let op = self.next_operation();
+        self.operations.push(op);
+        self.dump.eol();
+        Some(&self.operations[self.operations.len() - 1])
     }
 }

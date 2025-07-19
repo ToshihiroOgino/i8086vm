@@ -1,30 +1,68 @@
 use core::panic;
 use std::fmt::Display;
 
-pub enum Register {
-    Word(Register16Bit),
-    Byte(Register8Bit),
+#[derive(Debug, Default)]
+pub struct Register {
+    reg_16: [u16; 8],
+    reg_8: [u8; 8],
+    reg_seg: [u16; 4],
 }
 
 impl Register {
+    pub fn new() -> Self {
+        Register::default()
+    }
+
+    pub fn get(&self, reg: RegisterType) -> u16 {
+        match reg {
+            RegisterType::Word(r) => self.reg_16[r as usize],
+            RegisterType::Byte(r) => self.reg_8[r as usize] as u16,
+            RegisterType::Segment(seg) => self.reg_seg[seg as usize],
+        }
+    }
+
+    pub fn set(&mut self, reg: RegisterType, value: u16) {
+        match reg {
+            RegisterType::Word(r) => self.reg_16[r as usize] = value,
+            RegisterType::Byte(r) => {
+                if value > u8::MAX as u16 {
+                    panic!("Value exceeds 8-bit register limit");
+                }
+                self.reg_8[r as usize] = value as u8;
+            }
+            RegisterType::Segment(seg) => self.reg_seg[seg as usize] = value,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum RegisterType {
+    Word(Register16Bit),
+    Byte(Register8Bit),
+    Segment(SegmentRegister),
+}
+
+impl RegisterType {
     pub fn new(reg: u8, w: u8) -> Self {
         match w {
-            0 => Register::Byte(Register8Bit::from_u8(reg)),
-            1 => Register::Word(Register16Bit::from_u8(reg)),
+            0 => RegisterType::Byte(Register8Bit::from_u8(reg)),
+            1 => RegisterType::Word(Register16Bit::from_u8(reg)),
             _ => panic!("Invalid register size"),
         }
     }
 }
 
-impl Display for Register {
+impl Display for RegisterType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Register::Word(reg) => write!(f, "{}", reg),
-            Register::Byte(reg) => write!(f, "{}", reg),
+            RegisterType::Word(reg) => write!(f, "{}", reg),
+            RegisterType::Byte(reg) => write!(f, "{}", reg),
+            RegisterType::Segment(seg) => write!(f, "{}", seg),
         }
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Register16Bit {
     AX,
     CX,
@@ -68,6 +106,7 @@ impl Display for Register16Bit {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Register8Bit {
     AL,
     CL,
@@ -111,14 +150,7 @@ impl Display for Register8Bit {
     }
 }
 
-fn get_some_disp(disp: Option<u16>) -> u16 {
-    match disp {
-        Some(d) => d,
-        None => panic!("Invalid displacement"),
-    }
-}
-
-pub fn effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8) -> String {
+pub fn effective_address(rm: u8, mod_rm: u8, disp: u16, w: u8) -> String {
     let base = match rm {
         0b000 => "BX+SI",
         0b001 => "BX+DI",
@@ -133,13 +165,13 @@ pub fn effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8) -> String
     match mod_rm {
         0b00 => {
             if rm == 0b110 {
-                format!("[{disp:04x}]", disp = get_some_disp(disp))
+                format!("[{disp:04x}]", disp = disp)
             } else {
                 format!("[{base}]")
             }
         }
         0b01 => {
-            let disp_signed = get_some_disp(disp) as i8;
+            let disp_signed = disp as i8;
             if disp_signed >= 0 {
                 format!("[{base}+{disp_signed:x}]")
             } else {
@@ -147,33 +179,28 @@ pub fn effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8) -> String
             }
         }
         0b10 => {
-            let disp_signed = get_some_disp(disp) as i16;
+            let disp_signed = disp as i16;
             if disp_signed >= 0 {
                 format!("[{base}+{disp:x}]", disp = disp_signed)
             } else {
                 format!("[{base}-{disp:x}]", disp = disp_signed.abs())
             }
         }
-        0b11 => format!("{reg}", reg = Register::new(rm, w)),
+        0b11 => format!("{reg}", reg = RegisterType::new(rm, w)),
         _ => panic!("Invalid mod"),
     }
     .to_string()
 }
 
-pub fn calc_relative_disp(offset: usize, disp: Option<u16>, is_2byte_disp: bool) -> u16 {
+pub fn calc_relative_disp(offset: usize, disp: u16, is_2byte_disp: bool) -> u16 {
     if offset > u16::MAX as usize {
         panic!("Offset is overflowing");
     }
     let offset = offset as u16;
-    let signed_disp = match disp {
-        Some(d) => {
-            if is_2byte_disp {
-                d as i16
-            } else {
-                (d as i8).into()
-            }
-        }
-        None => panic!("Invalid displacement"),
+    let signed_disp = if is_2byte_disp {
+        disp as i16
+    } else {
+        (disp as i8).into()
     };
     if signed_disp >= 0 {
         offset + signed_disp as u16
@@ -182,6 +209,7 @@ pub fn calc_relative_disp(offset: usize, disp: Option<u16>, is_2byte_disp: bool)
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum SegmentRegister {
     ES,
     CS,
@@ -218,15 +246,15 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case(0b000, 0b11, None, 0, "AL" ; "REG 1")]
-    #[test_case(0b001, 0b11, None, 1, "CX" ; "REG 2")]
-    #[test_case(0b100, 0b00, None, 0, "SI"; "No disp 1")]
-    #[test_case(0b000, 0b00, None, 0, "[BX+SI]"; "No disp 2")]
-    #[test_case(0b110, 0b01, Some(0xee), 0, "[BP-12]" ; "Sign-extended disp")]
-    #[test_case(0b110, 0b10, Some(0x0f), 0, "[BP+f]" ; "r/m + Disp")]
-    #[test_case(0b110, 0b00, Some(0x0f), 0, "[000f]" ; "only Disp")]
-    #[test_case(0b110, 0b01, Some(0x04), 0, "[BP+4]" ; "mod=0b01")]
-    fn test_effective_address(rm: u8, mod_rm: u8, disp: Option<u16>, w: u8, expected: &str) {
+    #[test_case(0b000, 0b11, 0, 0, "AL" ; "REG 1")]
+    #[test_case(0b001, 0b11, 0, 1, "CX" ; "REG 2")]
+    #[test_case(0b100, 0b00, 0, 0, "SI"; "No disp 1")]
+    #[test_case(0b000, 0b00, 0, 0, "[BX+SI]"; "No disp 2")]
+    #[test_case(0b110, 0b01, 0xee, 0, "[BP-12]" ; "Sign-extended disp")]
+    #[test_case(0b110, 0b10, 0x0f, 0, "[BP+f]" ; "r/m + Disp")]
+    #[test_case(0b110, 0b00, 0x0f, 0, "[000f]" ; "only Disp")]
+    #[test_case(0b110, 0b01, 0x04, 0, "[BP+4]" ; "mod=0b01")]
+    fn test_effective_address(rm: u8, mod_rm: u8, disp: u16, w: u8, expected: &str) {
         let result = effective_address(rm, mod_rm, disp, w);
         assert_eq!(result, expected);
     }

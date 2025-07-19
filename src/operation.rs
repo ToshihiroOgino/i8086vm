@@ -1,6 +1,8 @@
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
-#[derive(PartialEq)]
+use crate::register::RegisterType;
+
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperationType {
     Undefined,
     // Data Transfer
@@ -198,6 +200,15 @@ impl Display for OperationType {
     }
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum OperandType {
+    None,
+    Reg,
+    Imm,
+    EA,
+}
+
+#[derive(Debug, Clone)]
 pub struct Operation {
     pub pos: usize,
     pub operation_type: OperationType,
@@ -212,9 +223,11 @@ pub struct Operation {
     pub reg: u8,
     pub data: u16,
     pub port: u8,
-    pub disp: Option<u16>,
+    pub disp: u16,
     pub int_type: u8,
     pub rep_operation_type: OperationType,
+    pub first: OperandType,
+    pub second: OperandType,
 }
 
 impl Operation {
@@ -233,9 +246,11 @@ impl Operation {
             reg: 0,
             data: 0,
             port: 0,
-            disp: None,
+            disp: 0,
             int_type: 0,
             rep_operation_type: OperationType::Undefined,
+            first: OperandType::None,
+            second: OperandType::None,
         }
     }
 
@@ -247,6 +262,10 @@ impl Operation {
 
     pub fn get_next_operation_pos(&self) -> usize {
         self.pos + self.raws.len()
+    }
+
+    pub fn get_register(&self) -> RegisterType {
+        RegisterType::new(self.reg, self.w)
     }
 }
 

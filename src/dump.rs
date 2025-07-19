@@ -3,7 +3,7 @@ use core::panic;
 use crate::{
     operation::OperationType,
     register::{
-        calc_relative_disp, effective_address, Register, Register16Bit, Register8Bit,
+        calc_relative_disp, effective_address, Register16Bit, Register8Bit, RegisterType,
         SegmentRegister,
     },
 };
@@ -51,7 +51,7 @@ fn dump_space() {
 }
 
 fn dump_reg(reg: u8, w: u8) {
-    let reg = Register::new(reg, w);
+    let reg = RegisterType::new(reg, w);
     print!("{reg}");
 }
 
@@ -82,14 +82,8 @@ fn dump_segment_register(seg_reg: u8) {
     print!("{}", SegmentRegister::from_u8(seg_reg));
 }
 
-fn dump_absolute_disp(disp: Option<u16>) {
-    print!(
-        "{:04x}",
-        match disp {
-            Some(d) => d,
-            None => panic!("Invalid displacement"),
-        }
-    );
+fn dump_absolute_disp(disp: u16) {
+    print!("{:04x}", disp);
 }
 
 fn dump_relative_disp(op: &Operation, is_2byte_disp: bool) {
@@ -145,7 +139,7 @@ impl Dump {
         // Memory to Accumulator
         dump_op_info(op);
         dump_space();
-        print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
+        print!("{acc_reg}", acc_reg = RegisterType::new(0b000, op.w));
         dump_comma();
         dump_ea(op);
     }
@@ -160,7 +154,7 @@ impl Dump {
         dump_space();
         dump_ea(op);
         dump_comma();
-        print!("{acc_reg}", acc_reg = Register::new(0b000, op.w));
+        print!("{acc_reg}", acc_reg = RegisterType::new(0b000, op.w));
     }
 
     pub fn simple_calc1(&self, op: &Operation) {
@@ -503,5 +497,13 @@ impl Dump {
             return;
         }
         dump_op_info(op);
+    }
+
+    pub fn eol(&self) {
+        if !self.is_enabled() {
+            return;
+        }
+        println!();
+        // stdout().flush().unwrap();
     }
 }
