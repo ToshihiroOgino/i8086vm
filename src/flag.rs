@@ -7,8 +7,6 @@ pub struct Flag {
     pub overflow: bool,
     pub sign: bool,
     pub zero: bool,
-    pub auxiliary: bool,
-    pub parity: bool,
 }
 
 impl Flag {
@@ -18,9 +16,14 @@ impl Flag {
             overflow: false,
             sign: false,
             zero: false,
-            auxiliary: false,
-            parity: false,
         }
+    }
+
+    pub fn setCOSZ(&mut self, carry: bool, overflow: bool, sign: bool, zero: bool) {
+        self.carry = carry;
+        self.overflow = overflow;
+        self.sign = sign;
+        self.zero = zero;
     }
 }
 

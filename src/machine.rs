@@ -23,6 +23,7 @@ impl Machine {
         metadata: metadata::Metadata,
         args: &[String],
         envs: &[String],
+        debug: bool,
     ) -> Self {
         let mut text = vec![0; metadata.text_size];
         reader
@@ -51,7 +52,7 @@ impl Machine {
             register,
             metadata,
             flag: Flag::new(),
-            dump: Dump::new(true),
+            dump: Dump::new(debug),
         }
     }
 
@@ -178,14 +179,16 @@ impl Machine {
                 if addr >= self.memory.len() {
                     panic!("Memory access out of bounds at address {}", addr);
                 }
-                if op.w == 0 {
+                let value = if op.w == 0 {
                     self.memory[addr] as u16
                 } else {
                     if addr + 1 >= self.memory.len() {
                         panic!("Memory access out of bounds at address {}", addr + 1);
                     }
                     u16::from_le_bytes([self.memory[addr], self.memory[addr + 1]])
-                }
+                };
+                self.dump.address_value(addr, value);
+                value
             }
             OperandType::SegReg => match op.reg {
                 0b00 => self.register.es,
@@ -210,6 +213,8 @@ impl Machine {
                 }
 
                 let addr = self.calc_effective_address(op);
+                self.dump
+                    .address_value_change(addr, self.memory[addr] as u16, value);
                 if addr >= self.memory.len() {
                     panic!("Memory access out of bounds at address {}", addr);
                 }
@@ -230,7 +235,9 @@ impl Machine {
         &self.memory[0..self.metadata.text_size]
     }
     fn get_data_segment(&self) -> &[u8] {
-        &self.memory[self.metadata.text_size..self.metadata.text_size + self.metadata.data_size]
+        let begin = self.metadata.text_size;
+        let end = begin + self.metadata.data_size;
+        &self.memory[begin..end]
     }
 
     fn mov(&mut self, op: &Operation) {
@@ -241,50 +248,81 @@ impl Machine {
     fn add(&mut self, op: &Operation) {
         let left = self.read_operand(op, op.first);
         let right = self.read_operand(op, op.second);
-        let result = left + right;
+        let result = match op.s << 1 | op.w {
+            0b00 => {
+                let res = left + right;
+                let res_u8 = left as u8 + right as u8;
+                self.flag
+                    .setCOSZ(res >= 0x100, res >= 0x100, false, res == 0);
+                res_u8 as u16
+            }
+            0b01 => {
+                let res = left as u16 as i32 + right as u16 as i32;
+                let res_i16 = left + right;
+                self.flag
+                    .setCOSZ(res > 0x10000, res != res_i16 as i32, false, res_i16 == 0);
+                res_i16 as u16
+            }
+            0b11 => {
+                let res = left as i16 as i32 + right as i16 as i32;
+                let res_i16 = left as i16 + right as i16;
+                self.flag.setCOSZ(
+                    res > 0x10000,
+                    res != res_i16 as i32,
+                    res_i16 < 0,
+                    res_i16 == 0,
+                );
+                res_i16 as u16
+            }
+            _ => unreachable!("Invalid operand width"),
+        };
         self.write_operand(op, op.first, result);
     }
 
     fn sub(&mut self, op: &Operation) {
         let left = self.read_operand(op, op.first);
         let right = self.read_operand(op, op.second);
-        let res_i32: i32 = left as i32 - right as i32;
-        let left = match (op.s << 1 | op.w) {
+        let result: u16 = match op.s << 1 | op.w {
             0b00 => {
-                // 1 byte
                 let res_u8 = left as u8 - right as u8;
+                let res = res_u8 as i32;
                 self.flag.zero = res_u8 == 0;
                 self.flag.sign = false;
-                self.flag.overflow = res_u8 as i32 != res_i32;
+                self.flag.overflow = res as i32 != res;
                 self.flag.carry = left < right;
-                res_u8 as u16
+                res as u16
             }
             0b01 => {
-                // 2 bytes
-                let res_i16 = left as i16 - right as i16;
-                self.flag.zero = res_i16 == 0;
-                self.flag.sign = res_i16 < 0;
-                self.flag.overflow = res_i16 as i32 != res_i32;
+                let res_i16: i16 = left as i16 - right as i16;
+                let res = res_i16 as i32;
+                self.flag.zero = res == 0;
+                self.flag.sign = res < 0;
+                self.flag.overflow = res != res_i16 as i32;
                 self.flag.carry = left < right;
                 res_i16 as u16
             }
             0b11 => {
-                // signed
-                let res_i16 = left as i16 - right as u8 as i16;
+                let res_i16: i16 = left as i16 - right as i16;
+                let res = (left as i16 - (right as u8 as i16)) as i32;
                 self.flag.zero = res_i16 == 0;
                 self.flag.sign = res_i16 < 0;
-                self.flag.overflow = res_i16 as i32 != res_i32;
+                self.flag.overflow = res != res_i16 as i32;
                 self.flag.carry = left < right as u8 as u16;
                 res_i16 as u16
             }
             _ => unreachable!("Invalid operand width"),
         };
-        let result = left - right;
         self.write_operand(op, op.first, result);
     }
 
-    fn int(&mut self, _: &Operation) {
-        let msg = Message::load(self.get_data_segment(), self.register.bx as usize);
+    fn int(&mut self) {
+        // let msg = Message::load(self.get_data_segment(), self.register.bx as usize);
+        let addr = self.register.bx as usize;
+        let msg = if addr <= self.metadata.text_size + self.metadata.data_size {
+            Message::load(self.get_data_segment(), addr)
+        } else {
+            Message::load(&self.memory, addr)
+        };
         match msg.message_type {
             1 => {
                 // Exit
@@ -293,7 +331,7 @@ impl Machine {
             }
             4 => {
                 // Write
-                let detail = msg.load_detail1(self.get_data_segment());
+                let detail = msg.load_detail1(&self.memory);
                 let fd = detail.m1i1();
                 let addr = detail.m1p1();
                 let len = detail.m1i2();
@@ -303,6 +341,8 @@ impl Machine {
                 println!("Unhandled interrupt type: {}", msg.message_type);
             }
         }
+        // なんで必要?
+        self.register.ax = 0;
     }
 
     fn push(&mut self, op: &Operation) {
@@ -320,7 +360,7 @@ impl Machine {
         if addr >= self.memory.len() {
             panic!("Memory access out of bounds at address {}", addr);
         }
-        let return_addr = self.register.ip + op.raws.len() as u16;
+        let return_addr = self.register.ip as u16;
         self.stack_push(&return_addr.to_le_bytes());
         self.register.ip = addr as u16;
     }
@@ -333,9 +373,96 @@ impl Machine {
         self.register.ip = addr as u16;
     }
 
+    fn lea(&mut self, op: &Operation) {
+        let addr = self.calc_effective_address(op);
+        self.dump.address_value(addr, self.memory[addr] as u16);
+        if addr >= self.memory.len() {
+            panic!("Memory access out of bounds at address {}", addr);
+        }
+        self.register.set(op.get_register(), addr as u16);
+    }
+
+    fn ret(&mut self) {
+        let return_addr = self.stack_pop_u16();
+        if return_addr as usize >= self.memory.len() {
+            panic!("Memory access out of bounds at address {}", return_addr);
+        }
+        self.register.ip = return_addr;
+        dbg!(return_addr);
+    }
+
+    fn or(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        let result = match op.w {
+            0 => (left as u8 | right as u8) as u16,
+            1 => left | right,
+            _ => unreachable!("Invalid operand width"),
+        };
+        self.flag.setCOSZ(false, false, false, result == 0);
+        self.write_operand(op, op.first, result);
+    }
+
+    fn je(&mut self, op: &Operation) {
+        if self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn cmp(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        match op.s << 1 | op.w {
+            0b00 => {
+                let res_u8 = left as u8 - right as u8;
+                let res = res_u8 as i32;
+                self.flag
+                    .setCOSZ(left < right, res != res_u8 as i32, false, res_u8 == 0);
+            }
+            0b01 => {
+                let res_i16: i16 = left as i16 - right as i16;
+                let res = res_i16 as i32;
+                self.flag.setCOSZ(
+                    left < right as u8 as u16,
+                    res != res_i16 as i32,
+                    res < 0,
+                    res_i16 == 0,
+                );
+            }
+            0b11 => {
+                let res_i16: i16 = left as i16 - right as i16;
+                let res = (left as i16 - (right as u8 as i16)) as i32;
+                self.flag.setCOSZ(
+                    left < right as u8 as u16,
+                    res != res_i16 as i32,
+                    res < 0,
+                    res_i16 == 0,
+                );
+            }
+            _ => unreachable!("Invalid operand width"),
+        };
+    }
+
+    pub fn jnl(&mut self, op: &Operation) {
+        if !self.flag.sign {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
     pub fn run(&mut self) {
-        let mut disassembler =
-            disassembler::Disassembler::new(self.get_text_segment().to_vec(), &self.metadata, true);
+        let mut disassembler = disassembler::Disassembler::new(
+            self.get_text_segment().to_vec(),
+            &self.metadata,
+            self.dump.enabled,
+        );
         self.dump.labels();
         loop {
             if self.stop {
@@ -351,21 +478,28 @@ impl Machine {
                 OperationType::Mov => self.mov(&op),
                 OperationType::Add => self.add(&op),
                 OperationType::Sub => self.sub(&op),
-                OperationType::Int => self.int(&op),
+                OperationType::Int => self.int(),
                 OperationType::Push => self.push(&op),
                 OperationType::Pop => self.pop(&op),
                 OperationType::Call => self.call(&op),
                 OperationType::Jmp => self.jmp(&op),
+                OperationType::Lea => self.lea(&op),
+                OperationType::Ret => self.ret(),
+                OperationType::Or => self.or(&op),
+                OperationType::JeJz => self.je(&op),
+                OperationType::Cmp => self.cmp(&op),
+                OperationType::JnlJge => self.jnl(&op),
                 _ => {
-                    println!("Unknown operation: {:?}", op.operation_type);
+                    println!("\nUnknown operation: {:?}", op.operation_type);
                     self.stop = true;
                 }
             }
+            self.dump.eol();
         }
     }
 
     pub fn exit(&mut self, status: u16) {
-        println!("<exit({})>", status);
+        println!("\n<exit({})>", status);
         self.stop = true;
     }
 
@@ -379,7 +513,7 @@ impl Machine {
         let str = String::from_utf8(data[begin..end].to_vec())
             .unwrap_or_else(|_| panic!("Failed to convert memory to string at address {}", addr));
         print!(
-            "<write(fd={}, addr=0x{:04x}, len={})>{}",
+            "\n<write(fd={}, addr=0x{:04x}, len={})>{}",
             fd, addr, len, str
         );
     }
