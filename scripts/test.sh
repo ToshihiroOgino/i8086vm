@@ -2,6 +2,10 @@
 TARGET=$1
 FILES=$(find ./setuptools/tests -maxdepth 1 -name '*.c' -type f | xargs -I x basename x)
 
+mkdir -p ./test/binary
+mkdir -p ./test/mmvm
+mkdir -p ./test/res
+
 # Suppress warnings from the Rust compiler
 export RUSTFLAGS="-Awarnings"
 
