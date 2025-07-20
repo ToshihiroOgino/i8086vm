@@ -1,3 +1,5 @@
+use std::process::exit;
+
 mod args;
 mod disassembler;
 mod dump;
@@ -40,7 +42,8 @@ fn main() {
             disassembler::disassemble(stream, &metadata, true);
         }
         args::AppMode::Execute => {
-            let mut machine = machine::Machine::new(stream, metadata, &config.argv, &config.envs);
+            let mut machine =
+                machine::Machine::new(stream, metadata, &config.argv, &config.envs, config.debug);
             machine.run();
         }
     }

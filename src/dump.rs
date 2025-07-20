@@ -532,4 +532,23 @@ impl Dump {
             flags = flags,
         );
     }
+
+    pub fn address_value(&self, addr: usize, value: u16) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!(" ;[{addr:04x}]{value:04x}", addr = addr, value = value);
+    }
+
+    pub fn address_value_change(&self, addr: usize, prev_value: u16, new_value: u16) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!(
+            " ;[{addr:04x}]{prev_value:04x}->{new_value:04x}",
+            addr = addr,
+            prev_value = prev_value,
+            new_value = new_value
+        );
+    }
 }

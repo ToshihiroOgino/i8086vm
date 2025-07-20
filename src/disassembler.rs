@@ -534,6 +534,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.bit_op1(&op);
             }
             0b0000_1100 | 0b0000_1101 => {
@@ -782,7 +787,7 @@ impl Disassembler {
             // --- Common ---
             // Add/Adc/Sub/Ssb/Cmp/And
             0b1000_0000..=0b1000_0011 => {
-                // Immediate to Register/Memory
+                // Immediate to/with Register/Memory
                 let mod_reg_rm = self.next_byte(&mut op);
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
@@ -826,6 +831,7 @@ impl Disassembler {
                         panic!("Invalid operation. reg is invalid");
                     }
                 };
+                op.first = OperandType::EA;
                 self.dump.stack1(&op);
             }
             // Neg/Mul/Imul/Div/Idiv/Not
@@ -927,7 +933,6 @@ impl Disassembler {
             return None;
         }
         let op = self.next_operation();
-        self.dump.eol();
         Some(op)
     }
 }
