@@ -1,16 +1,15 @@
 use crate::{
     dump::Dump,
     metadata::Metadata,
-    operation::{OperandType, Operation, OperationType},
+    operation::{self, OperandType, Operation, OperationType},
 };
 use core::panic;
 use std::mem::swap;
 
 pub struct Disassembler {
     text: Vec<u8>,
-    text_pos: usize,
     dump: Dump,
-    operations: Vec<Operation>,
+    text_pos: usize,
 }
 
 pub fn disassemble<R: std::io::Read>(
@@ -18,31 +17,24 @@ pub fn disassemble<R: std::io::Read>(
     metadata: &Metadata,
     dump_enabled: bool,
 ) -> Vec<Operation> {
-    let mut text: Vec<u8> = vec![0; metadata.text as usize];
+    let mut text: Vec<u8> = vec![0; metadata.text_size];
     stream
         .read_exact(&mut text)
         .expect("Failed to read text segment from stream");
 
-    let mut disassembler = Disassembler {
-        text,
-        text_pos: 0,
-        dump: Dump::new(dump_enabled),
-        operations: Vec::new(),
-    };
-    disassembler.disassemble_all();
-    disassembler.operations
+    let mut disassembler = Disassembler::new(text, metadata, dump_enabled);
+    disassembler.disassemble_all()
 }
 
 impl Disassembler {
     pub fn new(text: Vec<u8>, metadata: &Metadata, dump_enabled: bool) -> Self {
-        if text.len() != metadata.text as usize {
+        if text.len() != metadata.text_size {
             panic!("Text segment size does not match metadata");
         }
         Disassembler {
             text,
-            text_pos: 0,
             dump: Dump::new(dump_enabled),
-            operations: Vec::new(),
+            text_pos: 0,
         }
     }
 
@@ -143,10 +135,8 @@ impl Disassembler {
                 op.w = instruction & 1;
                 op.rm = 0b110;
                 op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
-
                 op.first = OperandType::Reg;
                 op.second = OperandType::EA;
-
                 match (instruction >> 1) & 1 {
                     0 => self.dump.mov4(&op),
                     1 => {
@@ -172,12 +162,14 @@ impl Disassembler {
                 // Register
                 op.operation_type = OperationType::Push;
                 op.reg = instruction & 0b111;
+                op.first = OperandType::Reg;
                 self.dump.stack2(&op);
             }
             0b0000_0110 | 0b0000_1110 | 0b0001_0110 | 0b0001_1110 => {
                 // Segment Register
                 op.operation_type = OperationType::Push;
                 op.reg = instruction >> 3 & 0b111;
+                op.first = OperandType::SegReg;
                 self.dump.stack3(&op);
             }
             // Pop
@@ -190,18 +182,21 @@ impl Disassembler {
                 if op.reg != 0b110 {
                     panic!("Invalid operation. reg must be 0b110 in this operation");
                 }
+                op.first = OperandType::EA;
                 self.dump.stack1(&op);
             }
             0b0101_1000..=0b0101_1111 => {
                 // Register
                 op.operation_type = OperationType::Pop;
                 op.reg = instruction & 0b111;
+                op.first = OperandType::Reg;
                 self.dump.stack2(&op);
             }
             0b0000_0111 | 0b0000_1111 | 0b0001_0111 | 0b0001_1111 => {
                 // Segment Register
                 op.operation_type = OperationType::Pop;
                 op.reg = instruction >> 3 & 0b111;
+                op.first = OperandType::SegReg;
                 self.dump.stack3(&op);
             }
             // Xchg
@@ -616,6 +611,7 @@ impl Disassembler {
                 // Direct within Segment
                 op.operation_type = OperationType::Call;
                 op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
+                op.first = OperandType::Disp;
                 self.dump.call1(&op);
             }
             0b1001_1010 => {
@@ -630,15 +626,18 @@ impl Disassembler {
                 // Direct within Segment
                 op.operation_type = OperationType::Jmp;
                 op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
+                op.first = OperandType::Disp;
                 self.dump.jmp1(&op);
             }
             0b1110_1011 => {
                 // Direct within Segment-Short
                 op.operation_type = OperationType::Jmp;
                 op.disp = self.next_byte(&mut op) as u16;
+                op.first = OperandType::Disp;
                 self.dump.jmp2(&op);
             }
             0b1110_1010 => {
+                // Direct Intersegment
                 op.operation_type = OperationType::Jmp;
                 op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
             }
@@ -912,21 +911,23 @@ impl Disassembler {
         op
     }
 
-    fn disassemble_all(&mut self) {
+    fn disassemble_all(&mut self) -> Vec<Operation> {
+        let mut operations = Vec::new();
         while self.text_pos < self.text.len() {
             let op = self.next_operation();
-            self.operations.push(op);
+            operations.push(op);
             self.dump.eol();
         }
+        operations
     }
 
-    pub fn next(&mut self) -> Option<&Operation> {
+    pub fn next(&mut self, ip: u16) -> Option<Operation> {
+        self.text_pos = ip as usize;
         if self.text_pos >= self.text.len() {
             return None;
         }
         let op = self.next_operation();
-        self.operations.push(op);
         self.dump.eol();
-        Some(&self.operations[self.operations.len() - 1])
+        Some(op)
     }
 }

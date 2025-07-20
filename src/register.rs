@@ -3,9 +3,31 @@ use std::fmt::Display;
 
 #[derive(Debug, Default)]
 pub struct Register {
-    reg_16: [u16; 8],
-    reg_8: [u8; 8],
-    reg_seg: [u16; 4],
+    // 16-bit registers
+    pub ax: u16,
+    pub cx: u16,
+    pub dx: u16,
+    pub bx: u16,
+    pub sp: u16,
+    pub bp: u16,
+    pub si: u16,
+    pub di: u16,
+    // 8-bit registers
+    pub al: u8,
+    pub cl: u8,
+    pub dl: u8,
+    pub bl: u8,
+    pub ah: u8,
+    pub ch: u8,
+    pub dh: u8,
+    pub bh: u8,
+    // Segment registers
+    pub es: u16,
+    pub cs: u16,
+    pub ss: u16,
+    pub ds: u16,
+    // Instruction Pointer
+    pub ip: u16,
 }
 
 #[allow(unused)]
@@ -16,144 +38,72 @@ impl Register {
 
     pub fn get(&self, reg: RegisterType) -> u16 {
         match reg {
-            RegisterType::Word(r) => self.reg_16[r as usize],
-            RegisterType::Byte(r) => self.reg_8[r as usize] as u16,
-            RegisterType::Segment(seg) => self.reg_seg[seg as usize],
+            RegisterType::Word(r) => match r {
+                Register16Bit::AX => self.ax,
+                Register16Bit::CX => self.cx,
+                Register16Bit::DX => self.dx,
+                Register16Bit::BX => self.bx,
+                Register16Bit::SP => self.sp,
+                Register16Bit::BP => self.bp,
+                Register16Bit::SI => self.si,
+                Register16Bit::DI => self.di,
+            },
+            RegisterType::Byte(r) => match r {
+                Register8Bit::AL => self.al,
+                Register8Bit::CL => self.cl,
+                Register8Bit::DL => self.dl,
+                Register8Bit::BL => self.bl,
+                Register8Bit::AH => self.ah,
+                Register8Bit::CH => self.ch,
+                Register8Bit::DH => self.dh,
+                Register8Bit::BH => self.bh,
+            }
+            .try_into()
+            .expect("Invalid byte register conversion"),
+            RegisterType::Segment(seg) => match seg {
+                SegmentRegister::ES => self.es,
+                SegmentRegister::CS => self.cs,
+                SegmentRegister::SS => self.ss,
+                SegmentRegister::DS => self.ds,
+            },
         }
     }
 
     pub fn set(&mut self, reg: RegisterType, value: u16) {
         match reg {
-            RegisterType::Word(r) => self.reg_16[r as usize] = value,
+            RegisterType::Word(r) => match r {
+                Register16Bit::AX => self.ax = value,
+                Register16Bit::CX => self.cx = value,
+                Register16Bit::DX => self.dx = value,
+                Register16Bit::BX => self.bx = value,
+                Register16Bit::SP => self.sp = value,
+                Register16Bit::BP => self.bp = value,
+                Register16Bit::SI => self.si = value,
+                Register16Bit::DI => self.di = value,
+            },
             RegisterType::Byte(r) => {
                 if value > u8::MAX as u16 {
                     panic!("Value exceeds 8-bit register limit");
                 }
-                self.reg_8[r as usize] = value as u8;
+                let value = value as u8;
+                match r {
+                    Register8Bit::AL => self.al = value,
+                    Register8Bit::CL => self.cl = value,
+                    Register8Bit::DL => self.dl = value,
+                    Register8Bit::BL => self.bl = value,
+                    Register8Bit::AH => self.ah = value,
+                    Register8Bit::CH => self.ch = value,
+                    Register8Bit::DH => self.dh = value,
+                    Register8Bit::BH => self.bh = value,
+                }
             }
-            RegisterType::Segment(seg) => self.reg_seg[seg as usize] = value,
+            RegisterType::Segment(seg) => match seg {
+                SegmentRegister::ES => self.es = value,
+                SegmentRegister::CS => self.cs = value,
+                SegmentRegister::SS => self.ss = value,
+                SegmentRegister::DS => self.ds = value,
+            },
         }
-    }
-
-    pub fn get_ax(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::AX))
-    }
-    pub fn set_ax(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::AX), value);
-    }
-    pub fn get_cx(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::CX))
-    }
-    pub fn set_cx(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::CX), value);
-    }
-    pub fn get_dx(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::DX))
-    }
-    pub fn set_dx(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::DX), value);
-    }
-    pub fn get_bx(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::BX))
-    }
-    pub fn set_bx(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::BX), value);
-    }
-    pub fn get_sp(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::SP))
-    }
-    pub fn set_sp(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::SP), value);
-    }
-    pub fn get_bp(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::BP))
-    }
-    pub fn set_bp(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::BP), value);
-    }
-    pub fn get_si(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::SI))
-    }
-    pub fn set_si(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::SI), value);
-    }
-    pub fn get_di(&self) -> u16 {
-        self.get(RegisterType::Word(Register16Bit::DI))
-    }
-    pub fn set_di(&mut self, value: u16) {
-        self.set(RegisterType::Word(Register16Bit::DI), value);
-    }
-    pub fn get_al(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::AL)) as u8
-    }
-    pub fn set_al(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::AL), value as u16);
-    }
-    pub fn get_cl(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::CL)) as u8
-    }
-    pub fn set_cl(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::CL), value as u16);
-    }
-    pub fn get_dl(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::DL)) as u8
-    }
-    pub fn set_dl(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::DL), value as u16);
-    }
-    pub fn get_bl(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::BL)) as u8
-    }
-    pub fn set_bl(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::BL), value as u16);
-    }
-    pub fn get_ah(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::AH)) as u8
-    }
-    pub fn set_ah(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::AH), value as u16);
-    }
-    pub fn get_ch(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::CH)) as u8
-    }
-    pub fn set_ch(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::CH), value as u16);
-    }
-    pub fn get_dh(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::DH)) as u8
-    }
-    pub fn set_dh(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::DH), value as u16);
-    }
-    pub fn get_bh(&self) -> u8 {
-        self.get(RegisterType::Byte(Register8Bit::BH)) as u8
-    }
-    pub fn set_bh(&mut self, value: u8) {
-        self.set(RegisterType::Byte(Register8Bit::BH), value as u16);
-    }
-    pub fn get_es(&self) -> u16 {
-        self.get(RegisterType::Segment(SegmentRegister::ES))
-    }
-    pub fn set_es(&mut self, value: u16) {
-        self.set(RegisterType::Segment(SegmentRegister::ES), value);
-    }
-    pub fn get_cs(&self) -> u16 {
-        self.get(RegisterType::Segment(SegmentRegister::CS))
-    }
-    pub fn set_cs(&mut self, value: u16) {
-        self.set(RegisterType::Segment(SegmentRegister::CS), value);
-    }
-    pub fn get_ss(&self) -> u16 {
-        self.get(RegisterType::Segment(SegmentRegister::SS))
-    }
-    pub fn set_ss(&mut self, value: u16) {
-        self.set(RegisterType::Segment(SegmentRegister::SS), value);
-    }
-    pub fn get_ds(&self) -> u16 {
-        self.get(RegisterType::Segment(SegmentRegister::DS))
-    }
-    pub fn set_ds(&mut self, value: u16) {
-        self.set(RegisterType::Segment(SegmentRegister::DS), value);
     }
 }
 
@@ -333,10 +283,10 @@ pub fn calc_relative_disp(offset: usize, disp: u16, is_2byte_disp: bool) -> u16 
 
 #[derive(Debug, Clone, Copy)]
 pub enum SegmentRegister {
-    ES,
-    CS,
-    SS,
-    DS,
+    ES = 0,
+    CS = 1,
+    SS = 2,
+    DS = 3,
 }
 
 impl SegmentRegister {

@@ -7,6 +7,8 @@ pub enum AppMode {
 pub struct ArgsConfig {
     pub mode: AppMode,
     pub target: String,
+    pub argv: Vec<String>,
+    pub envs: Vec<String>,
 }
 
 pub fn parse_args() -> Result<ArgsConfig, String> {
@@ -27,5 +29,14 @@ pub fn parse_args() -> Result<ArgsConfig, String> {
         None => return Err("No target specified.".to_string()),
     };
 
-    Ok(ArgsConfig { mode, target })
+    let argv = args.iter().skip(2).map(|s| s.to_string()).collect();
+    let mut envs = Vec::new();
+    envs.push("PATH=/usr:/usr/bin".to_string());
+
+    Ok(ArgsConfig {
+        mode,
+        target,
+        argv,
+        envs,
+    })
 }
