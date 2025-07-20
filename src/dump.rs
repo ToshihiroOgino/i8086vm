@@ -1,9 +1,10 @@
 use core::panic;
 
 use crate::{
+    flag,
     operation::OperationType,
     register::{
-        calc_relative_disp, effective_address, Register16Bit, Register8Bit, RegisterType,
+        calc_relative_disp, effective_address, Register, Register16Bit, Register8Bit, RegisterType,
         SegmentRegister,
     },
 };
@@ -505,5 +506,30 @@ impl Dump {
         }
         println!();
         // stdout().flush().unwrap();
+    }
+
+    pub fn labels(&self) {
+        if !self.is_enabled() {
+            return;
+        }
+        println!(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP");
+    }
+
+    pub fn state(&self, reg: &Register, flags: &flag::Flag) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!(
+            "{ax:04x} {bx:04x} {cx:04x} {dx:04x} {sp:04x} {bp:04x} {si:04x} {di:04x} {flags} ",
+            ax = reg.ax,
+            bx = reg.bx,
+            cx = reg.cx,
+            dx = reg.dx,
+            sp = reg.sp,
+            bp = reg.bp,
+            si = reg.si,
+            di = reg.di,
+            flags = flags,
+        );
     }
 }

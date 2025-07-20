@@ -1,6 +1,7 @@
 mod args;
 mod disassembler;
 mod dump;
+mod flag;
 mod machine;
 mod message;
 mod metadata;
@@ -39,7 +40,7 @@ fn main() {
             disassembler::disassemble(stream, &metadata, true);
         }
         args::AppMode::Execute => {
-            let mut machine = machine::Machine::new(stream, metadata);
+            let mut machine = machine::Machine::new(stream, metadata, &config.argv, &config.envs);
             machine.run();
         }
     }

@@ -204,8 +204,10 @@ impl Display for OperationType {
 pub enum OperandType {
     None,
     Reg,
+    SegReg,
     Imm,
     EA,
+    Disp,
 }
 
 #[derive(Debug, Clone)]
