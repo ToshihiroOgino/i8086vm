@@ -3,7 +3,7 @@ use crate::{
     message::Message,
     metadata::{self},
     operation::{OperandType, Operation, OperationType},
-    register::{self, Register, Register16Bit, RegisterType},
+    register::{self, Register, RegisterType},
 };
 
 pub struct Machine {
@@ -36,6 +36,7 @@ impl Machine {
             memory: vec![0; metadata.total as usize],
             register: Register::new(),
             metadata,
+            stack: Vec::new(),
         }
     }
 
@@ -51,26 +52,14 @@ impl Machine {
             }
             _ => {
                 let base = match op.rm {
-                    0b000 => {
-                        self.register.get(RegisterType::Word(Register16Bit::BX))
-                            + self.register.get(RegisterType::Word(Register16Bit::SI))
-                    }
-                    0b001 => {
-                        self.register.get(RegisterType::Word(Register16Bit::BX))
-                            + self.register.get(RegisterType::Word(Register16Bit::DI))
-                    }
-                    0b010 => {
-                        self.register.get(RegisterType::Word(Register16Bit::BP))
-                            + self.register.get(RegisterType::Word(Register16Bit::SI))
-                    }
-                    0b011 => {
-                        self.register.get(RegisterType::Word(Register16Bit::BP))
-                            + self.register.get(RegisterType::Word(Register16Bit::DI))
-                    }
-                    0b100 => self.register.get(RegisterType::Word(Register16Bit::SI)),
-                    0b101 => self.register.get(RegisterType::Word(Register16Bit::DI)),
-                    0b110 => self.register.get(RegisterType::Word(Register16Bit::BP)),
-                    0b111 => self.register.get(RegisterType::Word(Register16Bit::BX)),
+                    0b000 => self.register.get_bx() + self.register.get_si(),
+                    0b001 => self.register.get_bx() + self.register.get_di(),
+                    0b010 => self.register.get_bp() + self.register.get_si(),
+                    0b011 => self.register.get_bp() + self.register.get_di(),
+                    0b100 => self.register.get_si(),
+                    0b101 => self.register.get_di(),
+                    0b110 => self.register.get_bp(),
+                    0b111 => self.register.get_bx(),
                     _ => panic!("Invalid effective address"),
                 };
                 match op.mod_rm {
@@ -170,10 +159,7 @@ impl Machine {
     }
 
     fn int(&mut self, _: &Operation) {
-        let msg = Message::load(
-            &self.data,
-            self.register.get(RegisterType::Word(Register16Bit::BX)) as usize,
-        );
+        let msg = Message::load(&self.data, self.register.get_bx() as usize);
         match msg.message_type {
             1 => {
                 // Exit
@@ -191,6 +177,22 @@ impl Machine {
             _ => {
                 println!("Unhandled interrupt type: {}", msg.message_type);
             }
+        }
+    }
+
+    fn push(&mut self, op: &Operation) {
+        let value = self.read_operand(op, op.first);
+        self.stack.push(value);
+        self.register
+            .set(RegisterType::SP, self.register.get(RegisterType::SP) - 2);
+    }
+    fn pop(&mut self, op: &Operation) {
+        if let Some(value) = self.stack.pop() {
+            self.write_operand(op, op.first, value);
+            self.register
+                .set(RegisterType::SP, self.register.get(RegisterType::SP) + 2);
+        } else {
+            panic!("Stack underflow");
         }
     }
 
@@ -212,7 +214,8 @@ impl Machine {
                 OperationType::Sub => self.sub(op),
                 OperationType::Int => self.int(op),
                 _ => {
-                    println!("Unknown operation: {:?}", op);
+                    println!("Unknown operation: {:?}", op.operation_type);
+                    self.stop = true;
                 }
             }
             self.program_counter += 1;
