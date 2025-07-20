@@ -388,7 +388,6 @@ impl Machine {
             panic!("Memory access out of bounds at address {}", return_addr);
         }
         self.register.ip = return_addr;
-        dbg!(return_addr);
     }
 
     fn or(&mut self, op: &Operation) {

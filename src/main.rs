@@ -35,8 +35,6 @@ fn main() {
         }
     };
 
-    dbg!(&metadata);
-
     match config.mode {
         args::AppMode::Disassemble => {
             disassembler::disassemble(stream, &metadata, true);
