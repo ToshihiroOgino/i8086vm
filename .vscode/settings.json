@@ -4,6 +4,7 @@
         "Cmps",
         "COSZ",
         "disp",
+        "EINVAL",
         "envp",
         "errno",
         "Idiv",
