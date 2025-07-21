@@ -35,7 +35,8 @@
         "Stos",
         "syms",
         "Xchg",
-        "Xlat"
+        "Xlat",
+        "xzvf"
     ],
     "files.exclude": {
         "**/.*": true,
