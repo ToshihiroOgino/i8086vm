@@ -16,9 +16,6 @@ pub struct Machine {
     flag: Flag,
     dump: Dump,
     text: Vec<u8>,
-
-    // For debugging
-    stop_count: u16,
 }
 
 fn read_16(memory: &[u8], addr: usize) -> u16 {
@@ -75,15 +72,6 @@ impl Machine {
         let frame_base = metadata.total - args_frame.len();
         memory[frame_base..metadata.total].copy_from_slice(&args_frame);
 
-        // dump args
-        // for i in 0xffcc..metadata.total {
-        //     if (i == 0xffcc) || (i % 16 == 0) {
-        //         print!("\n{:04x}: ", i);
-        //     }
-        //     print!("{:02x} ", memory[i]);
-        // }
-        // println!();
-
         let mut register = Register::new();
         register.sp = frame_base as u16;
 
@@ -95,8 +83,6 @@ impl Machine {
             flag: Flag::new(),
             dump: Dump::new(debug),
             text,
-
-            stop_count: 0,
         }
     }
 
@@ -496,12 +482,6 @@ impl Machine {
                     write_16(&mut self.memory, bx + 2, 12); // EINVAL
                 }
             }
-            // 19 => {
-            //     // lseek
-            //     let fd = read_16(self.get_data_segment(), bx + MESSAGE_SIZE);
-            //     let offset = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 6);
-            //     let whence = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 2);
-            // }
             54 => {
                 // ioctl
                 let fd = read_16(self.get_data_segment(), bx + MESSAGE_SIZE);
@@ -899,8 +879,6 @@ impl Machine {
             disassembler::Disassembler::new(self.text.clone(), &self.metadata, self.dump.enabled);
         self.dump.labels();
 
-        let mut debug_count = 0;
-
         loop {
             if self.stop || self.register.ip > self.metadata.text_size as u16 {
                 break;
@@ -955,14 +933,6 @@ impl Machine {
                 }
             }
             self.dump.eol();
-
-            if self.stop_count > 0 {
-                debug_count += 1;
-                if debug_count >= self.stop_count {
-                    self.stop = true;
-                    println!("\nStopping execution after {} operations", debug_count);
-                }
-            }
         }
     }
 
