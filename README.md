@@ -9,18 +9,18 @@ OS: minix
 tar -xzvf setuptools.tar.gz
 cd setuptools
 make
-sudo make setup
 sudo make install
+sudo make setup
 ```
 
 ## Generate Binary for This App
 
 ```bash
-# for m2cc command (m2cc is installed at setup section)
+# Set PATH for m2cc command (m2cc is installed at setup section)
 export PATH=/usr/local/core/bin:$PATH
-# compile assembly code
-m2cc -.o asam.s -o asam.out
-# compile C code
+# Compile assembly code
+m2cc -.o asem.s -o asem.out
+# Compile C code
 m2cc main.c -o main.out
 ```
 
