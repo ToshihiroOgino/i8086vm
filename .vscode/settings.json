@@ -5,6 +5,7 @@
         "COSZ",
         "disp",
         "envp",
+        "errno",
         "Idiv",
         "Immed",
         "Imul",
@@ -21,6 +22,7 @@
         "Loopne",
         "LOOPNZ",
         "Loopz",
+        "lseek",
         "mmvm",
         "Movs",
         "MOVSW",
@@ -33,5 +35,9 @@
         "syms",
         "Xchg",
         "Xlat"
-    ]
+    ],
+    "files.exclude": {
+        "**/.*": true,
+        "**/*~": true
+    }
 }

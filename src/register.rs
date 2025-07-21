@@ -3,24 +3,22 @@ use std::fmt::Display;
 
 #[derive(Debug, Default)]
 pub struct Register {
+    // General purpose registers
+    pub al: u8,
+    pub ah: u8,
+    pub cl: u8,
+    pub ch: u8,
+    pub dl: u8,
+    pub dh: u8,
+    pub bl: u8,
+    pub bh: u8,
+
     // 16-bit registers
-    pub ax: u16,
-    pub cx: u16,
-    pub dx: u16,
-    pub bx: u16,
     pub sp: u16,
     pub bp: u16,
     pub si: u16,
     pub di: u16,
-    // 8-bit registers
-    pub al: u8,
-    pub cl: u8,
-    pub dl: u8,
-    pub bl: u8,
-    pub ah: u8,
-    pub ch: u8,
-    pub dh: u8,
-    pub bh: u8,
+
     // Segment registers
     pub es: u16,
     pub cs: u16,
@@ -39,10 +37,10 @@ impl Register {
     pub fn get(&self, reg: RegisterType) -> u16 {
         match reg {
             RegisterType::Word(r) => match r {
-                Register16Bit::AX => self.ax,
-                Register16Bit::CX => self.cx,
-                Register16Bit::DX => self.dx,
-                Register16Bit::BX => self.bx,
+                Register16Bit::AX => self.get_ax(),
+                Register16Bit::CX => self.get_cx(),
+                Register16Bit::DX => self.get_dx(),
+                Register16Bit::BX => self.get_bx(),
                 Register16Bit::SP => self.sp,
                 Register16Bit::BP => self.bp,
                 Register16Bit::SI => self.si,
@@ -72,19 +70,16 @@ impl Register {
     pub fn set(&mut self, reg: RegisterType, value: u16) {
         match reg {
             RegisterType::Word(r) => match r {
-                Register16Bit::AX => self.ax = value,
-                Register16Bit::CX => self.cx = value,
-                Register16Bit::DX => self.dx = value,
-                Register16Bit::BX => self.bx = value,
+                Register16Bit::AX => self.set_ax(value),
+                Register16Bit::CX => self.set_cx(value),
+                Register16Bit::DX => self.set_dx(value),
+                Register16Bit::BX => self.set_bx(value),
                 Register16Bit::SP => self.sp = value,
                 Register16Bit::BP => self.bp = value,
                 Register16Bit::SI => self.si = value,
                 Register16Bit::DI => self.di = value,
             },
             RegisterType::Byte(r) => {
-                if value > u8::MAX as u16 {
-                    panic!("Value exceeds 8-bit register limit");
-                }
                 let value = value as u8;
                 match r {
                     Register8Bit::AL => self.al = value,
@@ -105,8 +100,45 @@ impl Register {
             },
         }
     }
+
+    pub fn get_ax(&self) -> u16 {
+        u16::from_le_bytes([self.al, self.ah])
+    }
+    pub fn set_ax(&mut self, value: u16) {
+        let bytes = value.to_le_bytes();
+        self.al = bytes[0];
+        self.ah = bytes[1];
+    }
+
+    pub fn get_cx(&self) -> u16 {
+        u16::from_le_bytes([self.cl, self.ch])
+    }
+    pub fn set_cx(&mut self, value: u16) {
+        let bytes = value.to_le_bytes();
+        self.cl = bytes[0];
+        self.ch = bytes[1];
+    }
+
+    pub fn get_dx(&self) -> u16 {
+        u16::from_le_bytes([self.dl, self.dh])
+    }
+    pub fn set_dx(&mut self, value: u16) {
+        let bytes = value.to_le_bytes();
+        self.dl = bytes[0];
+        self.dh = bytes[1];
+    }
+
+    pub fn get_bx(&self) -> u16 {
+        u16::from_le_bytes([self.bl, self.bh])
+    }
+    pub fn set_bx(&mut self, value: u16) {
+        let bytes = value.to_le_bytes();
+        self.bl = bytes[0];
+        self.bh = bytes[1];
+    }
 }
 
+#[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub enum RegisterType {
     Word(Register16Bit),
