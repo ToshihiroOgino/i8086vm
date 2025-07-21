@@ -32,7 +32,7 @@ elif [ "$1" = "--all" ] || [ "$1" = "-a" ]; then
 fi
 
 BIN_FILE="./test/binary/$TARGET.out"
-/usr/local/core/bin/m2cc -.o ./setuptools/tests/$TARGET -o $BIN_FILE 2>/dev/null
+/usr/local/core/bin/m2cc ./setuptools/tests/$TARGET -o $BIN_FILE 2>/dev/null
 
 EXPECTED_FILE="./test/mmvm/$TARGET.out.txt"
 /usr/local/core/bin/mmvm -d $BIN_FILE 2>$EXPECTED_FILE
