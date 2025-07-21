@@ -685,6 +685,7 @@ impl Disassembler {
                 // Within Segment Adding Immediate to Sp
                 op.operation_type = OperationType::Ret;
                 op.disp = u16::from_le_bytes([self.next_byte(&mut op), self.next_byte(&mut op)]);
+                op.first = OperandType::Imm;
                 if instruction & 0b1000 == 1 {
                     panic!("Not implemented yet");
                 } else {

@@ -35,11 +35,33 @@ fn write_16(memory: &mut [u8], addr: usize, value: u16) {
     memory[addr..addr + 2].copy_from_slice(&value.to_le_bytes());
 }
 
+fn carry_lsh_u8(value: u8, count: u8) -> bool {
+    if count == 0 {
+        return false;
+    }
+    let res = (value << (count - 1)) >> 7;
+    res & 1 == 1
+}
+
+fn carry_lsh_u16(value: u16, count: u16) -> bool {
+    if count == 0 {
+        return false;
+    }
+    let res = (value << (count - 1)) >> 15;
+    res & 1 == 1
+}
+
+fn carry_rsh_u16(value: u16, count: u16) -> bool {
+    if count == 0 {
+        return false;
+    }
+    let res = (value >> (count - 1)) & 1;
+    res == 1
+}
+
 impl Machine {
     pub fn new(executable: &Vec<u8>, args: &[String], envs: &[String], debug: bool) -> Self {
         let metadata = metadata::Metadata::from_bytes(executable);
-
-        dbg!(&metadata);
 
         let text_begin = metadata.hdr_len as usize;
         let text = executable[text_begin..text_begin + metadata.text_size].to_vec();
@@ -54,13 +76,13 @@ impl Machine {
         memory[frame_base..metadata.total].copy_from_slice(&args_frame);
 
         // dump args
-        for i in 0xffcc..metadata.total {
-            if (i == 0xffcc) || (i % 16 == 0) {
-                print!("\n{:04x}: ", i);
-            }
-            print!("{:02x} ", memory[i]);
-        }
-        println!();
+        // for i in 0xffcc..metadata.total {
+        //     if (i == 0xffcc) || (i % 16 == 0) {
+        //         print!("\n{:04x}: ", i);
+        //     }
+        //     print!("{:02x} ", memory[i]);
+        // }
+        // println!();
 
         let mut register = Register::new();
         register.sp = frame_base as u16;
@@ -417,10 +439,24 @@ impl Machine {
     }
 
     fn dec(&mut self, op: &Operation) {
-        let value = self.read_operand(op, op.first) as i16;
-        let result = value.wrapping_sub(1);
-        self.flag.set_cosz(false, false, value < 1, result == 0);
-        self.write_operand(op, op.first, result as u16);
+        let value = self.read_operand(op, op.first);
+        let res = (value as i16 - 1) as i32;
+
+        if op.w == 0 {
+            let res_u8 = (res & 0xff) as u8;
+            self.flag
+                .set_cosz(self.flag.carry, res_u8 as i32 != res, false, res_u8 == 0);
+            self.write_operand(op, op.first, res_u8 as u16);
+        } else {
+            let res_i16 = res as i16;
+            self.flag.set_cosz(
+                self.flag.carry,
+                res != res_i16 as i32,
+                res < 0,
+                res_i16 == 0,
+            );
+            self.write_operand(op, op.first, res_i16 as u16);
+        }
     }
 
     fn int(&mut self) {
@@ -485,21 +521,12 @@ impl Machine {
 
     fn push(&mut self, op: &Operation) {
         let value = self.read_operand(op, op.first);
-        if op.w == 0 {
-            self.stack_push_u8((value & 0xff) as u8);
-        } else {
-            self.stack_push_u16(value);
-        }
+        self.stack_push_u16(value);
     }
 
     fn pop(&mut self, op: &Operation) {
-        if op.w == 0 {
-            let res = self.stack_pop_u8();
-            self.write_operand(op, op.first, res as u16);
-        } else {
-            let res = self.stack_pop_u16();
-            self.write_operand(op, op.first, res);
-        }
+        let res = self.stack_pop_u16();
+        self.write_operand(op, op.first, res);
     }
 
     fn call(&mut self, op: &Operation) {
@@ -528,12 +555,24 @@ impl Machine {
         self.register.set(op.get_register(), addr as u16);
     }
 
-    fn ret(&mut self) {
+    fn ret(&mut self, op: &Operation) {
         let return_addr = self.stack_pop_u16();
         if return_addr as usize >= self.memory.len() {
             panic!("Memory access out of bounds at address {}", return_addr);
         }
-        self.register.ip = return_addr;
+        match op.first {
+            OperandType::Imm => {
+                // Within Segment Adding Immediate to Sp
+                let imm = op.disp;
+                self.register.sp = self.register.sp.wrapping_add(imm);
+                self.register.ip = return_addr;
+            }
+            OperandType::None => {
+                // Within Segment
+                self.register.ip = return_addr;
+            }
+            _ => unreachable!("Invalid operand type for ret: {:?}", op.first),
+        }
     }
 
     fn and(&mut self, op: &Operation) {
@@ -576,7 +615,6 @@ impl Machine {
     fn cmp(&mut self, op: &Operation) {
         let left = self.read_operand(op, op.first);
         let right = self.read_operand(op, op.second);
-        dbg!(left, right);
         match op.s << 1 | op.w {
             0b00 => {
                 let res = (left & 0xff) as i32 - (right & 0xff) as i32;
@@ -591,15 +629,10 @@ impl Machine {
             }
             0b11 => {
                 if op.second == OperandType::Imm {
-                    let right = right as i8;
-                    let res_i16 = left as i16 - right as i16;
-                    let res = left as i16 as i32 - right as i16 as i32;
-                    self.flag.set_cosz(
-                        (left as i32) < (right as i32),
-                        res > 0xffff,
-                        res < 0,
-                        res_i16 == 0,
-                    );
+                    let res_i16 = left as i16 - right as i8 as i16;
+                    let res = left as i16 as i32 - right as i8 as i32;
+                    self.flag
+                        .set_cosz(left < right, res > 0xffff, res < 0, res_i16 == 0);
                 } else {
                     let res_i16 = left as i16 - right as i16;
                     let res = left as i16 as i32 - right as i16 as i32;
@@ -612,49 +645,104 @@ impl Machine {
     }
 
     fn shl(&mut self, op: &Operation) {
-        let value = self.read_operand(op, op.first);
-        let result = match op.v << 1 | op.w {
+        let left = self.read_operand(op, op.first);
+        match op.v << 1 | op.w {
             0b00 => {
-                let res = (value as i32) << 1;
-                let res_u8 = (res as u8) << 1;
+                let left = left as u8;
+                let res = (left << 1) as i32;
+                let res_i8 = res as i8;
+                let carry = carry_lsh_u8(left, 1);
+                let overflow = ((res_i8 >> 7) & 1 == 1) != carry;
+                self.flag.set_cosz(carry, overflow, res_i8 < 0, res_i8 == 0);
+                self.write_operand(op, op.first, res_i8 as u16);
+            }
+            0b01 => {
+                let res = (left << 1) as i32;
+                let res_i16 = res as i16;
+                let carry = carry_lsh_u16(left, 1 as u16);
+                let overflow = ((res_i16 >> 15) & 1 == 1) != carry;
                 self.flag
-                    .set_cosz(res > 0xff, res_u8 as i32 != res, false, res_u8 == 0);
-                res_u8 as u16
+                    .set_cosz(carry, overflow, res_i16 < 0, res_i16 == 0);
+                self.write_operand(op, op.first, res_i16 as u16);
             }
             0b10 => {
                 let cl = self.register.cl;
-                let res = (value as i32) << (cl & 0x1f);
-                let res_u8 = (res as u8) << (cl & 0x1f);
-                self.flag
-                    .set_cosz(res > 0xff, res != res_u8 as i32, res < 0, res_u8 == 0);
-                res_u8 as u16
-            }
-            0b01 => {
-                let res = (value as i32) << 1;
-                let res_u16 = (res as u16) << 1;
-                self.flag.set_cosz(
-                    res > 0xffff,
-                    res_u16 as i32 != res,
-                    (res_u16 as i16) < 0,
-                    res_u16 == 0,
-                );
-                res_u16
+                if cl == 0 {
+                    // Do nothing if CL is 0
+                }
+                let left = left as u8;
+                let num_shift = cl & 0x1f;
+                let res = (left << num_shift) as i32;
+                let res_i8 = res as i8;
+                let carry = carry_lsh_u8(left, 1);
+                let overflow = ((res_i8 >> 7) & 1 == 1) != carry;
+                self.flag.set_cosz(carry, overflow, res_i8 < 0, res_i8 == 0);
+                self.write_operand(op, op.first, res_i8 as u16);
             }
             0b11 => {
                 let cl = self.register.cl;
-                let res = (value as i32) << (cl & 0x1f);
-                let res_u16 = (res as u16) << (cl & 0x1f);
-                self.flag.set_cosz(
-                    res > 0xffff,
-                    res != res_u16 as i32,
-                    (res_u16 as i16) < 0,
-                    res_u16 == 0,
-                );
-                res_u16
+                if cl == 0 {
+                    // Do nothing if CL is 0
+                }
+                let num_shift = cl & 0x1f;
+                let res = (left << num_shift) as i32;
+                let res_i16 = res as i16;
+                let carry = carry_lsh_u16(left, num_shift as u16);
+                let overflow = ((res_i16 >> 15) & 1 == 1) != carry;
+                self.flag
+                    .set_cosz(carry, overflow, res_i16 < 0, res_i16 == 0);
+                self.write_operand(op, op.first, res_i16 as u16);
             }
             _ => unreachable!("Invalid operation"),
         };
-        self.write_operand(op, op.first, result);
+    }
+
+    fn sar(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        match op.v << 1 | op.w {
+            0b00 => {
+                let left = left as u8;
+                let res = (left as i8 >> 1) as i32;
+                let res_i8 = res as i8;
+                let carry = carry_rsh_u16(left as u16, 1);
+                self.flag.set_cosz(carry, false, res_i8 < 0, res_i8 == 0);
+                self.write_operand(op, op.first, res_i8 as u16);
+            }
+            0b01 => {
+                let res = (left as i16 >> 1) as i32;
+                let res_i16 = res as i16;
+                let carry = carry_rsh_u16(left, 1);
+                self.flag.set_cosz(carry, false, res_i16 < 0, res_i16 == 0);
+                self.write_operand(op, op.first, res_i16 as u16);
+            }
+            0b10 => {
+                let cl = self.register.cl;
+                if cl == 0 {
+                    // Do nothing if CL is 0
+                    return;
+                }
+                let num_shift = cl & 0x1f;
+                let res = (left as i16 >> num_shift) as i32;
+                let res_i16 = res as i16;
+                let carry = carry_rsh_u16(left, num_shift as u16);
+                self.flag.set_cosz(carry, false, res_i16 < 0, res_i16 == 0);
+                self.write_operand(op, op.first, res_i16 as u16);
+            }
+            0b11 => {
+                let cl = self.register.cl;
+                if cl == 0 {
+                    // Do nothing if CL is 0
+                    return;
+                }
+                let num_shift = cl & 0x1f;
+                let res = (left >> num_shift) as i32;
+                let res_i16 = res as i16;
+                let carry = carry_rsh_u16(left, num_shift as u16);
+                self.flag.set_cosz(carry, false, res_i16 < 0, res_i16 == 0);
+                self.write_operand(op, op.first, res_i16 as u16);
+            }
+            _ => unreachable!("Invalid operation"),
+        };
     }
 
     fn jmp(&mut self, op: &Operation) {
@@ -833,7 +921,7 @@ impl Machine {
                 OperationType::Call => self.call(&op),
                 OperationType::Jmp => self.jmp(&op),
                 OperationType::Lea => self.lea(&op),
-                OperationType::Ret => self.ret(),
+                OperationType::Ret => self.ret(&op),
                 OperationType::Or => self.or(&op),
                 OperationType::JeJz => self.je(&op),
                 OperationType::Cmp => self.cmp(&op),
@@ -851,6 +939,7 @@ impl Machine {
                 OperationType::JleJng => self.jle(&op),
                 OperationType::JnbeJa => self.jnbe(&op),
                 OperationType::ShlSal => self.shl(&op),
+                OperationType::Sar => self.sar(&op),
                 OperationType::JnleJg => self.jnle(&op),
                 OperationType::Cwd => self.cwd(),
                 OperationType::Div => self.div(&op),
@@ -929,21 +1018,21 @@ impl Machine {
         value
     }
 
-    fn stack_push_u8(&mut self, value: u8) {
-        let sp = self.register.sp as usize;
-        let sp_new = sp
-            .checked_sub(1)
-            .unwrap_or_else(|| panic!("Stack overflow: SP is too low to push value"));
-        self.memory[sp_new] = value;
-        self.register.sp = sp_new as u16;
-    }
-    fn stack_pop_u8(&mut self) -> u8 {
-        let sp = self.register.sp as usize;
-        let sp_new = sp
-            .checked_add(1)
-            .unwrap_or_else(|| panic!("Stack overflow: SP is too high to pop value"));
-        let value = self.memory[sp];
-        self.register.sp = sp_new as u16;
-        value
-    }
+    // fn stack_push_u8(&mut self, value: u8) {
+    //     let sp = self.register.sp as usize;
+    //     let sp_new = sp
+    //         .checked_sub(1)
+    //         .unwrap_or_else(|| panic!("Stack overflow: SP is too low to push value"));
+    //     self.memory[sp_new] = value;
+    //     self.register.sp = sp_new as u16;
+    // }
+    // fn stack_pop_u8(&mut self) -> u8 {
+    //     let sp = self.register.sp as usize;
+    //     let sp_new = sp
+    //         .checked_add(1)
+    //         .unwrap_or_else(|| panic!("Stack overflow: SP is too high to pop value"));
+    //     let value = self.memory[sp];
+    //     self.register.sp = sp_new as u16;
+    //     value
+    // }
 }
