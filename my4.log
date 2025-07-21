@@ -1,0 +1,1824 @@
+ AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP
+0000 0000 0000 0000 ffce 0000 0000 0000 ---- 0000: 31ed          XOR BP, BP
+0000 0000 0000 0000 ffce 0000 0000 0000 ---Z 0002: 89e3          MOV BX, SP
+0000 ffce 0000 0000 ffce 0000 0000 0000 ---Z 0004: 8b07          MOV AX, [BX] ;[ffce]0001
+0001 ffce 0000 0000 ffce 0000 0000 0000 ---Z 0006: 8d5702        LEA DX, [BX+2] ;[ffd0]ffd8
+0001 ffce 0000 ffd0 ffce 0000 0000 0000 ---Z 0009: 8d4f04        LEA CX, [BX+4] ;[ffd2]0000
+0001 ffce ffd2 ffd0 ffce 0000 0000 0000 ---Z 000c: 01c1          ADD CX, AX
+0001 ffce ffd3 ffd0 ffce 0000 0000 0000 --S- 000e: 01c1          ADD CX, AX
+0001 ffce ffd4 ffd0 ffce 0000 0000 0000 --S- 0010: bb0e00        MOV BX, 000e
+[src/machine.rs:579:9] left = 14
+[src/machine.rs:579:9] right = 530
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 --S- 0013: 81fb1202      CMP BX, 0212
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 C-S- 0017: 730f          JNB 0028
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 C-S- 0019: f6c301        TEST BL, 1
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 001c: 750a          JNE 0028
+[src/machine.rs:579:9] left = 21331
+[src/machine.rs:579:9] right = 21331
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 001e: 813f5353      CMP [BX], 5353 ;[000e]5353
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 0022: 7504          JNE 0028
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 0024: 891e0200      MOV [0002], BX ;[0002]0230->000e
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 0028: 8b1e0200      MOV BX, [0002] ;[0002]000e
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 002c: 890f          MOV [BX], CX ;[000e]5353->ffd4
+0001 000e ffd4 ffd0 ffce 0000 0000 0000 ---Z 002e: 51            PUSH CX
+0001 000e ffd4 ffd0 ffcc 0000 0000 0000 ---Z 002f: 52            PUSH DX
+0001 000e ffd4 ffd0 ffca 0000 0000 0000 ---Z 0030: 50            PUSH AX
+0001 000e ffd4 ffd0 ffc8 0000 0000 0000 ---Z 0031: e80500        CALL 0039
+0001 000e ffd4 ffd0 ffc6 0000 0000 0000 ---Z 0039: 55            PUSH BP
+0001 000e ffd4 ffd0 ffc4 0000 0000 0000 ---Z 003a: 89e5          MOV BP, SP
+0001 000e ffd4 ffd0 ffc4 ffc4 0000 0000 ---Z 003c: 50            PUSH AX
+0001 000e ffd4 ffd0 ffc2 ffc4 0000 0000 ---Z 003d: bad204        MOV DX, 04d2
+0001 000e ffd4 04d2 ffc2 ffc4 0000 0000 ---Z 0040: 8956fe        MOV [BP-2], DX ;[ffc2]0001->04d2
+0001 000e ffd4 04d2 ffc2 ffc4 0000 0000 ---Z 0043: 52            PUSH DX
+0001 000e ffd4 04d2 ffc0 ffc4 0000 0000 ---Z 0044: b80400        MOV AX, 0004
+0004 000e ffd4 04d2 ffc0 ffc4 0000 0000 ---Z 0047: 50            PUSH AX
+0004 000e ffd4 04d2 ffbe ffc4 0000 0000 ---Z 0048: e83c00        CALL 0087
+0004 000e ffd4 04d2 ffbc ffc4 0000 0000 ---Z 0087: 55            PUSH BP
+0004 000e ffd4 04d2 ffba ffc4 0000 0000 ---Z 0088: 89e5          MOV BP, SP
+0004 000e ffd4 04d2 ffba ffba 0000 0000 ---Z 008a: 50            PUSH AX
+0004 000e ffd4 04d2 ffb8 ffba 0000 0000 ---Z 008b: 50            PUSH AX
+0004 000e ffd4 04d2 ffb6 ffba 0000 0000 ---Z 008c: 8d5e06        LEA BX, [BP+6] ;[ffc0]04d2
+0004 ffc0 ffd4 04d2 ffb6 ffba 0000 0000 ---Z 008f: 895efe        MOV [BP-2], BX ;[ffb8]0004->ffc0
+0004 ffc0 ffd4 04d2 ffb6 ffba 0000 0000 ---Z 0092: b81c00        MOV AX, 001c
+001c ffc0 ffd4 04d2 ffb6 ffba 0000 0000 ---Z 0095: 50            PUSH AX
+001c ffc0 ffd4 04d2 ffb4 ffba 0000 0000 ---Z 0096: ff76fe        PUSH [BP-2] ;[ffb8]ffc0
+001c ffc0 ffd4 04d2 ffb2 ffba 0000 0000 ---Z 0099: ff7604        PUSH [BP+4] ;[ffbe]0004
+001c ffc0 ffd4 04d2 ffb0 ffba 0000 0000 ---Z 009c: e80a02        CALL 02a9
+001c ffc0 ffd4 04d2 ffae ffba 0000 0000 ---Z 02a9: 55            PUSH BP
+001c ffc0 ffd4 04d2 ffac ffba 0000 0000 ---Z 02aa: 89e5          MOV BP, SP
+001c ffc0 ffd4 04d2 ffac ffac 0000 0000 ---Z 02ac: 81ec1a04      SUB SP, 041a
+001c ffc0 ffd4 04d2 fb92 ffac 0000 0000 --S- 02b0: 56            PUSH SI
+001c ffc0 ffd4 04d2 fb90 ffac 0000 0000 --S- 02b1: 57            PUSH DI
+001c ffc0 ffd4 04d2 fb8e ffac 0000 0000 --S- 02b2: 8b7608        MOV SI, [BP+8] ;[ffb4]001c
+001c ffc0 ffd4 04d2 fb8e ffac 001c 0000 --S- 02b5: c746ec0000    MOV [BP-14], 0000 ;[ff98]0000->0000
+001c ffc0 ffd4 04d2 fb8e ffac 001c 0000 --S- 02ba: 8b5e04        MOV BX, [BP+4] ;[ffb0]0004
+001c 0004 ffd4 04d2 fb8e ffac 001c 0000 --S- 02bd: ff4604        INC [BP+4] ;[ffb0]0004 ;[ffb0]0004->0005
+001c 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02c0: 8a07          MOV AL, [BX] ;[0004]3d61
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02c2: 98            CBW
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02c3: 8946f8        MOV [BP-8], AX ;[ffa4]0000->0061
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02c6: 09c0          OR AX, AX
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02c8: 7503          JNE 02cd
+[src/machine.rs:579:9] left = 97
+[src/machine.rs:579:9] right = 37
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02cd: 837ef825      CMP [BP-8], 25 ;[ffa4]0061
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02d1: 7440          JE 0313
+0061 0004 ffd4 04d2 fb8e ffac 001c 0000 ---- 02d3: 8b14          MOV DX, [SI] ;[001c]0000
+0061 0004 ffd4 0000 fb8e ffac 001c 0000 ---- 02d5: 4a            DEC DX
+0061 0004 ffd4 ffff fb8e ffac 001c 0000 --S- 02d6: 8914          MOV [SI], DX ;[001c]0000->ffff
+0061 0004 ffd4 ffff fb8e ffac 001c 0000 --S- 02d8: 7c10          JL 02ea
+0061 0004 ffd4 ffff fb8e ffac 001c 0000 --S- 02ea: 56            PUSH SI
+0061 0004 ffd4 ffff fb8c ffac 001c 0000 --S- 02eb: ff76f8        PUSH [BP-8] ;[ffa4]0061
+0061 0004 ffd4 ffff fb8a ffac 001c 0000 --S- 02ee: e85305        CALL 0844
+0061 0004 ffd4 ffff fb88 ffac 001c 0000 --S- 0844: 55            PUSH BP
+0061 0004 ffd4 ffff fb86 ffac 001c 0000 --S- 0845: 89e5          MOV BP, SP
+0061 0004 ffd4 ffff fb86 fb86 001c 0000 --S- 0847: 50            PUSH AX
+0061 0004 ffd4 ffff fb84 fb86 001c 0000 --S- 0848: 50            PUSH AX
+0061 0004 ffd4 ffff fb82 fb86 001c 0000 --S- 0849: 56            PUSH SI
+0061 0004 ffd4 ffff fb80 fb86 001c 0000 --S- 084a: 57            PUSH DI
+0061 0004 ffd4 ffff fb7e fb86 001c 0000 --S- 084b: 8b7e04        MOV DI, [BP+4] ;[fb8a]0061
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 --S- 084e: 8b7606        MOV SI, [BP+6] ;[fb8c]001c
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 --S- 0851: c7060c004010  MOV [000c], 1040 ;[000c]0000->1040
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 0
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 --S- 0857: 837c0200      CMP [SI+2], 0 ;[001e]0001
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 085b: 7d07          JNL 0864
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 0864: f6440402      TEST Byte [SI+4], 2 ;[0020]0002
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 0868: 7506          JNE 0870
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 0870: f6440480      TEST Byte [SI+4], 80 ;[0020]0002
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 0874: 740c          JE 0882
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 0882: 8164047fff    AND [SI+4], ff7f ;[0020]0002 ;[0020]0002->0002
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 0887: 814c040001    OR [SI+4], 0100 ;[0020]0002 ;[0020]0002->0102
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---- 088c: f6440404      TEST Byte [SI+4], 4 ;[0020]0102
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 0890: 7403          JE 0895
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 0895: 837c0800      CMP [SI+8], 0 ;[0024]0000
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 0899: 7403          JE 089e
+[src/machine.rs:579:9] left = 28
+[src/machine.rs:579:9] right = 28
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 089e: 81fe1c00      CMP SI, 001c
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 08a2: 7532          JNE 08d6
+0061 0004 ffd4 ffff fb7e fb86 001c 0061 ---Z 08a4: ff361e00      PUSH [001e] ;[001e]0001
+0061 0004 ffd4 ffff fb7c fb86 001c 0061 ---Z 08a8: e8ad05        CALL 0e58
+0061 0004 ffd4 ffff fb7a fb86 001c 0061 ---Z 0e58: 55            PUSH BP
+0061 0004 ffd4 ffff fb78 fb86 001c 0061 ---Z 0e59: 89e5          MOV BP, SP
+0061 0004 ffd4 ffff fb78 fb78 001c 0061 ---Z 0e5b: 83ec20        SUB SP, 20
+0061 0004 ffd4 ffff fb58 fb78 001c 0061 --S- 0e5e: 8d46e0        LEA AX, [BP-20] ;[fb58]0000
+fb58 0004 ffd4 ffff fb58 fb78 001c 0061 --S- 0e61: 50            PUSH AX
+fb58 0004 ffd4 ffff fb56 fb78 001c 0061 --S- 0e62: ff7604        PUSH [BP+4] ;[fb7c]0001
+fb58 0004 ffd4 ffff fb54 fb78 001c 0061 --S- 0e65: e85700        CALL 0ebf
+fb58 0004 ffd4 ffff fb52 fb78 001c 0061 --S- 0ebf: 55            PUSH BP
+fb58 0004 ffd4 ffff fb50 fb78 001c 0061 --S- 0ec0: 89e5          MOV BP, SP
+fb58 0004 ffd4 ffff fb50 fb50 001c 0061 --S- 0ec2: ff7606        PUSH [BP+6] ;[fb56]fb58
+fb58 0004 ffd4 ffff fb4e fb50 001c 0061 --S- 0ec5: b80854        MOV AX, 5408
+5408 0004 ffd4 ffff fb4e fb50 001c 0061 --S- 0ec8: 50            PUSH AX
+5408 0004 ffd4 ffff fb4c fb50 001c 0061 --S- 0ec9: ff7604        PUSH [BP+4] ;[fb54]0001
+5408 0004 ffd4 ffff fb4a fb50 001c 0061 --S- 0ecc: e8f201        CALL 10c1
+5408 0004 ffd4 ffff fb48 fb50 001c 0061 --S- 10c1: 55            PUSH BP
+5408 0004 ffd4 ffff fb46 fb50 001c 0061 --S- 10c2: 89e5          MOV BP, SP
+5408 0004 ffd4 ffff fb46 fb46 001c 0061 --S- 10c4: 83ec18        SUB SP, 18
+5408 0004 ffd4 ffff fb2e fb46 001c 0061 --S- 10c7: 8b5604        MOV DX, [BP+4] ;[fb4a]0001
+5408 0004 ffd4 0001 fb2e fb46 001c 0061 --S- 10ca: 8956ec        MOV [BP-14], DX ;[fb32]0000->0001
+5408 0004 ffd4 0001 fb2e fb46 001c 0061 --S- 10cd: 8b5606        MOV DX, [BP+6] ;[fb4c]5408
+5408 0004 ffd4 5408 fb2e fb46 001c 0061 --S- 10d0: 8956f0        MOV [BP-10], DX ;[fb36]0000->5408
+5408 0004 ffd4 5408 fb2e fb46 001c 0061 --S- 10d3: 8b5608        MOV DX, [BP+8] ;[fb4e]fb58
+5408 0004 ffd4 fb58 fb2e fb46 001c 0061 --S- 10d6: 8956fa        MOV [BP-6], DX ;[fb40]0000->fb58
+5408 0004 ffd4 fb58 fb2e fb46 001c 0061 --S- 10d9: 8d46e8        LEA AX, [BP-18] ;[fb2e]0000
+fb2e 0004 ffd4 fb58 fb2e fb46 001c 0061 --S- 10dc: 50            PUSH AX
+fb2e 0004 ffd4 fb58 fb2c fb46 001c 0061 --S- 10dd: b83600        MOV AX, 0036
+0036 0004 ffd4 fb58 fb2c fb46 001c 0061 --S- 10e0: 50            PUSH AX
+0036 0004 ffd4 fb58 fb2a fb46 001c 0061 --S- 10e1: b80100        MOV AX, 0001
+0001 0004 ffd4 fb58 fb2a fb46 001c 0061 --S- 10e4: 50            PUSH AX
+0001 0004 ffd4 fb58 fb28 fb46 001c 0061 --S- 10e5: e836fd        CALL 0e1e
+0001 0004 ffd4 fb58 fb26 fb46 001c 0061 --S- 0e1e: 55            PUSH BP
+0001 0004 ffd4 fb58 fb24 fb46 001c 0061 --S- 0e1f: 89e5          MOV BP, SP
+0001 0004 ffd4 fb58 fb24 fb24 001c 0061 --S- 0e21: 56            PUSH SI
+0001 0004 ffd4 fb58 fb22 fb24 001c 0061 --S- 0e22: 57            PUSH DI
+0001 0004 ffd4 fb58 fb20 fb24 001c 0061 --S- 0e23: 8b7608        MOV SI, [BP+8] ;[fb2c]fb2e
+0001 0004 ffd4 fb58 fb20 fb24 fb2e 0061 --S- 0e26: 8b5606        MOV DX, [BP+6] ;[fb2a]0036
+0001 0004 ffd4 0036 fb20 fb24 fb2e 0061 --S- 0e29: 895402        MOV [SI+2], DX ;[fb30]0000->0036
+0001 0004 ffd4 0036 fb20 fb24 fb2e 0061 --S- 0e2c: 56            PUSH SI
+0001 0004 ffd4 0036 fb1e fb24 fb2e 0061 --S- 0e2d: ff7604        PUSH [BP+4] ;[fb28]0001
+0001 0004 ffd4 0036 fb1c fb24 fb2e 0061 --S- 0e30: e86b02        CALL 109e
+0001 0004 ffd4 0036 fb1a fb24 fb2e 0061 --S- 109e: b90300        MOV CX, 0003
+0001 0004 0003 0036 fb1a fb24 fb2e 0061 --S- 10a1: eb00          JMP Short 10a3
+0001 0004 0003 0036 fb1a fb24 fb2e 0061 --S- 10a3: 55            PUSH BP
+0001 0004 0003 0036 fb18 fb24 fb2e 0061 --S- 10a4: 89e5          MOV BP, SP
+0001 0004 0003 0036 fb18 fb18 fb2e 0061 --S- 10a6: 8b4604        MOV AX, [BP+4] ;[fb1c]0001
+0001 0004 0003 0036 fb18 fb18 fb2e 0061 --S- 10a9: 8b5e06        MOV BX, [BP+6] ;[fb1e]fb2e
+0001 fb2e 0003 0036 fb18 fb18 fb2e 0061 --S- 10ac: cd20          INT 20
+<ioctl(fd=1, req=0x5408, addr=0xfb58)>
+0000 fb2e 0003 0036 fb18 fb18 fb2e 0061 --S- 10ae: 5d            POP BP
+0000 fb2e 0003 0036 fb1a fb24 fb2e 0061 --S- 10af: c3            RET
+0000 fb2e 0003 0036 fb1c fb24 fb2e 0061 --S- 0e33: 5b            POP BX
+0000 0001 0003 0036 fb1e fb24 fb2e 0061 --S- 0e34: 5b            POP BX
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0061 --S- 0e35: 89c7          MOV DI, AX
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0000 --S- 0e37: 09ff          OR DI, DI
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0000 ---Z 0e39: 7403          JE 0e3e
+[src/machine.rs:579:9] left = 65514
+[src/machine.rs:579:9] right = 0
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0000 ---Z 0e3e: 837c0200      CMP [SI+2], 0 ;[fb30]ffea
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0000 --S- 0e42: 7d0e          JNL 0e52
+0000 fb2e 0003 0036 fb20 fb24 fb2e 0000 --S- 0e44: 8b5402        MOV DX, [SI+2] ;[fb30]ffea
+0000 fb2e 0003 ffea fb20 fb24 fb2e 0000 --S- 0e47: f7da          NEG DX
+0000 fb2e 0003 0016 fb20 fb24 fb2e 0000 C--- 0e49: 89162401      MOV [0124], DX ;[0124]0000->0016
+0000 fb2e 0003 0016 fb20 fb24 fb2e 0000 C--- 0e4d: b8ffff        MOV AX, ffff
+ffff fb2e 0003 0016 fb20 fb24 fb2e 0000 C--- 0e50: eb03          JMP Short 0e55
+ffff fb2e 0003 0016 fb20 fb24 fb2e 0000 C--- 0e55: e94c03        JMP 11a4
+ffff fb2e 0003 0016 fb20 fb24 fb2e 0000 C--- 11a4: 5f            POP DI
+ffff fb2e 0003 0016 fb22 fb24 fb2e 0061 C--- 11a5: 5e            POP SI
+ffff fb2e 0003 0016 fb24 fb24 001c 0061 C--- 11a6: 89ec          MOV SP, BP
+ffff fb2e 0003 0016 fb24 fb24 001c 0061 C--- 11a8: 5d            POP BP
+ffff fb2e 0003 0016 fb26 fb46 001c 0061 C--- 11a9: c3            RET
+ffff fb2e 0003 0016 fb28 fb46 001c 0061 C--- 10e8: 83c406        ADD SP, 6
+ffff fb2e 0003 0016 fb2e fb46 001c 0061 --S- 10eb: e9b800        JMP 11a6
+ffff fb2e 0003 0016 fb2e fb46 001c 0061 --S- 11a6: 89ec          MOV SP, BP
+ffff fb2e 0003 0016 fb46 fb46 001c 0061 --S- 11a8: 5d            POP BP
+ffff fb2e 0003 0016 fb48 fb50 001c 0061 --S- 11a9: c3            RET
+ffff fb2e 0003 0016 fb4a fb50 001c 0061 --S- 0ecf: 83c406        ADD SP, 6
+ffff fb2e 0003 0016 fb50 fb50 001c 0061 --S- 0ed2: e9d102        JMP 11a6
+ffff fb2e 0003 0016 fb50 fb50 001c 0061 --S- 11a6: 89ec          MOV SP, BP
+ffff fb2e 0003 0016 fb50 fb50 001c 0061 --S- 11a8: 5d            POP BP
+ffff fb2e 0003 0016 fb52 fb78 001c 0061 --S- 11a9: c3            RET
+ffff fb2e 0003 0016 fb54 fb78 001c 0061 --S- 0e68: 5b            POP BX
+ffff 0001 0003 0016 fb56 fb78 001c 0061 --S- 0e69: 5b            POP BX
+ffff fb58 0003 0016 fb58 fb78 001c 0061 --S- 0e6a: 31db          XOR BX, BX
+ffff 0000 0003 0016 fb58 fb78 001c 0061 ---Z 0e6c: 09c0          OR AX, AX
+ffff 0000 0003 0016 fb58 fb78 001c 0061 ---- 0e6e: 7501          JNE 0e71
+ffff 0000 0003 0016 fb58 fb78 001c 0061 ---- 0e71: 89d8          MOV AX, BX
+0000 0000 0003 0016 fb58 fb78 001c 0061 ---- 0e73: e93003        JMP 11a6
+0000 0000 0003 0016 fb58 fb78 001c 0061 ---- 11a6: 89ec          MOV SP, BP
+0000 0000 0003 0016 fb78 fb78 001c 0061 ---- 11a8: 5d            POP BP
+0000 0000 0003 0016 fb7a fb86 001c 0061 ---- 11a9: c3            RET
+0000 0000 0003 0016 fb7c fb86 001c 0061 ---- 08ab: 5b            POP BX
+0000 0001 0003 0016 fb7e fb86 001c 0061 ---- 08ac: 09c0          OR AX, AX
+0000 0001 0003 0016 fb7e fb86 001c 0061 ---Z 08ae: 7426          JE 08d6
+0000 0001 0003 0016 fb7e fb86 001c 0061 ---Z 08d6: b80004        MOV AX, 0400
+0400 0001 0003 0016 fb7e fb86 001c 0061 ---Z 08d9: 50            PUSH AX
+0400 0001 0003 0016 fb7c fb86 001c 0061 ---Z 08da: e84c02        CALL 0b29
+0400 0001 0003 0016 fb7a fb86 001c 0061 ---Z 0b29: 55            PUSH BP
+0400 0001 0003 0016 fb78 fb86 001c 0061 ---Z 0b2a: 89e5          MOV BP, SP
+0400 0001 0003 0016 fb78 fb78 001c 0061 ---Z 0b2c: 83ec0c        SUB SP, c
+0400 0001 0003 0016 fb6c fb78 001c 0061 --S- 0b2f: 56            PUSH SI
+0400 0001 0003 0016 fb6a fb78 001c 0061 --S- 0b30: 57            PUSH DI
+[src/machine.rs:579:9] left = 1024
+[src/machine.rs:579:9] right = 0
+0400 0001 0003 0016 fb68 fb78 001c 0061 --S- 0b31: 837e0400      CMP [BP+4], 0 ;[fb7c]0400
+0400 0001 0003 0016 fb68 fb78 001c 0061 ---- 0b35: 7505          JNE 0b3c
+0400 0001 0003 0016 fb68 fb78 001c 0061 ---- 0b3c: c746f40000    MOV [BP-c], 0000 ;[fb6c]0000->0000
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 2
+0400 0001 0003 0016 fb68 fb78 001c 0061 ---- 0b41: 837ef402      CMP [BP-c], 2 ;[fb6c]0000
+0400 0001 0003 0016 fb68 fb78 001c 0061 C-S- 0b45: 7203          JB 0b4a
+0400 0001 0003 0016 fb68 fb78 001c 0061 C-S- 0b4a: 8b5604        MOV DX, [BP+4] ;[fb7c]0400
+0400 0001 0003 0400 fb68 fb78 001c 0061 C-S- 0b4d: 42            INC DX
+0400 0001 0003 0401 fb68 fb78 001c 0061 C--- 0b4e: 81e2feff      AND DX, fffe
+0400 0001 0003 0400 fb68 fb78 001c 0061 ---- 0b52: 83c202        ADD DX, 2
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---- 0b55: 8956f6        MOV [BP-a], DX ;[fb6e]0000->0402
+[src/machine.rs:579:9] left = 1026
+[src/machine.rs:579:9] right = 4
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---- 0b58: 83fa04        CMP DX, 4
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---- 0b5b: 730b          JNB 0b68
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---- 0b68: 833e120200    CMP [0212], 0 ;[0212]0000
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---Z 0b6d: 752d          JNE 0b9c
+0400 0001 0003 0402 fb68 fb78 001c 0061 ---Z 0b6f: b80400        MOV AX, 0004
+0004 0001 0003 0402 fb68 fb78 001c 0061 ---Z 0b72: 50            PUSH AX
+0004 0001 0003 0402 fb66 fb78 001c 0061 ---Z 0b73: e86a02        CALL 0de0
+0004 0001 0003 0402 fb64 fb78 001c 0061 ---Z 0de0: 55            PUSH BP
+0004 0001 0003 0402 fb62 fb78 001c 0061 ---Z 0de1: 89e5          MOV BP, SP
+0004 0001 0003 0402 fb62 fb62 001c 0061 ---Z 0de3: 56            PUSH SI
+0004 0001 0003 0402 fb60 fb62 001c 0061 ---Z 0de4: 57            PUSH DI
+0004 0001 0003 0402 fb5e fb62 001c 0061 ---Z 0de5: 8b362601      MOV SI, [0126] ;[0126]0272
+0004 0001 0003 0402 fb5e fb62 0272 0061 ---Z 0de9: 8b5604        MOV DX, [BP+4] ;[fb66]0004
+0004 0001 0003 0004 fb5e fb62 0272 0061 ---Z 0dec: 03162601      ADD DX, [0126] ;[0126]0272
+0004 0001 0003 0276 fb5e fb62 0272 0061 ---- 0df0: 89d7          MOV DI, DX
+[src/machine.rs:579:9] left = 4
+[src/machine.rs:579:9] right = 0
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0df2: 837e0400      CMP [BP+4], 0 ;[fb66]0004
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0df6: 7e04          JLE 0dfc
+[src/machine.rs:579:9] left = 630
+[src/machine.rs:579:9] right = 626
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0df8: 39f7          CMP DI, SI
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0dfa: 720a          JB 0e06
+[src/machine.rs:579:9] left = 4
+[src/machine.rs:579:9] right = 0
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0dfc: 837e0400      CMP [BP+4], 0 ;[fb66]0004
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0e00: 7d09          JNL 0e0b
+0004 0001 0003 0276 fb5e fb62 0272 0276 ---- 0e0b: 57            PUSH DI
+0004 0001 0003 0276 fb5c fb62 0272 0276 ---- 0e0c: e896ff        CALL 0da5
+0004 0001 0003 0276 fb5a fb62 0272 0276 ---- 0da5: 55            PUSH BP
+0004 0001 0003 0276 fb58 fb62 0272 0276 ---- 0da6: 89e5          MOV BP, SP
+0004 0001 0003 0276 fb58 fb58 0272 0276 ---- 0da8: 83ec18        SUB SP, 18
+0004 0001 0003 0276 fb40 fb58 0272 0276 --S- 0dab: 8b162601      MOV DX, [0126] ;[0126]0272
+[src/machine.rs:579:9] left = 630
+[src/machine.rs:579:9] right = 626
+0004 0001 0003 0272 fb40 fb58 0272 0276 --S- 0daf: 395604        CMP [BP+4], DX ;[fb5c]0276
+0004 0001 0003 0272 fb40 fb58 0272 0276 ---- 0db2: 7427          JE 0ddb
+0004 0001 0003 0272 fb40 fb58 0272 0276 ---- 0db4: 8b5604        MOV DX, [BP+4] ;[fb5c]0276
+0004 0001 0003 0276 fb40 fb58 0272 0276 ---- 0db7: 8956f2        MOV [BP-e], DX ;[fb4a]0001->0276
+0004 0001 0003 0276 fb40 fb58 0272 0276 ---- 0dba: 8d46e8        LEA AX, [BP-18] ;[fb40]fb58
+fb40 0001 0003 0276 fb40 fb58 0272 0276 ---- 0dbd: 50            PUSH AX
+fb40 0001 0003 0276 fb3e fb58 0272 0276 ---- 0dbe: b81100        MOV AX, 0011
+0011 0001 0003 0276 fb3e fb58 0272 0276 ---- 0dc1: 50            PUSH AX
+0011 0001 0003 0276 fb3c fb58 0272 0276 ---- 0dc2: 31c0          XOR AX, AX
+0000 0001 0003 0276 fb3c fb58 0272 0276 ---Z 0dc4: 50            PUSH AX
+0000 0001 0003 0276 fb3a fb58 0272 0276 ---Z 0dc5: e85600        CALL 0e1e
+0000 0001 0003 0276 fb38 fb58 0272 0276 ---Z 0e1e: 55            PUSH BP
+0000 0001 0003 0276 fb36 fb58 0272 0276 ---Z 0e1f: 89e5          MOV BP, SP
+0000 0001 0003 0276 fb36 fb36 0272 0276 ---Z 0e21: 56            PUSH SI
+0000 0001 0003 0276 fb34 fb36 0272 0276 ---Z 0e22: 57            PUSH DI
+0000 0001 0003 0276 fb32 fb36 0272 0276 ---Z 0e23: 8b7608        MOV SI, [BP+8] ;[fb3e]fb40
+0000 0001 0003 0276 fb32 fb36 fb40 0276 ---Z 0e26: 8b5606        MOV DX, [BP+6] ;[fb3c]0011
+0000 0001 0003 0011 fb32 fb36 fb40 0276 ---Z 0e29: 895402        MOV [SI+2], DX ;[fb42]0000->0011
+0000 0001 0003 0011 fb32 fb36 fb40 0276 ---Z 0e2c: 56            PUSH SI
+0000 0001 0003 0011 fb30 fb36 fb40 0276 ---Z 0e2d: ff7604        PUSH [BP+4] ;[fb3a]0000
+0000 0001 0003 0011 fb2e fb36 fb40 0276 ---Z 0e30: e86b02        CALL 109e
+0000 0001 0003 0011 fb2c fb36 fb40 0276 ---Z 109e: b90300        MOV CX, 0003
+0000 0001 0003 0011 fb2c fb36 fb40 0276 ---Z 10a1: eb00          JMP Short 10a3
+0000 0001 0003 0011 fb2c fb36 fb40 0276 ---Z 10a3: 55            PUSH BP
+0000 0001 0003 0011 fb2a fb36 fb40 0276 ---Z 10a4: 89e5          MOV BP, SP
+0000 0001 0003 0011 fb2a fb2a fb40 0276 ---Z 10a6: 8b4604        MOV AX, [BP+4] ;[fb2e]0000
+0000 0001 0003 0011 fb2a fb2a fb40 0276 ---Z 10a9: 8b5e06        MOV BX, [BP+6] ;[fb30]fb40
+0000 fb40 0003 0011 fb2a fb2a fb40 0276 ---Z 10ac: cd20          INT 20
+<brk(0x0276) => 0>
+0000 fb40 0003 0011 fb2a fb2a fb40 0276 ---Z 10ae: 5d            POP BP
+0000 fb40 0003 0011 fb2c fb36 fb40 0276 ---Z 10af: c3            RET
+0000 fb40 0003 0011 fb2e fb36 fb40 0276 ---Z 0e33: 5b            POP BX
+0000 0000 0003 0011 fb30 fb36 fb40 0276 ---Z 0e34: 5b            POP BX
+0000 fb40 0003 0011 fb32 fb36 fb40 0276 ---Z 0e35: 89c7          MOV DI, AX
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e37: 09ff          OR DI, DI
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e39: 7403          JE 0e3e
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e3e: 837c0200      CMP [SI+2], 0 ;[fb42]0000
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e42: 7d0e          JNL 0e52
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e52: 8b4402        MOV AX, [SI+2] ;[fb42]0000
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 0e55: e94c03        JMP 11a4
+0000 fb40 0003 0011 fb32 fb36 fb40 0000 ---Z 11a4: 5f            POP DI
+0000 fb40 0003 0011 fb34 fb36 fb40 0276 ---Z 11a5: 5e            POP SI
+0000 fb40 0003 0011 fb36 fb36 0272 0276 ---Z 11a6: 89ec          MOV SP, BP
+0000 fb40 0003 0011 fb36 fb36 0272 0276 ---Z 11a8: 5d            POP BP
+0000 fb40 0003 0011 fb38 fb58 0272 0276 ---Z 11a9: c3            RET
+0000 fb40 0003 0011 fb3a fb58 0272 0276 ---Z 0dc8: 83c406        ADD SP, 6
+0000 fb40 0003 0011 fb40 fb58 0272 0276 --S- 0dcb: 09c0          OR AX, AX
+0000 fb40 0003 0011 fb40 fb58 0272 0276 ---Z 0dcd: 7d05          JNL 0dd4
+0000 fb40 0003 0011 fb40 fb58 0272 0276 ---Z 0dd4: 8b56fa        MOV DX, [BP-6] ;[fb52]0e68
+0000 fb40 0003 0e68 fb40 fb58 0272 0276 ---Z 0dd7: 89162601      MOV [0126], DX ;[0126]0272->0e68
+0000 fb40 0003 0e68 fb40 fb58 0272 0276 ---Z 0ddb: 31c0          XOR AX, AX
+0000 fb40 0003 0e68 fb40 fb58 0272 0276 ---Z 0ddd: e9c603        JMP 11a6
+0000 fb40 0003 0e68 fb40 fb58 0272 0276 ---Z 11a6: 89ec          MOV SP, BP
+0000 fb40 0003 0e68 fb58 fb58 0272 0276 ---Z 11a8: 5d            POP BP
+0000 fb40 0003 0e68 fb5a fb62 0272 0276 ---Z 11a9: c3            RET
+0000 fb40 0003 0e68 fb5c fb62 0272 0276 ---Z 0e0f: 5b            POP BX
+0000 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 0e10: 09c0          OR AX, AX
+0000 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 0e12: 7504          JNE 0e18
+0000 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 0e14: 89f0          MOV AX, SI
+0272 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 0e16: eb03          JMP Short 0e1b
+0272 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 0e1b: e98603        JMP 11a4
+0272 0276 0003 0e68 fb5e fb62 0272 0276 ---Z 11a4: 5f            POP DI
+0272 0276 0003 0e68 fb60 fb62 0272 0061 ---Z 11a5: 5e            POP SI
+0272 0276 0003 0e68 fb62 fb62 001c 0061 ---Z 11a6: 89ec          MOV SP, BP
+0272 0276 0003 0e68 fb62 fb62 001c 0061 ---Z 11a8: 5d            POP BP
+0272 0276 0003 0e68 fb64 fb78 001c 0061 ---Z 11a9: c3            RET
+0272 0276 0003 0e68 fb66 fb78 001c 0061 ---Z 0b76: 5b            POP BX
+0272 0004 0003 0e68 fb68 fb78 001c 0061 ---Z 0b77: 89c6          MOV SI, AX
+[src/machine.rs:579:9] left = 626
+[src/machine.rs:579:9] right = 65535
+0272 0004 0003 0e68 fb68 fb78 0272 0061 ---Z 0b79: 3dffff        CMP AX, ffff
+0272 0004 0003 0e68 fb68 fb78 0272 0061 C-S- 0b7c: 7505          JNE 0b83
+0272 0004 0003 0e68 fb68 fb78 0272 0061 C-S- 0b83: 89f2          MOV DX, SI
+0272 0004 0003 0272 fb68 fb78 0272 0061 C-S- 0b85: 42            INC DX
+0272 0004 0003 0273 fb68 fb78 0272 0061 C--- 0b86: 81e2feff      AND DX, fffe
+0272 0004 0003 0272 fb68 fb78 0272 0061 ---- 0b8a: 89d6          MOV SI, DX
+0272 0004 0003 0272 fb68 fb78 0272 0061 ---- 0b8c: 83c602        ADD SI, 2
+0272 0004 0003 0272 fb68 fb78 0274 0061 ---- 0b8f: 89361202      MOV [0212], SI ;[0212]0000->0274
+0272 0004 0003 0272 fb68 fb78 0274 0061 ---- 0b93: 89361402      MOV [0214], SI ;[0214]0000->0274
+0272 0004 0003 0272 fb68 fb78 0274 0061 ---- 0b97: c744fe0000    MOV [SI-2], 0000 ;[0272]0000->0000
+0272 0004 0003 0272 fb68 fb78 0274 0061 ---- 0b9c: c746fe0000    MOV [BP-2], 0000 ;[fb76]0000->0000
+0272 0004 0003 0272 fb68 fb78 0274 0061 ---- 0ba1: 8b361602      MOV SI, [0216] ;[0216]0000
+0272 0004 0003 0272 fb68 fb78 0000 0061 ---- 0ba5: 09f6          OR SI, SI
+0272 0004 0003 0272 fb68 fb78 0000 0061 ---Z 0ba7: 744d          JE 0bf6
+0272 0004 0003 0272 fb68 fb78 0000 0061 ---Z 0bf6: ff76f6        PUSH [BP-a] ;[fb6e]0402
+0272 0004 0003 0272 fb66 fb78 0000 0061 ---Z 0bf9: e8d0fe        CALL 0acc
+0272 0004 0003 0272 fb64 fb78 0000 0061 ---Z 0acc: 55            PUSH BP
+0272 0004 0003 0272 fb62 fb78 0000 0061 ---Z 0acd: 89e5          MOV BP, SP
+0272 0004 0003 0272 fb62 fb62 0000 0061 ---Z 0acf: 56            PUSH SI
+0272 0004 0003 0272 fb60 fb62 0000 0061 ---Z 0ad0: 8b1e1402      MOV BX, [0214] ;[0214]0274
+0272 0274 0003 0272 fb60 fb62 0000 0061 ---Z 0ad4: 035e04        ADD BX, [BP+4] ;[fb66]0402
+[src/machine.rs:579:9] left = 628
+[src/machine.rs:579:9] right = 1654
+0272 0676 0003 0272 fb60 fb62 0000 0061 ---- 0ad7: 391e1402      CMP [0214], BX ;[0214]0274
+0272 0676 0003 0272 fb60 fb62 0000 0061 C-S- 0adb: 7717          JNBE 0af4
+0272 0676 0003 0272 fb60 fb62 0000 0061 C-S- 0add: 8b5604        MOV DX, [BP+4] ;[fb66]0402
+0272 0676 0003 0402 fb60 fb62 0000 0061 C-S- 0ae0: 03161402      ADD DX, [0214] ;[0214]0274
+0272 0676 0003 0676 fb60 fb62 0000 0061 ---- 0ae4: 81c2ff03      ADD DX, 03ff
+0272 0676 0003 0a75 fb60 fb62 0000 0061 ---- 0ae8: 81e200fc      AND DX, fc00
+0272 0676 0003 0800 fb60 fb62 0000 0061 ---- 0aec: 89d6          MOV SI, DX
+[src/machine.rs:579:9] left = 628
+[src/machine.rs:579:9] right = 2048
+0272 0676 0003 0800 fb60 fb62 0800 0061 ---- 0aee: 39161402      CMP [0214], DX ;[0214]0274
+0272 0676 0003 0800 fb60 fb62 0800 0061 C-S- 0af2: 760a          JBE 0afe
+0272 0676 0003 0800 fb60 fb62 0800 0061 C-S- 0afe: 56            PUSH SI
+0272 0676 0003 0800 fb5e fb62 0800 0061 C-S- 0aff: e8a302        CALL 0da5
+0272 0676 0003 0800 fb5c fb62 0800 0061 C-S- 0da5: 55            PUSH BP
+0272 0676 0003 0800 fb5a fb62 0800 0061 C-S- 0da6: 89e5          MOV BP, SP
+0272 0676 0003 0800 fb5a fb5a 0800 0061 C-S- 0da8: 83ec18        SUB SP, 18
+0272 0676 0003 0800 fb42 fb5a 0800 0061 --S- 0dab: 8b162601      MOV DX, [0126] ;[0126]0e68
+[src/machine.rs:579:9] left = 2048
+[src/machine.rs:579:9] right = 3688
+0272 0676 0003 0e68 fb42 fb5a 0800 0061 --S- 0daf: 395604        CMP [BP+4], DX ;[fb5e]0800
+0272 0676 0003 0e68 fb42 fb5a 0800 0061 C-S- 0db2: 7427          JE 0ddb
+0272 0676 0003 0e68 fb42 fb5a 0800 0061 C-S- 0db4: 8b5604        MOV DX, [BP+4] ;[fb5e]0800
+0272 0676 0003 0800 fb42 fb5a 0800 0061 C-S- 0db7: 8956f2        MOV [BP-e], DX ;[fb4c]5408->0800
+0272 0676 0003 0800 fb42 fb5a 0800 0061 C-S- 0dba: 8d46e8        LEA AX, [BP-18] ;[fb42]0000
+fb42 0676 0003 0800 fb42 fb5a 0800 0061 C-S- 0dbd: 50            PUSH AX
+fb42 0676 0003 0800 fb40 fb5a 0800 0061 C-S- 0dbe: b81100        MOV AX, 0011
+0011 0676 0003 0800 fb40 fb5a 0800 0061 C-S- 0dc1: 50            PUSH AX
+0011 0676 0003 0800 fb3e fb5a 0800 0061 C-S- 0dc2: 31c0          XOR AX, AX
+0000 0676 0003 0800 fb3e fb5a 0800 0061 ---Z 0dc4: 50            PUSH AX
+0000 0676 0003 0800 fb3c fb5a 0800 0061 ---Z 0dc5: e85600        CALL 0e1e
+0000 0676 0003 0800 fb3a fb5a 0800 0061 ---Z 0e1e: 55            PUSH BP
+0000 0676 0003 0800 fb38 fb5a 0800 0061 ---Z 0e1f: 89e5          MOV BP, SP
+0000 0676 0003 0800 fb38 fb38 0800 0061 ---Z 0e21: 56            PUSH SI
+0000 0676 0003 0800 fb36 fb38 0800 0061 ---Z 0e22: 57            PUSH DI
+0000 0676 0003 0800 fb34 fb38 0800 0061 ---Z 0e23: 8b7608        MOV SI, [BP+8] ;[fb40]fb42
+0000 0676 0003 0800 fb34 fb38 fb42 0061 ---Z 0e26: 8b5606        MOV DX, [BP+6] ;[fb3e]0011
+0000 0676 0003 0011 fb34 fb38 fb42 0061 ---Z 0e29: 895402        MOV [SI+2], DX ;[fb44]0000->0011
+0000 0676 0003 0011 fb34 fb38 fb42 0061 ---Z 0e2c: 56            PUSH SI
+0000 0676 0003 0011 fb32 fb38 fb42 0061 ---Z 0e2d: ff7604        PUSH [BP+4] ;[fb3c]0000
+0000 0676 0003 0011 fb30 fb38 fb42 0061 ---Z 0e30: e86b02        CALL 109e
+0000 0676 0003 0011 fb2e fb38 fb42 0061 ---Z 109e: b90300        MOV CX, 0003
+0000 0676 0003 0011 fb2e fb38 fb42 0061 ---Z 10a1: eb00          JMP Short 10a3
+0000 0676 0003 0011 fb2e fb38 fb42 0061 ---Z 10a3: 55            PUSH BP
+0000 0676 0003 0011 fb2c fb38 fb42 0061 ---Z 10a4: 89e5          MOV BP, SP
+0000 0676 0003 0011 fb2c fb2c fb42 0061 ---Z 10a6: 8b4604        MOV AX, [BP+4] ;[fb30]0000
+0000 0676 0003 0011 fb2c fb2c fb42 0061 ---Z 10a9: 8b5e06        MOV BX, [BP+6] ;[fb32]fb42
+0000 fb42 0003 0011 fb2c fb2c fb42 0061 ---Z 10ac: cd20          INT 20
+<brk(0x0800) => 0>
+0000 fb42 0003 0011 fb2c fb2c fb42 0061 ---Z 10ae: 5d            POP BP
+0000 fb42 0003 0011 fb2e fb38 fb42 0061 ---Z 10af: c3            RET
+0000 fb42 0003 0011 fb30 fb38 fb42 0061 ---Z 0e33: 5b            POP BX
+0000 0000 0003 0011 fb32 fb38 fb42 0061 ---Z 0e34: 5b            POP BX
+0000 fb42 0003 0011 fb34 fb38 fb42 0061 ---Z 0e35: 89c7          MOV DI, AX
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e37: 09ff          OR DI, DI
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e39: 7403          JE 0e3e
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e3e: 837c0200      CMP [SI+2], 0 ;[fb44]0000
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e42: 7d0e          JNL 0e52
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e52: 8b4402        MOV AX, [SI+2] ;[fb44]0000
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 0e55: e94c03        JMP 11a4
+0000 fb42 0003 0011 fb34 fb38 fb42 0000 ---Z 11a4: 5f            POP DI
+0000 fb42 0003 0011 fb36 fb38 fb42 0061 ---Z 11a5: 5e            POP SI
+0000 fb42 0003 0011 fb38 fb38 0800 0061 ---Z 11a6: 89ec          MOV SP, BP
+0000 fb42 0003 0011 fb38 fb38 0800 0061 ---Z 11a8: 5d            POP BP
+0000 fb42 0003 0011 fb3a fb5a 0800 0061 ---Z 11a9: c3            RET
+0000 fb42 0003 0011 fb3c fb5a 0800 0061 ---Z 0dc8: 83c406        ADD SP, 6
+0000 fb42 0003 0011 fb42 fb5a 0800 0061 --S- 0dcb: 09c0          OR AX, AX
+0000 fb42 0003 0011 fb42 fb5a 0800 0061 ---Z 0dcd: 7d05          JNL 0dd4
+0000 fb42 0003 0011 fb42 fb5a 0800 0061 ---Z 0dd4: 8b56fa        MOV DX, [BP-6] ;[fb54]0001
+0000 fb42 0003 0001 fb42 fb5a 0800 0061 ---Z 0dd7: 89162601      MOV [0126], DX ;[0126]0e68->0001
+0000 fb42 0003 0001 fb42 fb5a 0800 0061 ---Z 0ddb: 31c0          XOR AX, AX
+0000 fb42 0003 0001 fb42 fb5a 0800 0061 ---Z 0ddd: e9c603        JMP 11a6
+0000 fb42 0003 0001 fb42 fb5a 0800 0061 ---Z 11a6: 89ec          MOV SP, BP
+0000 fb42 0003 0001 fb5a fb5a 0800 0061 ---Z 11a8: 5d            POP BP
+0000 fb42 0003 0001 fb5c fb62 0800 0061 ---Z 11a9: c3            RET
+0000 fb42 0003 0001 fb5e fb62 0800 0061 ---Z 0b02: 5b            POP BX
+0000 0800 0003 0001 fb60 fb62 0800 0061 ---Z 0b03: 09c0          OR AX, AX
+0000 0800 0003 0001 fb60 fb62 0800 0061 ---Z 0b05: 7404          JE 0b0b
+0000 0800 0003 0001 fb60 fb62 0800 0061 ---Z 0b0b: 8b1e1402      MOV BX, [0214] ;[0214]0274
+0000 0274 0003 0001 fb60 fb62 0800 0061 ---Z 0b0f: 8977fe        MOV [BX-2], SI ;[0272]0000->0800
+0000 0274 0003 0001 fb60 fb62 0800 0061 ---Z 0b12: c744fe0000    MOV [SI-2], 0000 ;[07fe]0000->0000
+0000 0274 0003 0001 fb60 fb62 0800 0061 ---Z 0b17: ff361402      PUSH [0214] ;[0214]0274
+0000 0274 0003 0001 fb5e fb62 0800 0061 ---Z 0b1b: e8da01        CALL 0cf8
+0000 0274 0003 0001 fb5c fb62 0800 0061 ---Z 0cf8: 55            PUSH BP
+0000 0274 0003 0001 fb5a fb62 0800 0061 ---Z 0cf9: 89e5          MOV BP, SP
+0000 0274 0003 0001 fb5a fb5a 0800 0061 ---Z 0cfb: 83ec06        SUB SP, 6
+0000 0274 0003 0001 fb54 fb5a 0800 0061 --S- 0cfe: 56            PUSH SI
+0000 0274 0003 0001 fb52 fb5a 0800 0061 --S- 0cff: 57            PUSH DI
+0000 0274 0003 0001 fb50 fb5a 0800 0061 --S- 0d00: 8b5604        MOV DX, [BP+4] ;[fb5e]0274
+0000 0274 0003 0274 fb50 fb5a 0800 0061 --S- 0d03: 8956fa        MOV [BP-6], DX ;[fb54]0001->0274
+0000 0274 0003 0274 fb50 fb5a 0800 0061 --S- 0d06: 09d2          OR DX, DX
+0000 0274 0003 0274 fb50 fb5a 0800 0061 ---- 0d08: 7461          JE 0d6b
+0000 0274 0003 0274 fb50 fb5a 0800 0061 ---- 0d0a: 31ff          XOR DI, DI
+0000 0274 0003 0274 fb50 fb5a 0800 0000 ---Z 0d0c: 8b361602      MOV SI, [0216] ;[0216]0000
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d10: 09f6          OR SI, SI
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d12: 740b          JE 0d1f
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d1f: 8b5efa        MOV BX, [BP-6] ;[fb54]0274
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d22: 8937          MOV [BX], SI ;[0274]0000->0000
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d24: 09ff          OR DI, DI
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d26: 7407          JE 0d2f
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d2f: 8b56fa        MOV DX, [BP-6] ;[fb54]0274
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d32: 89161602      MOV [0216], DX ;[0216]0000->0274
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d36: 09f6          OR SI, SI
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d38: 7415          JE 0d4f
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d4f: 09ff          OR DI, DI
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d51: 7418          JE 0d6b
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 0d6b: e93604        JMP 11a4
+0000 0274 0003 0274 fb50 fb5a 0000 0000 ---Z 11a4: 5f            POP DI
+0000 0274 0003 0274 fb52 fb5a 0000 0061 ---Z 11a5: 5e            POP SI
+0000 0274 0003 0274 fb54 fb5a 0800 0061 ---Z 11a6: 89ec          MOV SP, BP
+0000 0274 0003 0274 fb5a fb5a 0800 0061 ---Z 11a8: 5d            POP BP
+0000 0274 0003 0274 fb5c fb62 0800 0061 ---Z 11a9: c3            RET
+0000 0274 0003 0274 fb5e fb62 0800 0061 ---Z 0b1e: 5b            POP BX
+0000 0274 0003 0274 fb60 fb62 0800 0061 ---Z 0b1f: 89361402      MOV [0214], SI ;[0214]0274->0800
+0000 0274 0003 0274 fb60 fb62 0800 0061 ---Z 0b23: b80100        MOV AX, 0001
+0001 0274 0003 0274 fb60 fb62 0800 0061 ---Z 0b26: e97c06        JMP 11a5
+0001 0274 0003 0274 fb60 fb62 0800 0061 ---Z 11a5: 5e            POP SI
+0001 0274 0003 0274 fb62 fb62 0000 0061 ---Z 11a6: 89ec          MOV SP, BP
+0001 0274 0003 0274 fb62 fb62 0000 0061 ---Z 11a8: 5d            POP BP
+0001 0274 0003 0274 fb64 fb78 0000 0061 ---Z 11a9: c3            RET
+0001 0274 0003 0274 fb66 fb78 0000 0061 ---Z 0bfc: 5b            POP BX
+0001 0402 0003 0274 fb68 fb78 0000 0061 ---Z 0bfd: 09c0          OR AX, AX
+0001 0402 0003 0274 fb68 fb78 0000 0061 ---- 0bff: 7406          JE 0c07
+0001 0402 0003 0274 fb68 fb78 0000 0061 ---- 0c01: ff46f4        INC [BP-c] ;[fb6c]0000 ;[fb6c]0000->0001
+0001 0402 0003 0274 fb68 fb78 0000 0061 ---- 0c04: e93aff        JMP 0b41
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 2
+0001 0402 0003 0274 fb68 fb78 0000 0061 ---- 0b41: 837ef402      CMP [BP-c], 2 ;[fb6c]0001
+0001 0402 0003 0274 fb68 fb78 0000 0061 C-S- 0b45: 7203          JB 0b4a
+0001 0402 0003 0274 fb68 fb78 0000 0061 C-S- 0b4a: 8b5604        MOV DX, [BP+4] ;[fb7c]0400
+0001 0402 0003 0400 fb68 fb78 0000 0061 C-S- 0b4d: 42            INC DX
+0001 0402 0003 0401 fb68 fb78 0000 0061 C--- 0b4e: 81e2feff      AND DX, fffe
+0001 0402 0003 0400 fb68 fb78 0000 0061 ---- 0b52: 83c202        ADD DX, 2
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b55: 8956f6        MOV [BP-a], DX ;[fb6e]0402->0402
+[src/machine.rs:579:9] left = 1026
+[src/machine.rs:579:9] right = 4
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b58: 83fa04        CMP DX, 4
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b5b: 730b          JNB 0b68
+[src/machine.rs:579:9] left = 628
+[src/machine.rs:579:9] right = 0
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b68: 833e120200    CMP [0212], 0 ;[0212]0274
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b6d: 752d          JNE 0b9c
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0b9c: c746fe0000    MOV [BP-2], 0000 ;[fb76]0000->0000
+0001 0402 0003 0402 fb68 fb78 0000 0061 ---- 0ba1: 8b361602      MOV SI, [0216] ;[0216]0274
+0001 0402 0003 0402 fb68 fb78 0274 0061 ---- 0ba5: 09f6          OR SI, SI
+0001 0402 0003 0402 fb68 fb78 0274 0061 ---- 0ba7: 744d          JE 0bf6
+0001 0402 0003 0402 fb68 fb78 0274 0061 ---- 0ba9: 8b54fe        MOV DX, [SI-2] ;[0272]0800
+0001 0402 0003 0800 fb68 fb78 0274 0061 ---- 0bac: 8956fa        MOV [BP-6], DX ;[fb72]0000->0800
+0001 0402 0003 0800 fb68 fb78 0274 0061 ---- 0baf: 8b56f6        MOV DX, [BP-a] ;[fb6e]0402
+0001 0402 0003 0402 fb68 fb78 0274 0061 ---- 0bb2: 01f2          ADD DX, SI
+0001 0402 0003 0676 fb68 fb78 0274 0061 ---- 0bb4: 89d7          MOV DI, DX
+[src/machine.rs:579:9] left = 2048
+[src/machine.rs:579:9] right = 1654
+0001 0402 0003 0676 fb68 fb78 0274 0676 ---- 0bb6: 397efa        CMP [BP-6], DI ;[fb72]0800
+0001 0402 0003 0676 fb68 fb78 0274 0676 ---- 0bb9: 7234          JB 0bef
+[src/machine.rs:579:9] left = 1654
+[src/machine.rs:579:9] right = 628
+0001 0402 0003 0676 fb68 fb78 0274 0676 ---- 0bbb: 39f7          CMP DI, SI
+0001 0402 0003 0676 fb68 fb78 0274 0676 ---- 0bbd: 7630          JBE 0bef
+0001 0402 0003 0676 fb68 fb78 0274 0676 ---- 0bbf: 8d5d02        LEA BX, [DI+2] ;[0678]0000
+[src/machine.rs:579:9] left = 2048
+[src/machine.rs:579:9] right = 1656
+0001 0678 0003 0676 fb68 fb78 0274 0676 ---- 0bc2: 395efa        CMP [BP-6], BX ;[fb72]0800
+0001 0678 0003 0676 fb68 fb78 0274 0676 ---- 0bc5: 760f          JBE 0bd6
+0001 0678 0003 0676 fb68 fb78 0274 0676 ---- 0bc7: 8b56fa        MOV DX, [BP-6] ;[fb72]0800
+0001 0678 0003 0800 fb68 fb78 0274 0676 ---- 0bca: 8955fe        MOV [DI-2], DX ;[0674]0000->0800
+0001 0678 0003 0800 fb68 fb78 0274 0676 ---- 0bcd: 897cfe        MOV [SI-2], DI ;[0272]0800->0676
+0001 0678 0003 0800 fb68 fb78 0274 0676 ---- 0bd0: 8b14          MOV DX, [SI] ;[0274]0000
+0001 0678 0003 0000 fb68 fb78 0274 0676 ---- 0bd2: 8915          MOV [DI], DX ;[0676]0000->0000
+0001 0678 0003 0000 fb68 fb78 0274 0676 ---- 0bd4: 893c          MOV [SI], DI ;[0274]0000->0676
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0001 0678 0003 0000 fb68 fb78 0274 0676 ---- 0bd6: 837efe00      CMP [BP-2], 0 ;[fb76]0000
+0001 0678 0003 0000 fb68 fb78 0274 0676 ---Z 0bda: 7409          JE 0be5
+0001 0678 0003 0000 fb68 fb78 0274 0676 ---Z 0be5: 8b14          MOV DX, [SI] ;[0274]0676
+0001 0678 0003 0676 fb68 fb78 0274 0676 ---Z 0be7: 89161602      MOV [0216], DX ;[0216]0274->0676
+0001 0678 0003 0676 fb68 fb78 0274 0676 ---Z 0beb: 89f0          MOV AX, SI
+0274 0678 0003 0676 fb68 fb78 0274 0676 ---Z 0bed: eb1a          JMP Short 0c09
+0274 0678 0003 0676 fb68 fb78 0274 0676 ---Z 0c09: e99805        JMP 11a4
+0274 0678 0003 0676 fb68 fb78 0274 0676 ---Z 11a4: 5f            POP DI
+0274 0678 0003 0676 fb6a fb78 0274 0061 ---Z 11a5: 5e            POP SI
+0274 0678 0003 0676 fb6c fb78 001c 0061 ---Z 11a6: 89ec          MOV SP, BP
+0274 0678 0003 0676 fb78 fb78 001c 0061 ---Z 11a8: 5d            POP BP
+0274 0678 0003 0676 fb7a fb86 001c 0061 ---Z 11a9: c3            RET
+0274 0678 0003 0676 fb7c fb86 001c 0061 ---Z 08dd: 5b            POP BX
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 08de: 894408        MOV [SI+8], AX ;[0024]0000->0274
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 08e1: 09c0          OR AX, AX
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---- 08e3: 7507          JNE 08ec
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---- 08ec: 814c040800    OR [SI+4], 0008 ;[0020]0102 ;[0020]0102->010a
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---- 08f1: c744060004    MOV [SI+6], 0400 ;[0022]0000->0400
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---- 08f6: f6440440      TEST Byte [SI+4], 40 ;[0020]010a
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 08fa: 7506          JNE 0902
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 08fc: c704ff03      MOV [SI], 03ff ;[001c]ffff->03ff
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 0900: eb04          JMP Short 0906
+0274 0400 0003 0676 fb7e fb86 001c 0061 ---Z 0906: 8b5408        MOV DX, [SI+8] ;[0024]0274
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 0909: 89540a        MOV [SI+a], DX ;[0026]0000->0274
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 090c: f6440404      TEST Byte [SI+4], 4 ;[0020]010a
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 0910: 745b          JE 096d
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 096d: f6440440      TEST Byte [SI+4], 40 ;[0020]010a
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 0971: 7503          JNE 0976
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 0973: e97700        JMP 09ed
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 09ed: 8b540a        MOV DX, [SI+a] ;[0026]0274
+0274 0400 0003 0274 fb7e fb86 001c 0061 ---Z 09f0: 2b5408        SUB DX, [SI+8] ;[0024]0274
+0274 0400 0003 0000 fb7e fb86 001c 0061 ---Z 09f3: 8956fc        MOV [BP-4], DX ;[fb82]0061->0000
+0274 0400 0003 0000 fb7e fb86 001c 0061 ---Z 09f6: 8b5406        MOV DX, [SI+6] ;[0022]0400
+0274 0400 0003 0400 fb7e fb86 001c 0061 ---Z 09f9: 4a            DEC DX
+0274 0400 0003 03ff fb7e fb86 001c 0061 ---- 09fa: 8914          MOV [SI], DX ;[001c]03ff->03ff
+0274 0400 0003 03ff fb7e fb86 001c 0061 ---- 09fc: 8b5c08        MOV BX, [SI+8] ;[0024]0274
+0274 0274 0003 03ff fb7e fb86 001c 0061 ---- 09ff: 83c301        ADD BX, 1
+0274 0275 0003 03ff fb7e fb86 001c 0061 ---- 0a02: 895c0a        MOV [SI+a], BX ;[0026]0274->0275
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0274 0275 0003 03ff fb7e fb86 001c 0061 ---- 0a05: 837efc00      CMP [BP-4], 0 ;[fb82]0000
+0274 0275 0003 03ff fb7e fb86 001c 0061 ---Z 0a09: 7e4d          JLE 0a58
+0274 0275 0003 03ff fb7e fb86 001c 0061 ---Z 0a58: 89fa          MOV DX, DI
+0274 0275 0003 0061 fb7e fb86 001c 0061 ---Z 0a5a: 8b5c08        MOV BX, [SI+8] ;[0024]0274
+0274 0274 0003 0061 fb7e fb86 001c 0061 ---Z 0a5d: 8817          MOV [BX], DL ;[0274]0076->0061
+0274 0274 0003 0061 fb7e fb86 001c 0061 ---Z 0a5f: 89f8          MOV AX, DI
+0061 0274 0003 0061 fb7e fb86 001c 0061 ---Z 0a61: 30e4          XOR AH, AH
+0061 0274 0003 0061 fb7e fb86 001c 0061 ---Z 0a63: e93e07        JMP 11a4
+0061 0274 0003 0061 fb7e fb86 001c 0061 ---Z 11a4: 5f            POP DI
+0061 0274 0003 0061 fb80 fb86 001c 0000 ---Z 11a5: 5e            POP SI
+0061 0274 0003 0061 fb82 fb86 001c 0000 ---Z 11a6: 89ec          MOV SP, BP
+0061 0274 0003 0061 fb86 fb86 001c 0000 ---Z 11a8: 5d            POP BP
+0061 0274 0003 0061 fb88 ffac 001c 0000 ---Z 11a9: c3            RET
+0061 0274 0003 0061 fb8a ffac 001c 0000 ---Z 02f1: 5b            POP BX
+0061 0061 0003 0061 fb8c ffac 001c 0000 ---Z 02f2: 5b            POP BX
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---Z 02f3: 50            PUSH AX
+0061 001c 0003 0061 fb8c ffac 001c 0000 ---Z 02f4: 5a            POP DX
+[src/machine.rs:579:9] left = 97
+[src/machine.rs:579:9] right = 255
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---Z 02f5: 83faff        CMP DX, -1
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---- 02f8: 7514          JNE 030e
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---- 030e: ff46ec        INC [BP-14] ;[ff98]0000 ;[ff98]0000->0001
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---- 0311: eba7          JMP Short 02ba
+0061 001c 0003 0061 fb8e ffac 001c 0000 ---- 02ba: 8b5e04        MOV BX, [BP+4] ;[ffb0]0005
+0061 0005 0003 0061 fb8e ffac 001c 0000 ---- 02bd: ff4604        INC [BP+4] ;[ffb0]0005 ;[ffb0]0005->0006
+0061 0005 0003 0061 fb8e ffac 001c 0000 ---- 02c0: 8a07          MOV AL, [BX] ;[0005]253d
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02c2: 98            CBW
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02c3: 8946f8        MOV [BP-8], AX ;[ffa4]0061->003d
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02c6: 09c0          OR AX, AX
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02c8: 7503          JNE 02cd
+[src/machine.rs:579:9] left = 61
+[src/machine.rs:579:9] right = 37
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02cd: 837ef825      CMP [BP-8], 25 ;[ffa4]003d
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02d1: 7440          JE 0313
+003d 0005 0003 0061 fb8e ffac 001c 0000 ---- 02d3: 8b14          MOV DX, [SI] ;[001c]03ff
+003d 0005 0003 03ff fb8e ffac 001c 0000 ---- 02d5: 4a            DEC DX
+003d 0005 0003 03fe fb8e ffac 001c 0000 ---- 02d6: 8914          MOV [SI], DX ;[001c]03ff->03fe
+003d 0005 0003 03fe fb8e ffac 001c 0000 ---- 02d8: 7c10          JL 02ea
+003d 0005 0003 03fe fb8e ffac 001c 0000 ---- 02da: 8b56f8        MOV DX, [BP-8] ;[ffa4]003d
+003d 0005 0003 003d fb8e ffac 001c 0000 ---- 02dd: 30f6          XOR DH, DH
+003d 0005 0003 003d fb8e ffac 001c 0000 ---Z 02df: 8b5c0a        MOV BX, [SI+a] ;[0026]0275
+003d 0275 0003 003d fb8e ffac 001c 0000 ---Z 02e2: ff440a        INC [SI+a] ;[0026]0275 ;[0026]0275->0276
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 02e5: 8817          MOV [BX], DL ;[0275]0006->003d
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 02e7: 52            PUSH DX
+003d 0275 0003 003d fb8c ffac 001c 0000 ---- 02e8: eb0a          JMP Short 02f4
+003d 0275 0003 003d fb8c ffac 001c 0000 ---- 02f4: 5a            POP DX
+[src/machine.rs:579:9] left = 61
+[src/machine.rs:579:9] right = 255
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 02f5: 83faff        CMP DX, -1
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 02f8: 7514          JNE 030e
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 030e: ff46ec        INC [BP-14] ;[ff98]0001 ;[ff98]0001->0002
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 0311: eba7          JMP Short 02ba
+003d 0275 0003 003d fb8e ffac 001c 0000 ---- 02ba: 8b5e04        MOV BX, [BP+4] ;[ffb0]0006
+003d 0006 0003 003d fb8e ffac 001c 0000 ---- 02bd: ff4604        INC [BP+4] ;[ffb0]0006 ;[ffb0]0006->0007
+003d 0006 0003 003d fb8e ffac 001c 0000 ---- 02c0: 8a07          MOV AL, [BX] ;[0006]6425
+0025 0006 0003 003d fb8e ffac 001c 0000 ---- 02c2: 98            CBW
+0025 0006 0003 003d fb8e ffac 001c 0000 ---- 02c3: 8946f8        MOV [BP-8], AX ;[ffa4]003d->0025
+0025 0006 0003 003d fb8e ffac 001c 0000 ---- 02c6: 09c0          OR AX, AX
+0025 0006 0003 003d fb8e ffac 001c 0000 ---- 02c8: 7503          JNE 02cd
+[src/machine.rs:579:9] left = 37
+[src/machine.rs:579:9] right = 37
+0025 0006 0003 003d fb8e ffac 001c 0000 ---- 02cd: 837ef825      CMP [BP-8], 25 ;[ffa4]0025
+0025 0006 0003 003d fb8e ffac 001c 0000 ---Z 02d1: 7440          JE 0313
+0025 0006 0003 003d fb8e ffac 001c 0000 ---Z 0313: 31ff          XOR DI, DI
+0025 0006 0003 003d fb8e ffac 001c 0000 ---Z 0315: eb24          JMP Short 033b
+0025 0006 0003 003d fb8e ffac 001c 0000 ---Z 033b: 8b5e04        MOV BX, [BP+4] ;[ffb0]0007
+0025 0007 0003 003d fb8e ffac 001c 0000 ---Z 033e: 8a07          MOV AL, [BX] ;[0007]0a64
+0064 0007 0003 003d fb8e ffac 001c 0000 ---Z 0340: 98            CBW
+0064 0007 0003 003d fb8e ffac 001c 0000 ---Z 0341: bb8c00        MOV BX, 008c
+0064 008c 0003 003d fb8e ffac 001c 0000 ---Z 0344: e9e60d        JMP 112d
+0064 008c 0003 003d fb8e ffac 001c 0000 ---Z 112d: 8b17          MOV DX, [BX] ;[008c]0335
+0064 008c 0003 0335 fb8e ffac 001c 0000 ---Z 112f: 8b4f02        MOV CX, [BX+2] ;[008e]0005
+0064 008c 0005 0335 fb8e ffac 001c 0000 ---Z 1132: 83c304        ADD BX, 4
+0064 0090 0005 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 0090 0004 0335 fb8e ffac 001c 0000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 32
+0064 0090 0004 0335 fb8e ffac 001c 0000 ---- 1138: 3b07          CMP AX, [BX] ;[0090]0020
+0064 0090 0004 0335 fb8e ffac 001c 0000 ---- 113a: 75f6          JNE 1132
+0064 0090 0004 0335 fb8e ffac 001c 0000 ---- 1132: 83c304        ADD BX, 4
+0064 0094 0004 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 0094 0003 0335 fb8e ffac 001c 0000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 35
+0064 0094 0003 0335 fb8e ffac 001c 0000 ---- 1138: 3b07          CMP AX, [BX] ;[0094]0023
+0064 0094 0003 0335 fb8e ffac 001c 0000 ---- 113a: 75f6          JNE 1132
+0064 0094 0003 0335 fb8e ffac 001c 0000 ---- 1132: 83c304        ADD BX, 4
+0064 0098 0003 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 0098 0002 0335 fb8e ffac 001c 0000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 43
+0064 0098 0002 0335 fb8e ffac 001c 0000 ---- 1138: 3b07          CMP AX, [BX] ;[0098]002b
+0064 0098 0002 0335 fb8e ffac 001c 0000 ---- 113a: 75f6          JNE 1132
+0064 0098 0002 0335 fb8e ffac 001c 0000 ---- 1132: 83c304        ADD BX, 4
+0064 009c 0002 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 009c 0001 0335 fb8e ffac 001c 0000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 45
+0064 009c 0001 0335 fb8e ffac 001c 0000 ---- 1138: 3b07          CMP AX, [BX] ;[009c]002d
+0064 009c 0001 0335 fb8e ffac 001c 0000 ---- 113a: 75f6          JNE 1132
+0064 009c 0001 0335 fb8e ffac 001c 0000 ---- 1132: 83c304        ADD BX, 4
+0064 00a0 0001 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 00a0 0000 0335 fb8e ffac 001c 0000 ---Z 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 48
+0064 00a0 0000 0335 fb8e ffac 001c 0000 ---Z 1138: 3b07          CMP AX, [BX] ;[00a0]0030
+0064 00a0 0000 0335 fb8e ffac 001c 0000 ---- 113a: 75f6          JNE 1132
+0064 00a0 0000 0335 fb8e ffac 001c 0000 ---- 1132: 83c304        ADD BX, 4
+0064 00a4 0000 0335 fb8e ffac 001c 0000 ---- 1135: 49            DEC CX
+0064 00a4 ffff 0335 fb8e ffac 001c 0000 --S- 1136: 7c14          JL 114c
+0064 00a4 ffff 0335 fb8e ffac 001c 0000 --S- 114c: 89d3          MOV BX, DX
+0064 0335 ffff 0335 fb8e ffac 001c 0000 --S- 114e: ebef          JMP Short 113f
+0064 0335 ffff 0335 fb8e ffac 001c 0000 --S- 113f: 85db          TEST BX, BX
+0064 0335 ffff 0335 fb8e ffac 001c 0000 ---- 1141: 7507          JNE 114a
+0064 0335 ffff 0335 fb8e ffac 001c 0000 ---- 114a: ffe3          JMP BX
+0064 0335 ffff 0335 fb8e ffac 001c 0000 ---- 0335: 81cf0010      OR DI, 1000
+0064 0335 ffff 0335 fb8e ffac 001c 1000 ---- 0339: eb0f          JMP Short 034a
+0064 0335 ffff 0335 fb8e ffac 001c 1000 ---- 034a: f7c70010      TEST DI, 1000
+0064 0335 ffff 0335 fb8e ffac 001c 1000 ---- 034e: 74eb          JE 033b
+0064 0335 ffff 0335 fb8e ffac 001c 1000 ---- 0350: 8b5604        MOV DX, [BP+4] ;[ffb0]0007
+0064 0335 ffff 0007 fb8e ffac 001c 1000 ---- 0353: 8956ea        MOV [BP-16], DX ;[ff96]0000->0007
+0064 0335 ffff 0007 fb8e ffac 001c 1000 ---- 0356: 8d4606        LEA AX, [BP+6] ;[ffb2]ffc0
+ffb2 0335 ffff 0007 fb8e ffac 001c 1000 ---- 0359: 50            PUSH AX
+ffb2 0335 ffff 0007 fb8c ffac 001c 1000 ---- 035a: 8d46f6        LEA AX, [BP-a] ;[ffa2]0000
+ffa2 0335 ffff 0007 fb8c ffac 001c 1000 ---- 035d: 50            PUSH AX
+ffa2 0335 ffff 0007 fb8a ffac 001c 1000 ---- 035e: ff7604        PUSH [BP+4] ;[ffb0]0007
+ffa2 0335 ffff 0007 fb88 ffac 001c 1000 ---- 0361: e865fd        CALL 00c9
+ffa2 0335 ffff 0007 fb86 ffac 001c 1000 ---- 00c9: 55            PUSH BP
+ffa2 0335 ffff 0007 fb84 ffac 001c 1000 ---- 00ca: 89e5          MOV BP, SP
+ffa2 0335 ffff 0007 fb84 fb84 001c 1000 ---- 00cc: 50            PUSH AX
+ffa2 0335 ffff 0007 fb82 fb84 001c 1000 ---- 00cd: 50            PUSH AX
+ffa2 0335 ffff 0007 fb80 fb84 001c 1000 ---- 00ce: 56            PUSH SI
+ffa2 0335 ffff 0007 fb7e fb84 001c 1000 ---- 00cf: 57            PUSH DI
+ffa2 0335 ffff 0007 fb7c fb84 001c 1000 ---- 00d0: 8b7604        MOV SI, [BP+4] ;[fb88]0007
+[src/machine.rs:579:9] left = 2660
+[src/machine.rs:579:9] right = 42
+ffa2 0335 ffff 0007 fb7c fb84 0007 1000 ---- 00d3: 803c2a        CMP Byte [SI], 2a ;[0007]0a64
+ffa2 0335 ffff 0007 fb7c fb84 0007 1000 ---- 00d6: 751b          JNE 00f3
+ffa2 0335 ffff 0007 fb7c fb84 0007 1000 ---- 00f3: 31ff          XOR DI, DI
+ffa2 0335 ffff 0007 fb7c fb84 0007 0000 ---Z 00f5: 8a04          MOV AL, [SI] ;[0007]0a64
+ff64 0335 ffff 0007 fb7c fb84 0007 0000 ---Z 00f7: 98            CBW
+0064 0335 ffff 0007 fb7c fb84 0007 0000 ---Z 00f8: 2d3000        SUB AX, 0030
+0034 0335 ffff 0007 fb7c fb84 0007 0000 ---- 00fb: 8946fc        MOV [BP-4], AX ;[fb80]ffa2->0034
+0034 0335 ffff 0007 fb7c fb84 0007 0000 ---- 00fe: 7c13          JL 0113
+[src/machine.rs:579:9] left = 52
+[src/machine.rs:579:9] right = 9
+0034 0335 ffff 0007 fb7c fb84 0007 0000 ---- 0100: 837efc09      CMP [BP-4], 9 ;[fb80]0034
+0034 0335 ffff 0007 fb7c fb84 0007 0000 ---- 0104: 7f0d          JNLE 0113
+0034 0335 ffff 0007 fb7c fb84 0007 0000 ---- 0113: 8b5e06        MOV BX, [BP+6] ;[fb8a]ffa2
+0034 ffa2 ffff 0007 fb7c fb84 0007 0000 ---- 0116: 893f          MOV [BX], DI ;[ffa2]0000->0000
+0034 ffa2 ffff 0007 fb7c fb84 0007 0000 ---- 0118: 89f0          MOV AX, SI
+0007 ffa2 ffff 0007 fb7c fb84 0007 0000 ---- 011a: e98710        JMP 11a4
+0007 ffa2 ffff 0007 fb7c fb84 0007 0000 ---- 11a4: 5f            POP DI
+0007 ffa2 ffff 0007 fb7e fb84 0007 1000 ---- 11a5: 5e            POP SI
+0007 ffa2 ffff 0007 fb80 fb84 001c 1000 ---- 11a6: 89ec          MOV SP, BP
+0007 ffa2 ffff 0007 fb84 fb84 001c 1000 ---- 11a8: 5d            POP BP
+0007 ffa2 ffff 0007 fb86 ffac 001c 1000 ---- 11a9: c3            RET
+0007 ffa2 ffff 0007 fb88 ffac 001c 1000 ---- 0364: 83c406        ADD SP, 6
+0007 ffa2 ffff 0007 fb8e ffac 001c 1000 --S- 0367: 894604        MOV [BP+4], AX ;[ffb0]0007->0007
+[src/machine.rs:579:9] left = 7
+[src/machine.rs:579:9] right = 7
+0007 ffa2 ffff 0007 fb8e ffac 001c 1000 --S- 036a: 3946ea        CMP [BP-16], AX ;[ff96]0007
+0007 ffa2 ffff 0007 fb8e ffac 001c 1000 ---Z 036d: 7404          JE 0373
+0007 ffa2 ffff 0007 fb8e ffac 001c 1000 ---Z 0373: 8b5e04        MOV BX, [BP+4] ;[ffb0]0007
+[src/machine.rs:579:9] left = 2660
+[src/machine.rs:579:9] right = 46
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 0376: 803f2e        CMP Byte [BX], 2e ;[0007]0a64
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---- 0379: 7527          JNE 03a2
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---- 03a2: f7c70001      TEST DI, 0100
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03a6: 740d          JE 03b5
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03b5: f7c70001      TEST DI, 0100
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03b9: 7505          JNE 03c0
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03bb: c746f60000    MOV [BP-a], 0000 ;[ffa2]0000->0000
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03c0: f7c70200      TEST DI, 0002
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03c4: 7404          JE 03ca
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03ca: f7c70100      TEST DI, 0001
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03ce: 7404          JE 03d4
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 03d4: 8d9ee7fb      LEA BX, [BP-419] ;[fb93]0000
+0007 fb93 ffff 0007 fb8e ffac 001c 1000 ---Z 03d8: 895ee8        MOV [BP-18], BX ;[ff94]0000->fb93
+0007 fb93 ffff 0007 fb8e ffac 001c 1000 ---Z 03db: 895efe        MOV [BP-2], BX ;[ffaa]0000->fb93
+0007 fb93 ffff 0007 fb8e ffac 001c 1000 ---Z 03de: eb1e          JMP Short 03fe
+0007 fb93 ffff 0007 fb8e ffac 001c 1000 ---Z 03fe: 8b5e04        MOV BX, [BP+4] ;[ffb0]0007
+0007 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 0401: 8a07          MOV AL, [BX] ;[0007]0a64
+0064 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 0403: 98            CBW
+0064 0007 ffff 0007 fb8e ffac 001c 1000 ---Z 0404: bba400        MOV BX, 00a4
+0064 00a4 ffff 0007 fb8e ffac 001c 1000 ---Z 0407: e9230d        JMP 112d
+0064 00a4 ffff 0007 fb8e ffac 001c 1000 ---Z 112d: 8b17          MOV DX, [BX] ;[00a4]05c1
+0064 00a4 ffff 05c1 fb8e ffac 001c 1000 ---Z 112f: 8b4f02        MOV CX, [BX+2] ;[00a6]0003
+0064 00a4 0003 05c1 fb8e ffac 001c 1000 ---Z 1132: 83c304        ADD BX, 4
+0064 00a8 0003 05c1 fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00a8 0002 05c1 fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 76
+0064 00a8 0002 05c1 fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00a8]004c
+0064 00a8 0002 05c1 fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00a8 0002 05c1 fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00ac 0002 05c1 fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00ac 0001 05c1 fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 104
+0064 00ac 0001 05c1 fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00ac]0068
+0064 00ac 0001 05c1 fb8e ffac 001c 1000 C-S- 113a: 75f6          JNE 1132
+0064 00ac 0001 05c1 fb8e ffac 001c 1000 C-S- 1132: 83c304        ADD BX, 4
+0064 00b0 0001 05c1 fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00b0 0000 05c1 fb8e ffac 001c 1000 ---Z 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 108
+0064 00b0 0000 05c1 fb8e ffac 001c 1000 ---Z 1138: 3b07          CMP AX, [BX] ;[00b0]006c
+0064 00b0 0000 05c1 fb8e ffac 001c 1000 C-S- 113a: 75f6          JNE 1132
+0064 00b0 0000 05c1 fb8e ffac 001c 1000 C-S- 1132: 83c304        ADD BX, 4
+0064 00b4 0000 05c1 fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00b4 ffff 05c1 fb8e ffac 001c 1000 --S- 1136: 7c14          JL 114c
+0064 00b4 ffff 05c1 fb8e ffac 001c 1000 --S- 114c: 89d3          MOV BX, DX
+0064 05c1 ffff 05c1 fb8e ffac 001c 1000 --S- 114e: ebef          JMP Short 113f
+0064 05c1 ffff 05c1 fb8e ffac 001c 1000 --S- 113f: 85db          TEST BX, BX
+0064 05c1 ffff 05c1 fb8e ffac 001c 1000 ---- 1141: 7507          JNE 114a
+0064 05c1 ffff 05c1 fb8e ffac 001c 1000 ---- 114a: ffe3          JMP BX
+0064 05c1 ffff 05c1 fb8e ffac 001c 1000 ---- 05c1: 8b5e04        MOV BX, [BP+4] ;[ffb0]0007
+0064 0007 ffff 05c1 fb8e ffac 001c 1000 ---- 05c4: ff4604        INC [BP+4] ;[ffb0]0007 ;[ffb0]0007->0008
+0064 0007 ffff 05c1 fb8e ffac 001c 1000 ---- 05c7: 8a07          MOV AL, [BX] ;[0007]0a64
+0064 0007 ffff 05c1 fb8e ffac 001c 1000 ---- 05c9: 98            CBW
+0064 0007 ffff 05c1 fb8e ffac 001c 1000 ---- 05ca: 8946f8        MOV [BP-8], AX ;[ffa4]0025->0064
+0064 0007 ffff 05c1 fb8e ffac 001c 1000 ---- 05cd: bbb400        MOV BX, 00b4
+0064 00b4 ffff 05c1 fb8e ffac 001c 1000 ---- 05d0: e95a0b        JMP 112d
+0064 00b4 ffff 05c1 fb8e ffac 001c 1000 ---- 112d: 8b17          MOV DX, [BX] ;[00b4]040a
+0064 00b4 ffff 040a fb8e ffac 001c 1000 ---- 112f: 8b4f02        MOV CX, [BX+2] ;[00b6]0011
+0064 00b4 0011 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00b8 0011 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00b8 0010 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 69
+0064 00b8 0010 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00b8]0045
+0064 00b8 0010 040a fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00b8 0010 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00bc 0010 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00bc 000f 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 71
+0064 00bc 000f 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00bc]0047
+0064 00bc 000f 040a fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00bc 000f 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00c0 000f 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00c0 000e 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 88
+0064 00c0 000e 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00c0]0058
+0064 00c0 000e 040a fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00c0 000e 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00c4 000e 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00c4 000d 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 98
+0064 00c4 000d 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00c4]0062
+0064 00c4 000d 040a fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00c4 000d 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00c8 000d 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00c8 000c 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 99
+0064 00c8 000c 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00c8]0063
+0064 00c8 000c 040a fb8e ffac 001c 1000 ---- 113a: 75f6          JNE 1132
+0064 00c8 000c 040a fb8e ffac 001c 1000 ---- 1132: 83c304        ADD BX, 4
+0064 00cc 000c 040a fb8e ffac 001c 1000 ---- 1135: 49            DEC CX
+0064 00cc 000b 040a fb8e ffac 001c 1000 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 100
+0064 00cc 000b 040a fb8e ffac 001c 1000 ---- 1138: 3b07          CMP AX, [BX] ;[00cc]0064
+0064 00cc 000b 040a fb8e ffac 001c 1000 ---Z 113a: 75f6          JNE 1132
+0064 00cc 000b 040a fb8e ffac 001c 1000 ---Z 113c: 8b5f02        MOV BX, [BX+2] ;[00ce]050d
+0064 050d 000b 040a fb8e ffac 001c 1000 ---Z 113f: 85db          TEST BX, BX
+0064 050d 000b 040a fb8e ffac 001c 1000 ---- 1141: 7507          JNE 114a
+0064 050d 000b 040a fb8e ffac 001c 1000 ---- 114a: ffe3          JMP BX
+0064 050d 000b 040a fb8e ffac 001c 1000 ---- 050d: 81cf0004      OR DI, 0400
+0064 050d 000b 040a fb8e ffac 001c 1400 ---- 0511: f7c70002      TEST DI, 0200
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 0515: 7507          JNE 051e
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 0517: c746f40100    MOV [BP-c], 0001 ;[ffa0]0000->0001
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 051c: eb04          JMP Short 0522
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 0522: 8b46f8        MOV AX, [BP-8] ;[ffa4]0064
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 0525: 98            CBW
+0064 050d 000b 040a fb8e ffac 001c 1400 ---Z 0526: bb0100        MOV BX, 0001
+0064 0001 000b 040a fb8e ffac 001c 1400 ---Z 0529: 53            PUSH BX
+0064 0001 000b 040a fb8c ffac 001c 1400 ---Z 052a: ff76f4        PUSH [BP-c] ;[ffa0]0001
+0064 0001 000b 040a fb8a ffac 001c 1400 ---Z 052d: 50            PUSH AX
+0064 0001 000b 040a fb88 ffac 001c 1400 ---Z 052e: ff76fe        PUSH [BP-2] ;[ffaa]fb93
+0064 0001 000b 040a fb86 ffac 001c 1400 ---Z 0531: 57            PUSH DI
+0064 0001 000b 040a fb84 ffac 001c 1400 ---Z 0532: 8d4606        LEA AX, [BP+6] ;[ffb2]ffc0
+ffb2 0001 000b 040a fb84 ffac 001c 1400 ---Z 0535: 50            PUSH AX
+ffb2 0001 000b 040a fb82 ffac 001c 1400 ---Z 0536: e8e4fb        CALL 011d
+ffb2 0001 000b 040a fb80 ffac 001c 1400 ---Z 011d: 55            PUSH BP
+ffb2 0001 000b 040a fb7e ffac 001c 1400 ---Z 011e: 89e5          MOV BP, SP
+ffb2 0001 000b 040a fb7e fb7e 001c 1400 ---Z 0120: 83ec0c        SUB SP, c
+ffb2 0001 000b 040a fb72 fb7e 001c 1400 --S- 0123: 56            PUSH SI
+ffb2 0001 000b 040a fb70 fb7e 001c 1400 --S- 0124: 57            PUSH DI
+ffb2 0001 000b 040a fb6e fb7e 001c 1400 --S- 0125: 8b7e04        MOV DI, [BP+4] ;[fb82]ffb2
+ffb2 0001 000b 040a fb6e fb7e 001c ffb2 --S- 0128: 8b7608        MOV SI, [BP+8] ;[fb86]fb93
+ffb2 0001 000b 040a fb6e fb7e fb93 ffb2 --S- 012b: 8976f6        MOV [BP-a], SI ;[fb74]0000->fb93
+ffb2 0001 000b 040a fb6e fb7e fb93 ffb2 --S- 012e: e97a00        JMP 01ab
+ffb2 0001 000b 040a fb6e fb7e fb93 ffb2 --S- 01ab: ba6000        MOV DX, 0060
+ffb2 0001 000b 0060 fb6e fb7e fb93 ffb2 --S- 01ae: 235606        AND DX, [BP+6] ;[fb84]1400
+ffb2 0001 000b 0000 fb6e fb7e fb93 ffb2 ---Z 01b1: bb5c00        MOV BX, 005c
+ffb2 005c 000b 0000 fb6e fb7e fb93 ffb2 ---Z 01b4: 89d0          MOV AX, DX
+0000 005c 000b 0000 fb6e fb7e fb93 ffb2 ---Z 01b6: e9740f        JMP 112d
+0000 005c 000b 0000 fb6e fb7e fb93 ffb2 ---Z 112d: 8b17          MOV DX, [BX] ;[005c]0184
+0000 005c 000b 0184 fb6e fb7e fb93 ffb2 ---Z 112f: 8b4f02        MOV CX, [BX+2] ;[005e]0002
+0000 005c 0002 0184 fb6e fb7e fb93 ffb2 ---Z 1132: 83c304        ADD BX, 4
+0000 0060 0002 0184 fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0000 0060 0001 0184 fb6e fb7e fb93 ffb2 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 32
+0000 0060 0001 0184 fb6e fb7e fb93 ffb2 ---- 1138: 3b07          CMP AX, [BX] ;[0060]0020
+0000 0060 0001 0184 fb6e fb7e fb93 ffb2 C-S- 113a: 75f6          JNE 1132
+0000 0060 0001 0184 fb6e fb7e fb93 ffb2 C-S- 1132: 83c304        ADD BX, 4
+0000 0064 0001 0184 fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0000 0064 0000 0184 fb6e fb7e fb93 ffb2 ---Z 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 64
+0000 0064 0000 0184 fb6e fb7e fb93 ffb2 ---Z 1138: 3b07          CMP AX, [BX] ;[0064]0040
+0000 0064 0000 0184 fb6e fb7e fb93 ffb2 C-S- 113a: 75f6          JNE 1132
+0000 0064 0000 0184 fb6e fb7e fb93 ffb2 C-S- 1132: 83c304        ADD BX, 4
+0000 0068 0000 0184 fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0000 0068 ffff 0184 fb6e fb7e fb93 ffb2 --S- 1136: 7c14          JL 114c
+0000 0068 ffff 0184 fb6e fb7e fb93 ffb2 --S- 114c: 89d3          MOV BX, DX
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 --S- 114e: ebef          JMP Short 113f
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 --S- 113f: 85db          TEST BX, BX
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 ---- 1141: 7507          JNE 114a
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 ---- 114a: ffe3          JMP BX
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 0
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 ---- 0184: 837e0e00      CMP [BP+e], 0 ;[fb8c]0001
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 ---- 0188: 7410          JE 019a
+0000 0184 ffff 0184 fb6e fb7e fb93 ffb2 ---- 018a: 8b1d          MOV BX, [DI] ;[ffb2]ffc0
+0000 ffc0 ffff 0184 fb6e fb7e fb93 ffb2 ---- 018c: 830502        ADD [DI], 2 ;[ffb2]ffc0 ;[ffb2]ffc0->ffc2
+0000 ffc0 ffff 0184 fb6e fb7e fb93 ffb2 --S- 018f: 8b07          MOV AX, [BX] ;[ffc0]04d2
+04d2 ffc0 ffff 0184 fb6e fb7e fb93 ffb2 --S- 0191: 99            CWD
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 --S- 0192: 8946fc        MOV [BP-4], AX ;[fb7a]08dd->04d2
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 --S- 0195: 8956fe        MOV [BP-2], DX ;[fb7c]1000->0000
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 --S- 0198: eb1f          JMP Short 01b9
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 0
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 --S- 01b9: 837e0e00      CMP [BP+e], 0 ;[fb8c]0001
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---- 01bd: 7438          JE 01f7
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---- 01bf: 837efe00      CMP [BP-2], 0 ;[fb7c]0000
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01c3: 7d10          JNL 01d5
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01d5: f6460602      TEST Byte [BP+6], 2 ;[fb84]1400
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01d9: 7406          JE 01e1
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01e1: f6460604      TEST Byte [BP+6], 4 ;[fb84]1400
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01e5: 7404          JE 01eb
+04d2 ffc0 ffff 0000 fb6e fb7e fb93 ffb2 ---Z 01eb: 8b56fc        MOV DX, [BP-4] ;[fb7a]04d2
+04d2 ffc0 ffff 04d2 fb6e fb7e fb93 ffb2 ---Z 01ee: 8b4efe        MOV CX, [BP-2] ;[fb7c]0000
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 01f1: 8956f8        MOV [BP-8], DX ;[fb76]0000->04d2
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 01f4: 894efa        MOV [BP-6], CX ;[fb78]fb86->0000
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 01f7: f6460608      TEST Byte [BP+6], 8 ;[fb84]1400
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 01fb: 740a          JE 0207
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 0207: 8b56fa        MOV DX, [BP-6] ;[fb78]0000
+04d2 ffc0 0000 0000 fb6e fb7e fb93 ffb2 ---Z 020a: 0b56f8        OR DX, [BP-8] ;[fb76]04d2
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---- 020d: 750b          JNE 021a
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---- 021a: f6460608      TEST Byte [BP+6], 8 ;[fb84]1400
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 021e: 740c          JE 022c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 112
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 ---Z 022c: 807e0a70      CMP Byte [BP+a], 70 ;[fb88]0064
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 0230: 7533          JNE 0265
+04d2 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 0265: 8a460a        MOV AL, [BP+a] ;[fb88]0064
+0464 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 0268: 98            CBW
+0064 ffc0 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 0269: bb6800        MOV BX, 0068
+0064 0068 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 026c: e9be0e        JMP 112d
+0064 0068 0000 04d2 fb6e fb7e fb93 ffb2 C-S- 112d: 8b17          MOV DX, [BX] ;[0068]026f
+0064 0068 0000 026f fb6e fb7e fb93 ffb2 C-S- 112f: 8b4f02        MOV CX, [BX+2] ;[006a]0008
+0064 0068 0008 026f fb6e fb7e fb93 ffb2 C-S- 1132: 83c304        ADD BX, 4
+0064 006c 0008 026f fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0064 006c 0007 026f fb6e fb7e fb93 ffb2 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 88
+0064 006c 0007 026f fb6e fb7e fb93 ffb2 ---- 1138: 3b07          CMP AX, [BX] ;[006c]0058
+0064 006c 0007 026f fb6e fb7e fb93 ffb2 ---- 113a: 75f6          JNE 1132
+0064 006c 0007 026f fb6e fb7e fb93 ffb2 ---- 1132: 83c304        ADD BX, 4
+0064 0070 0007 026f fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0064 0070 0006 026f fb6e fb7e fb93 ffb2 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 98
+0064 0070 0006 026f fb6e fb7e fb93 ffb2 ---- 1138: 3b07          CMP AX, [BX] ;[0070]0062
+0064 0070 0006 026f fb6e fb7e fb93 ffb2 ---- 113a: 75f6          JNE 1132
+0064 0070 0006 026f fb6e fb7e fb93 ffb2 ---- 1132: 83c304        ADD BX, 4
+0064 0074 0006 026f fb6e fb7e fb93 ffb2 ---- 1135: 49            DEC CX
+0064 0074 0005 026f fb6e fb7e fb93 ffb2 ---- 1136: 7c14          JL 114c
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 100
+0064 0074 0005 026f fb6e fb7e fb93 ffb2 ---- 1138: 3b07          CMP AX, [BX] ;[0074]0064
+0064 0074 0005 026f fb6e fb7e fb93 ffb2 ---Z 113a: 75f6          JNE 1132
+0064 0074 0005 026f fb6e fb7e fb93 ffb2 ---Z 113c: 8b5f02        MOV BX, [BX+2] ;[0076]0257
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---Z 113f: 85db          TEST BX, BX
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---- 1141: 7507          JNE 114a
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---- 114a: ffe3          JMP BX
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---- 0257: c746f40a00    MOV [BP-c], 000a ;[fb72]0800->000a
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---- 025c: eb11          JMP Short 026f
+0064 0257 0005 026f fb6e fb7e fb93 ffb2 ---- 026f: ff760c        PUSH [BP+c] ;[fb8a]0001
+0064 0257 0005 026f fb6c fb7e fb93 ffb2 ---- 0272: 56            PUSH SI
+0064 0257 0005 026f fb6a fb7e fb93 ffb2 ---- 0273: ff76f4        PUSH [BP-c] ;[fb72]000a
+0064 0257 0005 026f fb68 fb7e fb93 ffb2 ---- 0276: ff76fa        PUSH [BP-6] ;[fb78]0000
+0064 0257 0005 026f fb66 fb7e fb93 ffb2 ---- 0279: ff76f8        PUSH [BP-8] ;[fb76]04d2
+0064 0257 0005 026f fb64 fb7e fb93 ffb2 ---- 027c: e8e707        CALL 0a66
+0064 0257 0005 026f fb62 fb7e fb93 ffb2 ---- 0a66: 55            PUSH BP
+0064 0257 0005 026f fb60 fb7e fb93 ffb2 ---- 0a67: 89e5          MOV BP, SP
+0064 0257 0005 026f fb60 fb60 fb93 ffb2 ---- 0a69: 56            PUSH SI
+0064 0257 0005 026f fb5e fb60 fb93 ffb2 ---- 0a6a: 57            PUSH DI
+0064 0257 0005 026f fb5c fb60 fb93 ffb2 ---- 0a6b: 8b760a        MOV SI, [BP+a] ;[fb6a]fb93
+0064 0257 0005 026f fb5c fb60 fb93 ffb2 ---- 0a6e: 8b4608        MOV AX, [BP+8] ;[fb68]000a
+000a 0257 0005 026f fb5c fb60 fb93 ffb2 ---- 0a71: 99            CWD
+000a 0257 0005 0000 fb5c fb60 fb93 ffb2 ---- 0a72: ff7606        PUSH [BP+6] ;[fb66]0000
+000a 0257 0005 0000 fb5a fb60 fb93 ffb2 ---- 0a75: ff7604        PUSH [BP+4] ;[fb64]04d2
+000a 0257 0005 0000 fb58 fb60 fb93 ffb2 ---- 0a78: 52            PUSH DX
+000a 0257 0005 0000 fb56 fb60 fb93 ffb2 ---- 0a79: 50            PUSH AX
+000a 0257 0005 0000 fb54 fb60 fb93 ffb2 ---- 0a7a: e83107        CALL 11ae
+000a 0257 0005 0000 fb52 fb60 fb93 ffb2 ---- 11ae: 56            PUSH SI
+000a 0257 0005 0000 fb50 fb60 fb93 ffb2 ---- 11af: 57            PUSH DI
+000a 0257 0005 0000 fb4e fb60 fb93 ffb2 ---- 11b0: 89e6          MOV SI, SP
+000a 0257 0005 0000 fb4e fb60 fb4e ffb2 ---- 11b2: 8b5c06        MOV BX, [SI+6] ;[fb54]000a
+000a 000a 0005 0000 fb4e fb60 fb4e ffb2 ---- 11b5: 8b4408        MOV AX, [SI+8] ;[fb56]0000
+0000 000a 0005 0000 fb4e fb60 fb4e ffb2 ---- 11b8: 09c0          OR AX, AX
+0000 000a 0005 0000 fb4e fb60 fb4e ffb2 ---Z 11ba: 7518          JNE 11d4
+0000 000a 0005 0000 fb4e fb60 fb4e ffb2 ---Z 11bc: 31d2          XOR DX, DX
+0000 000a 0005 0000 fb4e fb60 fb4e ffb2 ---Z 11be: 8b4c0a        MOV CX, [SI+a] ;[fb58]04d2
+0000 000a 04d2 0000 fb4e fb60 fb4e ffb2 ---Z 11c1: 8b440c        MOV AX, [SI+c] ;[fb5a]0000
+0000 000a 04d2 0000 fb4e fb60 fb4e ffb2 ---Z 11c4: f7f3          DIV BX
+0000 000a 04d2 0000 fb4e fb60 fb4e ffb2 ---Z 11c6: 91            XCHG CX, AX
+04d2 000a 0000 0000 fb4e fb60 fb4e ffb2 ---Z 11c7: f7f3          DIV BX
+007b 000a 0000 0004 fb4e fb60 fb4e ffb2 ---Z 11c9: 31db          XOR BX, BX
+007b 0000 0000 0004 fb4e fb60 fb4e ffb2 ---Z 11cb: 89d0          MOV AX, DX
+0004 0000 0000 0004 fb4e fb60 fb4e ffb2 ---Z 11cd: 89da          MOV DX, BX
+0004 0000 0000 0000 fb4e fb60 fb4e ffb2 ---Z 11cf: 5f            POP DI
+0004 0000 0000 0000 fb50 fb60 fb4e ffb2 ---Z 11d0: 5e            POP SI
+0004 0000 0000 0000 fb52 fb60 fb93 ffb2 ---Z 11d1: c20800        RET 0008
+0004 0000 0000 0000 fb54 fb60 fb93 ffb2 ---Z 0a7d: 89c7          MOV DI, AX
+0004 0000 0000 0000 fb54 fb60 fb93 0004 ---Z 0a7f: 8b4608        MOV AX, [BP+8] ;[fb68]000a
+000a 0000 0000 0000 fb54 fb60 fb93 0004 ---Z 0a82: 99            CWD
+000a 0000 0000 0000 fb54 fb60 fb93 0004 ---Z 0a83: ff7606        PUSH [BP+6] ;[fb66]0000
+000a 0000 0000 0000 fb52 fb60 fb93 0004 ---Z 0a86: ff7604        PUSH [BP+4] ;[fb64]04d2
+000a 0000 0000 0000 fb50 fb60 fb93 0004 ---Z 0a89: 52            PUSH DX
+000a 0000 0000 0000 fb4e fb60 fb93 0004 ---Z 0a8a: 50            PUSH AX
+000a 0000 0000 0000 fb4c fb60 fb93 0004 ---Z 0a8b: e8c206        CALL 1150
+000a 0000 0000 0000 fb4a fb60 fb93 0004 ---Z 1150: 56            PUSH SI
+000a 0000 0000 0000 fb48 fb60 fb93 0004 ---Z 1151: 57            PUSH DI
+000a 0000 0000 0000 fb46 fb60 fb93 0004 ---Z 1152: 89e6          MOV SI, SP
+000a 0000 0000 0000 fb46 fb60 fb46 0004 ---Z 1154: 8b5c06        MOV BX, [SI+6] ;[fb4c]000a
+000a 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 1157: 8b4408        MOV AX, [SI+8] ;[fb4e]0000
+0000 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 115a: 09c0          OR AX, AX
+0000 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 115c: 7514          JNE 1172
+0000 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 115e: 31d2          XOR DX, DX
+0000 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 1160: 8b4c0a        MOV CX, [SI+a] ;[fb50]04d2
+0000 000a 04d2 0000 fb46 fb60 fb46 0004 ---Z 1163: 8b440c        MOV AX, [SI+c] ;[fb52]0000
+0000 000a 04d2 0000 fb46 fb60 fb46 0004 ---Z 1166: f7f3          DIV BX
+0000 000a 04d2 0000 fb46 fb60 fb46 0004 ---Z 1168: 91            XCHG CX, AX
+04d2 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 1169: f7f3          DIV BX
+007b 000a 0000 0004 fb46 fb60 fb46 0004 ---Z 116b: 89ca          MOV DX, CX
+007b 000a 0000 0000 fb46 fb60 fb46 0004 ---Z 116d: 5f            POP DI
+007b 000a 0000 0000 fb48 fb60 fb46 0004 ---Z 116e: 5e            POP SI
+007b 000a 0000 0000 fb4a fb60 fb93 0004 ---Z 116f: c20800        RET 0008
+007b 000a 0000 0000 fb4c fb60 fb93 0004 ---Z 0a8e: 894604        MOV [BP+4], AX ;[fb64]04d2->007b
+007b 000a 0000 0000 fb4c fb60 fb93 0004 ---Z 0a91: 895606        MOV [BP+6], DX ;[fb66]0000->0000
+007b 000a 0000 0000 fb4c fb60 fb93 0004 ---Z 0a94: 09c2          OR DX, AX
+007b 000a 0000 007b fb4c fb60 fb93 0004 ---- 0a96: 7506          JNE 0a9e
+007b 000a 0000 007b fb4c fb60 fb93 0004 ---- 0a9e: 8b560c        MOV DX, [BP+c] ;[fb6c]0001
+007b 000a 0000 0001 fb4c fb60 fb93 0004 ---- 0aa1: 4a            DEC DX
+007b 000a 0000 0000 fb4c fb60 fb93 0004 ---Z 0aa2: 52            PUSH DX
+007b 000a 0000 0000 fb4a fb60 fb93 0004 ---Z 0aa3: 56            PUSH SI
+007b 000a 0000 0000 fb48 fb60 fb93 0004 ---Z 0aa4: ff7608        PUSH [BP+8] ;[fb68]000a
+007b 000a 0000 0000 fb46 fb60 fb93 0004 ---Z 0aa7: ff7606        PUSH [BP+6] ;[fb66]0000
+007b 000a 0000 0000 fb44 fb60 fb93 0004 ---Z 0aaa: ff7604        PUSH [BP+4] ;[fb64]007b
+007b 000a 0000 0000 fb42 fb60 fb93 0004 ---Z 0aad: e8b6ff        CALL 0a66
+007b 000a 0000 0000 fb40 fb60 fb93 0004 ---Z 0a66: 55            PUSH BP
+007b 000a 0000 0000 fb3e fb60 fb93 0004 ---Z 0a67: 89e5          MOV BP, SP
+007b 000a 0000 0000 fb3e fb3e fb93 0004 ---Z 0a69: 56            PUSH SI
+007b 000a 0000 0000 fb3c fb3e fb93 0004 ---Z 0a6a: 57            PUSH DI
+007b 000a 0000 0000 fb3a fb3e fb93 0004 ---Z 0a6b: 8b760a        MOV SI, [BP+a] ;[fb48]fb93
+007b 000a 0000 0000 fb3a fb3e fb93 0004 ---Z 0a6e: 8b4608        MOV AX, [BP+8] ;[fb46]000a
+000a 000a 0000 0000 fb3a fb3e fb93 0004 ---Z 0a71: 99            CWD
+000a 000a 0000 0000 fb3a fb3e fb93 0004 ---Z 0a72: ff7606        PUSH [BP+6] ;[fb44]0000
+000a 000a 0000 0000 fb38 fb3e fb93 0004 ---Z 0a75: ff7604        PUSH [BP+4] ;[fb42]007b
+000a 000a 0000 0000 fb36 fb3e fb93 0004 ---Z 0a78: 52            PUSH DX
+000a 000a 0000 0000 fb34 fb3e fb93 0004 ---Z 0a79: 50            PUSH AX
+000a 000a 0000 0000 fb32 fb3e fb93 0004 ---Z 0a7a: e83107        CALL 11ae
+000a 000a 0000 0000 fb30 fb3e fb93 0004 ---Z 11ae: 56            PUSH SI
+000a 000a 0000 0000 fb2e fb3e fb93 0004 ---Z 11af: 57            PUSH DI
+000a 000a 0000 0000 fb2c fb3e fb93 0004 ---Z 11b0: 89e6          MOV SI, SP
+000a 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11b2: 8b5c06        MOV BX, [SI+6] ;[fb32]000a
+000a 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11b5: 8b4408        MOV AX, [SI+8] ;[fb34]0000
+0000 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11b8: 09c0          OR AX, AX
+0000 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11ba: 7518          JNE 11d4
+0000 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11bc: 31d2          XOR DX, DX
+0000 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11be: 8b4c0a        MOV CX, [SI+a] ;[fb36]007b
+0000 000a 007b 0000 fb2c fb3e fb2c 0004 ---Z 11c1: 8b440c        MOV AX, [SI+c] ;[fb38]0000
+0000 000a 007b 0000 fb2c fb3e fb2c 0004 ---Z 11c4: f7f3          DIV BX
+0000 000a 007b 0000 fb2c fb3e fb2c 0004 ---Z 11c6: 91            XCHG CX, AX
+007b 000a 0000 0000 fb2c fb3e fb2c 0004 ---Z 11c7: f7f3          DIV BX
+000c 000a 0000 0003 fb2c fb3e fb2c 0004 ---Z 11c9: 31db          XOR BX, BX
+000c 0000 0000 0003 fb2c fb3e fb2c 0004 ---Z 11cb: 89d0          MOV AX, DX
+0003 0000 0000 0003 fb2c fb3e fb2c 0004 ---Z 11cd: 89da          MOV DX, BX
+0003 0000 0000 0000 fb2c fb3e fb2c 0004 ---Z 11cf: 5f            POP DI
+0003 0000 0000 0000 fb2e fb3e fb2c 0004 ---Z 11d0: 5e            POP SI
+0003 0000 0000 0000 fb30 fb3e fb93 0004 ---Z 11d1: c20800        RET 0008
+0003 0000 0000 0000 fb32 fb3e fb93 0004 ---Z 0a7d: 89c7          MOV DI, AX
+0003 0000 0000 0000 fb32 fb3e fb93 0003 ---Z 0a7f: 8b4608        MOV AX, [BP+8] ;[fb46]000a
+000a 0000 0000 0000 fb32 fb3e fb93 0003 ---Z 0a82: 99            CWD
+000a 0000 0000 0000 fb32 fb3e fb93 0003 ---Z 0a83: ff7606        PUSH [BP+6] ;[fb44]0000
+000a 0000 0000 0000 fb30 fb3e fb93 0003 ---Z 0a86: ff7604        PUSH [BP+4] ;[fb42]007b
+000a 0000 0000 0000 fb2e fb3e fb93 0003 ---Z 0a89: 52            PUSH DX
+000a 0000 0000 0000 fb2c fb3e fb93 0003 ---Z 0a8a: 50            PUSH AX
+000a 0000 0000 0000 fb2a fb3e fb93 0003 ---Z 0a8b: e8c206        CALL 1150
+000a 0000 0000 0000 fb28 fb3e fb93 0003 ---Z 1150: 56            PUSH SI
+000a 0000 0000 0000 fb26 fb3e fb93 0003 ---Z 1151: 57            PUSH DI
+000a 0000 0000 0000 fb24 fb3e fb93 0003 ---Z 1152: 89e6          MOV SI, SP
+000a 0000 0000 0000 fb24 fb3e fb24 0003 ---Z 1154: 8b5c06        MOV BX, [SI+6] ;[fb2a]000a
+000a 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 1157: 8b4408        MOV AX, [SI+8] ;[fb2c]0000
+0000 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 115a: 09c0          OR AX, AX
+0000 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 115c: 7514          JNE 1172
+0000 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 115e: 31d2          XOR DX, DX
+0000 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 1160: 8b4c0a        MOV CX, [SI+a] ;[fb2e]007b
+0000 000a 007b 0000 fb24 fb3e fb24 0003 ---Z 1163: 8b440c        MOV AX, [SI+c] ;[fb30]0000
+0000 000a 007b 0000 fb24 fb3e fb24 0003 ---Z 1166: f7f3          DIV BX
+0000 000a 007b 0000 fb24 fb3e fb24 0003 ---Z 1168: 91            XCHG CX, AX
+007b 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 1169: f7f3          DIV BX
+000c 000a 0000 0003 fb24 fb3e fb24 0003 ---Z 116b: 89ca          MOV DX, CX
+000c 000a 0000 0000 fb24 fb3e fb24 0003 ---Z 116d: 5f            POP DI
+000c 000a 0000 0000 fb26 fb3e fb24 0003 ---Z 116e: 5e            POP SI
+000c 000a 0000 0000 fb28 fb3e fb93 0003 ---Z 116f: c20800        RET 0008
+000c 000a 0000 0000 fb2a fb3e fb93 0003 ---Z 0a8e: 894604        MOV [BP+4], AX ;[fb42]007b->000c
+000c 000a 0000 0000 fb2a fb3e fb93 0003 ---Z 0a91: 895606        MOV [BP+6], DX ;[fb44]0000->0000
+000c 000a 0000 0000 fb2a fb3e fb93 0003 ---Z 0a94: 09c2          OR DX, AX
+000c 000a 0000 000c fb2a fb3e fb93 0003 ---- 0a96: 7506          JNE 0a9e
+000c 000a 0000 000c fb2a fb3e fb93 0003 ---- 0a9e: 8b560c        MOV DX, [BP+c] ;[fb4a]0000
+000c 000a 0000 0000 fb2a fb3e fb93 0003 ---- 0aa1: 4a            DEC DX
+000c 000a 0000 ffff fb2a fb3e fb93 0003 --S- 0aa2: 52            PUSH DX
+000c 000a 0000 ffff fb28 fb3e fb93 0003 --S- 0aa3: 56            PUSH SI
+000c 000a 0000 ffff fb26 fb3e fb93 0003 --S- 0aa4: ff7608        PUSH [BP+8] ;[fb46]000a
+000c 000a 0000 ffff fb24 fb3e fb93 0003 --S- 0aa7: ff7606        PUSH [BP+6] ;[fb44]0000
+000c 000a 0000 ffff fb22 fb3e fb93 0003 --S- 0aaa: ff7604        PUSH [BP+4] ;[fb42]000c
+000c 000a 0000 ffff fb20 fb3e fb93 0003 --S- 0aad: e8b6ff        CALL 0a66
+000c 000a 0000 ffff fb1e fb3e fb93 0003 --S- 0a66: 55            PUSH BP
+000c 000a 0000 ffff fb1c fb3e fb93 0003 --S- 0a67: 89e5          MOV BP, SP
+000c 000a 0000 ffff fb1c fb1c fb93 0003 --S- 0a69: 56            PUSH SI
+000c 000a 0000 ffff fb1a fb1c fb93 0003 --S- 0a6a: 57            PUSH DI
+000c 000a 0000 ffff fb18 fb1c fb93 0003 --S- 0a6b: 8b760a        MOV SI, [BP+a] ;[fb26]fb93
+000c 000a 0000 ffff fb18 fb1c fb93 0003 --S- 0a6e: 8b4608        MOV AX, [BP+8] ;[fb24]000a
+000a 000a 0000 ffff fb18 fb1c fb93 0003 --S- 0a71: 99            CWD
+000a 000a 0000 0000 fb18 fb1c fb93 0003 --S- 0a72: ff7606        PUSH [BP+6] ;[fb22]0000
+000a 000a 0000 0000 fb16 fb1c fb93 0003 --S- 0a75: ff7604        PUSH [BP+4] ;[fb20]000c
+000a 000a 0000 0000 fb14 fb1c fb93 0003 --S- 0a78: 52            PUSH DX
+000a 000a 0000 0000 fb12 fb1c fb93 0003 --S- 0a79: 50            PUSH AX
+000a 000a 0000 0000 fb10 fb1c fb93 0003 --S- 0a7a: e83107        CALL 11ae
+000a 000a 0000 0000 fb0e fb1c fb93 0003 --S- 11ae: 56            PUSH SI
+000a 000a 0000 0000 fb0c fb1c fb93 0003 --S- 11af: 57            PUSH DI
+000a 000a 0000 0000 fb0a fb1c fb93 0003 --S- 11b0: 89e6          MOV SI, SP
+000a 000a 0000 0000 fb0a fb1c fb0a 0003 --S- 11b2: 8b5c06        MOV BX, [SI+6] ;[fb10]000a
+000a 000a 0000 0000 fb0a fb1c fb0a 0003 --S- 11b5: 8b4408        MOV AX, [SI+8] ;[fb12]0000
+0000 000a 0000 0000 fb0a fb1c fb0a 0003 --S- 11b8: 09c0          OR AX, AX
+0000 000a 0000 0000 fb0a fb1c fb0a 0003 ---Z 11ba: 7518          JNE 11d4
+0000 000a 0000 0000 fb0a fb1c fb0a 0003 ---Z 11bc: 31d2          XOR DX, DX
+0000 000a 0000 0000 fb0a fb1c fb0a 0003 ---Z 11be: 8b4c0a        MOV CX, [SI+a] ;[fb14]000c
+0000 000a 000c 0000 fb0a fb1c fb0a 0003 ---Z 11c1: 8b440c        MOV AX, [SI+c] ;[fb16]0000
+0000 000a 000c 0000 fb0a fb1c fb0a 0003 ---Z 11c4: f7f3          DIV BX
+0000 000a 000c 0000 fb0a fb1c fb0a 0003 ---Z 11c6: 91            XCHG CX, AX
+000c 000a 0000 0000 fb0a fb1c fb0a 0003 ---Z 11c7: f7f3          DIV BX
+0001 000a 0000 0002 fb0a fb1c fb0a 0003 ---Z 11c9: 31db          XOR BX, BX
+0001 0000 0000 0002 fb0a fb1c fb0a 0003 ---Z 11cb: 89d0          MOV AX, DX
+0002 0000 0000 0002 fb0a fb1c fb0a 0003 ---Z 11cd: 89da          MOV DX, BX
+0002 0000 0000 0000 fb0a fb1c fb0a 0003 ---Z 11cf: 5f            POP DI
+0002 0000 0000 0000 fb0c fb1c fb0a 0003 ---Z 11d0: 5e            POP SI
+0002 0000 0000 0000 fb0e fb1c fb93 0003 ---Z 11d1: c20800        RET 0008
+0002 0000 0000 0000 fb10 fb1c fb93 0003 ---Z 0a7d: 89c7          MOV DI, AX
+0002 0000 0000 0000 fb10 fb1c fb93 0002 ---Z 0a7f: 8b4608        MOV AX, [BP+8] ;[fb24]000a
+000a 0000 0000 0000 fb10 fb1c fb93 0002 ---Z 0a82: 99            CWD
+000a 0000 0000 0000 fb10 fb1c fb93 0002 ---Z 0a83: ff7606        PUSH [BP+6] ;[fb22]0000
+000a 0000 0000 0000 fb0e fb1c fb93 0002 ---Z 0a86: ff7604        PUSH [BP+4] ;[fb20]000c
+000a 0000 0000 0000 fb0c fb1c fb93 0002 ---Z 0a89: 52            PUSH DX
+000a 0000 0000 0000 fb0a fb1c fb93 0002 ---Z 0a8a: 50            PUSH AX
+000a 0000 0000 0000 fb08 fb1c fb93 0002 ---Z 0a8b: e8c206        CALL 1150
+000a 0000 0000 0000 fb06 fb1c fb93 0002 ---Z 1150: 56            PUSH SI
+000a 0000 0000 0000 fb04 fb1c fb93 0002 ---Z 1151: 57            PUSH DI
+000a 0000 0000 0000 fb02 fb1c fb93 0002 ---Z 1152: 89e6          MOV SI, SP
+000a 0000 0000 0000 fb02 fb1c fb02 0002 ---Z 1154: 8b5c06        MOV BX, [SI+6] ;[fb08]000a
+000a 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 1157: 8b4408        MOV AX, [SI+8] ;[fb0a]0000
+0000 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 115a: 09c0          OR AX, AX
+0000 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 115c: 7514          JNE 1172
+0000 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 115e: 31d2          XOR DX, DX
+0000 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 1160: 8b4c0a        MOV CX, [SI+a] ;[fb0c]000c
+0000 000a 000c 0000 fb02 fb1c fb02 0002 ---Z 1163: 8b440c        MOV AX, [SI+c] ;[fb0e]0000
+0000 000a 000c 0000 fb02 fb1c fb02 0002 ---Z 1166: f7f3          DIV BX
+0000 000a 000c 0000 fb02 fb1c fb02 0002 ---Z 1168: 91            XCHG CX, AX
+000c 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 1169: f7f3          DIV BX
+0001 000a 0000 0002 fb02 fb1c fb02 0002 ---Z 116b: 89ca          MOV DX, CX
+0001 000a 0000 0000 fb02 fb1c fb02 0002 ---Z 116d: 5f            POP DI
+0001 000a 0000 0000 fb04 fb1c fb02 0002 ---Z 116e: 5e            POP SI
+0001 000a 0000 0000 fb06 fb1c fb93 0002 ---Z 116f: c20800        RET 0008
+0001 000a 0000 0000 fb08 fb1c fb93 0002 ---Z 0a8e: 894604        MOV [BP+4], AX ;[fb20]000c->0001
+0001 000a 0000 0000 fb08 fb1c fb93 0002 ---Z 0a91: 895606        MOV [BP+6], DX ;[fb22]0000->0000
+0001 000a 0000 0000 fb08 fb1c fb93 0002 ---Z 0a94: 09c2          OR DX, AX
+0001 000a 0000 0001 fb08 fb1c fb93 0002 ---- 0a96: 7506          JNE 0a9e
+0001 000a 0000 0001 fb08 fb1c fb93 0002 ---- 0a9e: 8b560c        MOV DX, [BP+c] ;[fb28]ffff
+0001 000a 0000 ffff fb08 fb1c fb93 0002 ---- 0aa1: 4a            DEC DX
+0001 000a 0000 fffe fb08 fb1c fb93 0002 --S- 0aa2: 52            PUSH DX
+0001 000a 0000 fffe fb06 fb1c fb93 0002 --S- 0aa3: 56            PUSH SI
+0001 000a 0000 fffe fb04 fb1c fb93 0002 --S- 0aa4: ff7608        PUSH [BP+8] ;[fb24]000a
+0001 000a 0000 fffe fb02 fb1c fb93 0002 --S- 0aa7: ff7606        PUSH [BP+6] ;[fb22]0000
+0001 000a 0000 fffe fb00 fb1c fb93 0002 --S- 0aaa: ff7604        PUSH [BP+4] ;[fb20]0001
+0001 000a 0000 fffe fafe fb1c fb93 0002 --S- 0aad: e8b6ff        CALL 0a66
+0001 000a 0000 fffe fafc fb1c fb93 0002 --S- 0a66: 55            PUSH BP
+0001 000a 0000 fffe fafa fb1c fb93 0002 --S- 0a67: 89e5          MOV BP, SP
+0001 000a 0000 fffe fafa fafa fb93 0002 --S- 0a69: 56            PUSH SI
+0001 000a 0000 fffe faf8 fafa fb93 0002 --S- 0a6a: 57            PUSH DI
+0001 000a 0000 fffe faf6 fafa fb93 0002 --S- 0a6b: 8b760a        MOV SI, [BP+a] ;[fb04]fb93
+0001 000a 0000 fffe faf6 fafa fb93 0002 --S- 0a6e: 8b4608        MOV AX, [BP+8] ;[fb02]000a
+000a 000a 0000 fffe faf6 fafa fb93 0002 --S- 0a71: 99            CWD
+000a 000a 0000 0000 faf6 fafa fb93 0002 --S- 0a72: ff7606        PUSH [BP+6] ;[fb00]0000
+000a 000a 0000 0000 faf4 fafa fb93 0002 --S- 0a75: ff7604        PUSH [BP+4] ;[fafe]0001
+000a 000a 0000 0000 faf2 fafa fb93 0002 --S- 0a78: 52            PUSH DX
+000a 000a 0000 0000 faf0 fafa fb93 0002 --S- 0a79: 50            PUSH AX
+000a 000a 0000 0000 faee fafa fb93 0002 --S- 0a7a: e83107        CALL 11ae
+000a 000a 0000 0000 faec fafa fb93 0002 --S- 11ae: 56            PUSH SI
+000a 000a 0000 0000 faea fafa fb93 0002 --S- 11af: 57            PUSH DI
+000a 000a 0000 0000 fae8 fafa fb93 0002 --S- 11b0: 89e6          MOV SI, SP
+000a 000a 0000 0000 fae8 fafa fae8 0002 --S- 11b2: 8b5c06        MOV BX, [SI+6] ;[faee]000a
+000a 000a 0000 0000 fae8 fafa fae8 0002 --S- 11b5: 8b4408        MOV AX, [SI+8] ;[faf0]0000
+0000 000a 0000 0000 fae8 fafa fae8 0002 --S- 11b8: 09c0          OR AX, AX
+0000 000a 0000 0000 fae8 fafa fae8 0002 ---Z 11ba: 7518          JNE 11d4
+0000 000a 0000 0000 fae8 fafa fae8 0002 ---Z 11bc: 31d2          XOR DX, DX
+0000 000a 0000 0000 fae8 fafa fae8 0002 ---Z 11be: 8b4c0a        MOV CX, [SI+a] ;[faf2]0001
+0000 000a 0001 0000 fae8 fafa fae8 0002 ---Z 11c1: 8b440c        MOV AX, [SI+c] ;[faf4]0000
+0000 000a 0001 0000 fae8 fafa fae8 0002 ---Z 11c4: f7f3          DIV BX
+0000 000a 0001 0000 fae8 fafa fae8 0002 ---Z 11c6: 91            XCHG CX, AX
+0001 000a 0000 0000 fae8 fafa fae8 0002 ---Z 11c7: f7f3          DIV BX
+0000 000a 0000 0001 fae8 fafa fae8 0002 ---Z 11c9: 31db          XOR BX, BX
+0000 0000 0000 0001 fae8 fafa fae8 0002 ---Z 11cb: 89d0          MOV AX, DX
+0001 0000 0000 0001 fae8 fafa fae8 0002 ---Z 11cd: 89da          MOV DX, BX
+0001 0000 0000 0000 fae8 fafa fae8 0002 ---Z 11cf: 5f            POP DI
+0001 0000 0000 0000 faea fafa fae8 0002 ---Z 11d0: 5e            POP SI
+0001 0000 0000 0000 faec fafa fb93 0002 ---Z 11d1: c20800        RET 0008
+0001 0000 0000 0000 faee fafa fb93 0002 ---Z 0a7d: 89c7          MOV DI, AX
+0001 0000 0000 0000 faee fafa fb93 0001 ---Z 0a7f: 8b4608        MOV AX, [BP+8] ;[fb02]000a
+000a 0000 0000 0000 faee fafa fb93 0001 ---Z 0a82: 99            CWD
+000a 0000 0000 0000 faee fafa fb93 0001 ---Z 0a83: ff7606        PUSH [BP+6] ;[fb00]0000
+000a 0000 0000 0000 faec fafa fb93 0001 ---Z 0a86: ff7604        PUSH [BP+4] ;[fafe]0001
+000a 0000 0000 0000 faea fafa fb93 0001 ---Z 0a89: 52            PUSH DX
+000a 0000 0000 0000 fae8 fafa fb93 0001 ---Z 0a8a: 50            PUSH AX
+000a 0000 0000 0000 fae6 fafa fb93 0001 ---Z 0a8b: e8c206        CALL 1150
+000a 0000 0000 0000 fae4 fafa fb93 0001 ---Z 1150: 56            PUSH SI
+000a 0000 0000 0000 fae2 fafa fb93 0001 ---Z 1151: 57            PUSH DI
+000a 0000 0000 0000 fae0 fafa fb93 0001 ---Z 1152: 89e6          MOV SI, SP
+000a 0000 0000 0000 fae0 fafa fae0 0001 ---Z 1154: 8b5c06        MOV BX, [SI+6] ;[fae6]000a
+000a 000a 0000 0000 fae0 fafa fae0 0001 ---Z 1157: 8b4408        MOV AX, [SI+8] ;[fae8]0000
+0000 000a 0000 0000 fae0 fafa fae0 0001 ---Z 115a: 09c0          OR AX, AX
+0000 000a 0000 0000 fae0 fafa fae0 0001 ---Z 115c: 7514          JNE 1172
+0000 000a 0000 0000 fae0 fafa fae0 0001 ---Z 115e: 31d2          XOR DX, DX
+0000 000a 0000 0000 fae0 fafa fae0 0001 ---Z 1160: 8b4c0a        MOV CX, [SI+a] ;[faea]0001
+0000 000a 0001 0000 fae0 fafa fae0 0001 ---Z 1163: 8b440c        MOV AX, [SI+c] ;[faec]0000
+0000 000a 0001 0000 fae0 fafa fae0 0001 ---Z 1166: f7f3          DIV BX
+0000 000a 0001 0000 fae0 fafa fae0 0001 ---Z 1168: 91            XCHG CX, AX
+0001 000a 0000 0000 fae0 fafa fae0 0001 ---Z 1169: f7f3          DIV BX
+0000 000a 0000 0001 fae0 fafa fae0 0001 ---Z 116b: 89ca          MOV DX, CX
+0000 000a 0000 0000 fae0 fafa fae0 0001 ---Z 116d: 5f            POP DI
+0000 000a 0000 0000 fae2 fafa fae0 0001 ---Z 116e: 5e            POP SI
+0000 000a 0000 0000 fae4 fafa fb93 0001 ---Z 116f: c20800        RET 0008
+0000 000a 0000 0000 fae6 fafa fb93 0001 ---Z 0a8e: 894604        MOV [BP+4], AX ;[fafe]0001->0000
+0000 000a 0000 0000 fae6 fafa fb93 0001 ---Z 0a91: 895606        MOV [BP+6], DX ;[fb00]0000->0000
+0000 000a 0000 0000 fae6 fafa fb93 0001 ---Z 0a94: 09c2          OR DX, AX
+0000 000a 0000 0000 fae6 fafa fb93 0001 ---Z 0a96: 7506          JNE 0a9e
+[src/machine.rs:579:9] left = 65534
+[src/machine.rs:579:9] right = 1
+0000 000a 0000 0000 fae6 fafa fb93 0001 ---Z 0a98: 837e0c01      CMP [BP+c], 1 ;[fb06]fffe
+0000 000a 0000 0000 fae6 fafa fb93 0001 --S- 0a9c: 7e17          JLE 0ab5
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 9
+0000 000a 0000 0000 fae6 fafa fb93 0001 --S- 0ab5: 83ff09        CMP DI, 9
+0000 000a 0000 0000 fae6 fafa fb93 0001 C-S- 0ab8: 7e07          JLE 0ac1
+0000 000a 0000 0000 fae6 fafa fb93 0001 C-S- 0ac1: 8d4530        LEA AX, [DI+30] ;[0031]0000
+0031 000a 0000 0000 fae6 fafa fb93 0001 C-S- 0ac4: 8804          MOV [SI], AL ;[fb93]0000->0031
+0031 000a 0000 0000 fae6 fafa fb93 0001 C-S- 0ac6: 8d4401        LEA AX, [SI+1] ;[fb94]0000
+fb94 000a 0000 0000 fae6 fafa fb93 0001 C-S- 0ac9: e9d806        JMP 11a4
+fb94 000a 0000 0000 fae6 fafa fb93 0001 C-S- 11a4: 5f            POP DI
+fb94 000a 0000 0000 fae8 fafa fb93 000a C-S- 11a5: 5e            POP SI
+fb94 000a 0000 0000 faea fafa 0000 000a C-S- 11a6: 89ec          MOV SP, BP
+fb94 000a 0000 0000 fafa fafa 0000 000a C-S- 11a8: 5d            POP BP
+fb94 000a 0000 0000 fafc fb1c 0000 000a C-S- 11a9: c3            RET
+fb94 000a 0000 0000 fafe fb1c 0000 000a C-S- 0ab0: 83c40a        ADD SP, a
+fb94 000a 0000 0000 fb08 fb1c 0000 000a --S- 0ab3: 89c6          MOV SI, AX
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 9
+fb94 000a 0000 0000 fb08 fb1c fb94 000a --S- 0ab5: 83ff09        CMP DI, 9
+fb94 000a 0000 0000 fb08 fb1c fb94 000a ---- 0ab8: 7e07          JLE 0ac1
+fb94 000a 0000 0000 fb08 fb1c fb94 000a ---- 0aba: 89f8          MOV AX, DI
+000a 000a 0000 0000 fb08 fb1c fb94 000a ---- 0abc: 2da9ff        SUB AX, ffa9
+0061 000a 0000 0000 fb08 fb1c fb94 000a C--- 0abf: eb03          JMP Short 0ac4
+0061 000a 0000 0000 fb08 fb1c fb94 000a C--- 0ac4: 8804          MOV [SI], AL ;[fb94]0000->0061
+0061 000a 0000 0000 fb08 fb1c fb94 000a C--- 0ac6: 8d4401        LEA AX, [SI+1] ;[fb95]0000
+fb95 000a 0000 0000 fb08 fb1c fb94 000a C--- 0ac9: e9d806        JMP 11a4
+fb95 000a 0000 0000 fb08 fb1c fb94 000a C--- 11a4: 5f            POP DI
+fb95 000a 0000 0000 fb0a fb1c fb94 000a C--- 11a5: 5e            POP SI
+fb95 000a 0000 0000 fb0c fb1c 0000 000a C--- 11a6: 89ec          MOV SP, BP
+fb95 000a 0000 0000 fb1c fb1c 0000 000a C--- 11a8: 5d            POP BP
+fb95 000a 0000 0000 fb1e fb3e 0000 000a C--- 11a9: c3            RET
+fb95 000a 0000 0000 fb20 fb3e 0000 000a C--- 0ab0: 83c40a        ADD SP, a
+fb95 000a 0000 0000 fb2a fb3e 0000 000a --S- 0ab3: 89c6          MOV SI, AX
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 9
+fb95 000a 0000 0000 fb2a fb3e fb95 000a --S- 0ab5: 83ff09        CMP DI, 9
+fb95 000a 0000 0000 fb2a fb3e fb95 000a ---- 0ab8: 7e07          JLE 0ac1
+fb95 000a 0000 0000 fb2a fb3e fb95 000a ---- 0aba: 89f8          MOV AX, DI
+000a 000a 0000 0000 fb2a fb3e fb95 000a ---- 0abc: 2da9ff        SUB AX, ffa9
+0061 000a 0000 0000 fb2a fb3e fb95 000a C--- 0abf: eb03          JMP Short 0ac4
+0061 000a 0000 0000 fb2a fb3e fb95 000a C--- 0ac4: 8804          MOV [SI], AL ;[fb95]0000->0061
+0061 000a 0000 0000 fb2a fb3e fb95 000a C--- 0ac6: 8d4401        LEA AX, [SI+1] ;[fb96]0000
+fb96 000a 0000 0000 fb2a fb3e fb95 000a C--- 0ac9: e9d806        JMP 11a4
+fb96 000a 0000 0000 fb2a fb3e fb95 000a C--- 11a4: 5f            POP DI
+fb96 000a 0000 0000 fb2c fb3e fb95 000a C--- 11a5: 5e            POP SI
+fb96 000a 0000 0000 fb2e fb3e 0000 000a C--- 11a6: 89ec          MOV SP, BP
+fb96 000a 0000 0000 fb3e fb3e 0000 000a C--- 11a8: 5d            POP BP
+fb96 000a 0000 0000 fb40 fb60 0000 000a C--- 11a9: c3            RET
+fb96 000a 0000 0000 fb42 fb60 0000 000a C--- 0ab0: 83c40a        ADD SP, a
+fb96 000a 0000 0000 fb4c fb60 0000 000a --S- 0ab3: 89c6          MOV SI, AX
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 9
+fb96 000a 0000 0000 fb4c fb60 fb96 000a --S- 0ab5: 83ff09        CMP DI, 9
+fb96 000a 0000 0000 fb4c fb60 fb96 000a ---- 0ab8: 7e07          JLE 0ac1
+fb96 000a 0000 0000 fb4c fb60 fb96 000a ---- 0aba: 89f8          MOV AX, DI
+000a 000a 0000 0000 fb4c fb60 fb96 000a ---- 0abc: 2da9ff        SUB AX, ffa9
+0061 000a 0000 0000 fb4c fb60 fb96 000a C--- 0abf: eb03          JMP Short 0ac4
+0061 000a 0000 0000 fb4c fb60 fb96 000a C--- 0ac4: 8804          MOV [SI], AL ;[fb96]0000->0061
+0061 000a 0000 0000 fb4c fb60 fb96 000a C--- 0ac6: 8d4401        LEA AX, [SI+1] ;[fb97]0000
+fb97 000a 0000 0000 fb4c fb60 fb96 000a C--- 0ac9: e9d806        JMP 11a4
+fb97 000a 0000 0000 fb4c fb60 fb96 000a C--- 11a4: 5f            POP DI
+fb97 000a 0000 0000 fb4e fb60 fb96 000a C--- 11a5: 5e            POP SI
+fb97 000a 0000 0000 fb50 fb60 0000 000a C--- 11a6: 89ec          MOV SP, BP
+fb97 000a 0000 0000 fb60 fb60 0000 000a C--- 11a8: 5d            POP BP
+fb97 000a 0000 0000 fb62 fb7e 0000 000a C--- 11a9: c3            RET
+fb97 000a 0000 0000 fb64 fb7e 0000 000a C--- 027f: 83c40a        ADD SP, a
+fb97 000a 0000 0000 fb6e fb7e 0000 000a --S- 0282: 89c6          MOV SI, AX
+[src/machine.rs:579:9] left = 100
+[src/machine.rs:579:9] right = 88
+fb97 000a 0000 0000 fb6e fb7e fb97 000a --S- 0284: 807e0a58      CMP Byte [BP+a], 58 ;[fb88]0064
+fb97 000a 0000 0000 fb6e fb7e fb97 000a ---- 0288: 751a          JNE 02a4
+fb97 000a 0000 0000 fb6e fb7e fb97 000a ---- 02a4: 89f0          MOV AX, SI
+fb97 000a 0000 0000 fb6e fb7e fb97 000a ---- 02a6: e9fb0e        JMP 11a4
+fb97 000a 0000 0000 fb6e fb7e fb97 000a ---- 11a4: 5f            POP DI
+fb97 000a 0000 0000 fb70 fb7e fb97 1400 ---- 11a5: 5e            POP SI
+fb97 000a 0000 0000 fb72 fb7e 001c 1400 ---- 11a6: 89ec          MOV SP, BP
+fb97 000a 0000 0000 fb7e fb7e 001c 1400 ---- 11a8: 5d            POP BP
+fb97 000a 0000 0000 fb80 ffac 001c 1400 ---- 11a9: c3            RET
+fb97 000a 0000 0000 fb82 ffac 001c 1400 ---- 0539: 83c40c        ADD SP, c
+fb97 000a 0000 0000 fb8e ffac 001c 1400 --S- 053c: 8946fe        MOV [BP-2], AX ;[ffaa]fb93->fb97
+fb97 000a 0000 0000 fb8e ffac 001c 1400 --S- 053f: e99100        JMP 05d3
+fb97 000a 0000 0000 fb8e ffac 001c 1400 --S- 05d3: c746f22000    MOV [BP-e], 0020 ;[ff9e]0000->0020
+fb97 000a 0000 0000 fb8e ffac 001c 1400 --S- 05d8: f7c71000      TEST DI, 0010
+fb97 000a 0000 0000 fb8e ffac 001c 1400 ---Z 05dc: 7405          JE 05e3
+fb97 000a 0000 0000 fb8e ffac 001c 1400 ---Z 05e3: 8b56fe        MOV DX, [BP-2] ;[ffaa]fb97
+fb97 000a 0000 fb97 fb8e ffac 001c 1400 ---Z 05e6: 2b56e8        SUB DX, [BP-18] ;[ff94]fb93
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 05e9: 8956fc        MOV [BP-4], DX ;[ffa8]0000->0004
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 05ec: c746ee0000    MOV [BP-12], 0000 ;[ff9a]0000->0000
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 05f1: f7c71000      TEST DI, 0010
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---Z 05f5: 7433          JE 062a
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---Z 062a: 8b56f6        MOV DX, [BP-a] ;[ffa2]0000
+fb97 000a 0000 0000 fb8e ffac 001c 1400 ---Z 062d: 2b56fc        SUB DX, [BP-4] ;[ffa8]0004
+fb97 000a 0000 fffc fb8e ffac 001c 1400 C-S- 0630: 8956fa        MOV [BP-6], DX ;[ffa6]0000->fffc
+fb97 000a 0000 fffc fb8e ffac 001c 1400 C-S- 0633: 7f03          JNLE 0638
+fb97 000a 0000 fffc fb8e ffac 001c 1400 C-S- 0635: e93001        JMP 0768
+fb97 000a 0000 fffc fb8e ffac 001c 1400 C-S- 0768: 8b56fc        MOV DX, [BP-4] ;[ffa8]0004
+fb97 000a 0000 0004 fb8e ffac 001c 1400 C-S- 076b: 0156ec        ADD [BP-14], DX ;[ff98]0002 ;[ff98]0002->0006
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 076e: ff4efc        DEC [BP-4] ;[ffa8]0004 ;[ffa8]0004->0003
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 0771: 7c45          JL 07b8
+fb97 000a 0000 0004 fb8e ffac 001c 1400 ---- 0773: 8b14          MOV DX, [SI] ;[001c]03fe
+fb97 000a 0000 03fe fb8e ffac 001c 1400 ---- 0775: 4a            DEC DX
+fb97 000a 0000 03fd fb8e ffac 001c 1400 ---- 0776: 8914          MOV [SI], DX ;[001c]03fe->03fd
+fb97 000a 0000 03fd fb8e ffac 001c 1400 ---- 0778: 7c15          JL 078f
+fb97 000a 0000 03fd fb8e ffac 001c 1400 ---- 077a: 8b5ee8        MOV BX, [BP-18] ;[ff94]fb93
+fb97 fb93 0000 03fd fb8e ffac 001c 1400 ---- 077d: ff46e8        INC [BP-18] ;[ff94]fb93 ;[ff94]fb93->fb94
+fb97 fb93 0000 03fd fb8e ffac 001c 1400 --S- 0780: 8a17          MOV DL, [BX] ;[fb93]6131
+fb97 fb93 0000 0331 fb8e ffac 001c 1400 --S- 0782: 30f6          XOR DH, DH
+fb97 fb93 0000 0031 fb8e ffac 001c 1400 ---Z 0784: 8b5c0a        MOV BX, [SI+a] ;[0026]0276
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---Z 0787: ff440a        INC [SI+a] ;[0026]0276 ;[0026]0276->0277
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 078a: 8817          MOV [BX], DL ;[0276]0000->0031
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 078c: 52            PUSH DX
+fb97 0276 0000 0031 fb8c ffac 001c 1400 ---- 078d: eb11          JMP Short 07a0
+fb97 0276 0000 0031 fb8c ffac 001c 1400 ---- 07a0: 5a            POP DX
+[src/machine.rs:579:9] left = 49
+[src/machine.rs:579:9] right = 255
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 07a1: 83faff        CMP DX, -1
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 07a4: 75c8          JNE 076e
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 076e: ff4efc        DEC [BP-4] ;[ffa8]0003 ;[ffa8]0003->0002
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 0771: 7c45          JL 07b8
+fb97 0276 0000 0031 fb8e ffac 001c 1400 ---- 0773: 8b14          MOV DX, [SI] ;[001c]03fd
+fb97 0276 0000 03fd fb8e ffac 001c 1400 ---- 0775: 4a            DEC DX
+fb97 0276 0000 03fc fb8e ffac 001c 1400 ---- 0776: 8914          MOV [SI], DX ;[001c]03fd->03fc
+fb97 0276 0000 03fc fb8e ffac 001c 1400 ---- 0778: 7c15          JL 078f
+fb97 0276 0000 03fc fb8e ffac 001c 1400 ---- 077a: 8b5ee8        MOV BX, [BP-18] ;[ff94]fb94
+fb97 fb94 0000 03fc fb8e ffac 001c 1400 ---- 077d: ff46e8        INC [BP-18] ;[ff94]fb94 ;[ff94]fb94->fb95
+fb97 fb94 0000 03fc fb8e ffac 001c 1400 --S- 0780: 8a17          MOV DL, [BX] ;[fb94]6161
+fb97 fb94 0000 0361 fb8e ffac 001c 1400 --S- 0782: 30f6          XOR DH, DH
+fb97 fb94 0000 0061 fb8e ffac 001c 1400 ---Z 0784: 8b5c0a        MOV BX, [SI+a] ;[0026]0277
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---Z 0787: ff440a        INC [SI+a] ;[0026]0277 ;[0026]0277->0278
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 078a: 8817          MOV [BX], DL ;[0277]0000->0061
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 078c: 52            PUSH DX
+fb97 0277 0000 0061 fb8c ffac 001c 1400 ---- 078d: eb11          JMP Short 07a0
+fb97 0277 0000 0061 fb8c ffac 001c 1400 ---- 07a0: 5a            POP DX
+[src/machine.rs:579:9] left = 97
+[src/machine.rs:579:9] right = 255
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 07a1: 83faff        CMP DX, -1
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 07a4: 75c8          JNE 076e
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 076e: ff4efc        DEC [BP-4] ;[ffa8]0002 ;[ffa8]0002->0001
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 0771: 7c45          JL 07b8
+fb97 0277 0000 0061 fb8e ffac 001c 1400 ---- 0773: 8b14          MOV DX, [SI] ;[001c]03fc
+fb97 0277 0000 03fc fb8e ffac 001c 1400 ---- 0775: 4a            DEC DX
+fb97 0277 0000 03fb fb8e ffac 001c 1400 ---- 0776: 8914          MOV [SI], DX ;[001c]03fc->03fb
+fb97 0277 0000 03fb fb8e ffac 001c 1400 ---- 0778: 7c15          JL 078f
+fb97 0277 0000 03fb fb8e ffac 001c 1400 ---- 077a: 8b5ee8        MOV BX, [BP-18] ;[ff94]fb95
+fb97 fb95 0000 03fb fb8e ffac 001c 1400 ---- 077d: ff46e8        INC [BP-18] ;[ff94]fb95 ;[ff94]fb95->fb96
+fb97 fb95 0000 03fb fb8e ffac 001c 1400 --S- 0780: 8a17          MOV DL, [BX] ;[fb95]6161
+fb97 fb95 0000 0361 fb8e ffac 001c 1400 --S- 0782: 30f6          XOR DH, DH
+fb97 fb95 0000 0061 fb8e ffac 001c 1400 ---Z 0784: 8b5c0a        MOV BX, [SI+a] ;[0026]0278
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---Z 0787: ff440a        INC [SI+a] ;[0026]0278 ;[0026]0278->0279
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---- 078a: 8817          MOV [BX], DL ;[0278]0000->0061
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---- 078c: 52            PUSH DX
+fb97 0278 0000 0061 fb8c ffac 001c 1400 ---- 078d: eb11          JMP Short 07a0
+fb97 0278 0000 0061 fb8c ffac 001c 1400 ---- 07a0: 5a            POP DX
+[src/machine.rs:579:9] left = 97
+[src/machine.rs:579:9] right = 255
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---- 07a1: 83faff        CMP DX, -1
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---- 07a4: 75c8          JNE 076e
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---- 076e: ff4efc        DEC [BP-4] ;[ffa8]0001 ;[ffa8]0001->0000
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---Z 0771: 7c45          JL 07b8
+fb97 0278 0000 0061 fb8e ffac 001c 1400 ---Z 0773: 8b14          MOV DX, [SI] ;[001c]03fb
+fb97 0278 0000 03fb fb8e ffac 001c 1400 ---Z 0775: 4a            DEC DX
+fb97 0278 0000 03fa fb8e ffac 001c 1400 ---- 0776: 8914          MOV [SI], DX ;[001c]03fb->03fa
+fb97 0278 0000 03fa fb8e ffac 001c 1400 ---- 0778: 7c15          JL 078f
+fb97 0278 0000 03fa fb8e ffac 001c 1400 ---- 077a: 8b5ee8        MOV BX, [BP-18] ;[ff94]fb96
+fb97 fb96 0000 03fa fb8e ffac 001c 1400 ---- 077d: ff46e8        INC [BP-18] ;[ff94]fb96 ;[ff94]fb96->fb97
+fb97 fb96 0000 03fa fb8e ffac 001c 1400 --S- 0780: 8a17          MOV DL, [BX] ;[fb96]0061
+fb97 fb96 0000 0361 fb8e ffac 001c 1400 --S- 0782: 30f6          XOR DH, DH
+fb97 fb96 0000 0061 fb8e ffac 001c 1400 ---Z 0784: 8b5c0a        MOV BX, [SI+a] ;[0026]0279
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---Z 0787: ff440a        INC [SI+a] ;[0026]0279 ;[0026]0279->027a
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---- 078a: 8817          MOV [BX], DL ;[0279]0000->0061
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---- 078c: 52            PUSH DX
+fb97 0279 0000 0061 fb8c ffac 001c 1400 ---- 078d: eb11          JMP Short 07a0
+fb97 0279 0000 0061 fb8c ffac 001c 1400 ---- 07a0: 5a            POP DX
+[src/machine.rs:579:9] left = 97
+[src/machine.rs:579:9] right = 255
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---- 07a1: 83faff        CMP DX, -1
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---- 07a4: 75c8          JNE 076e
+fb97 0279 0000 0061 fb8e ffac 001c 1400 ---- 076e: ff4efc        DEC [BP-4] ;[ffa8]0000 ;[ffa8]0000->ffff
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 0771: 7c45          JL 07b8
+[src/machine.rs:579:9] left = 65532
+[src/machine.rs:579:9] right = 0
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 07b8: 837efa00      CMP [BP-6], 0 ;[ffa6]fffc
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 07bc: 7e06          JLE 07c4
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 07c4: ff4efa        DEC [BP-6] ;[ffa6]fffc ;[ffa6]fffc->fffb
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 07c7: 7d03          JNL 07cc
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 07c9: e9eefa        JMP 02ba
+fb97 0279 0000 0061 fb8e ffac 001c 1400 --S- 02ba: 8b5e04        MOV BX, [BP+4] ;[ffb0]0008
+fb97 0008 0000 0061 fb8e ffac 001c 1400 --S- 02bd: ff4604        INC [BP+4] ;[ffb0]0008 ;[ffb0]0008->0009
+fb97 0008 0000 0061 fb8e ffac 001c 1400 ---- 02c0: 8a07          MOV AL, [BX] ;[0008]000a
+fb0a 0008 0000 0061 fb8e ffac 001c 1400 ---- 02c2: 98            CBW
+000a 0008 0000 0061 fb8e ffac 001c 1400 ---- 02c3: 8946f8        MOV [BP-8], AX ;[ffa4]0064->000a
+000a 0008 0000 0061 fb8e ffac 001c 1400 ---- 02c6: 09c0          OR AX, AX
+000a 0008 0000 0061 fb8e ffac 001c 1400 ---- 02c8: 7503          JNE 02cd
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 37
+000a 0008 0000 0061 fb8e ffac 001c 1400 ---- 02cd: 837ef825      CMP [BP-8], 25 ;[ffa4]000a
+000a 0008 0000 0061 fb8e ffac 001c 1400 C-S- 02d1: 7440          JE 0313
+000a 0008 0000 0061 fb8e ffac 001c 1400 C-S- 02d3: 8b14          MOV DX, [SI] ;[001c]03fa
+000a 0008 0000 03fa fb8e ffac 001c 1400 C-S- 02d5: 4a            DEC DX
+000a 0008 0000 03f9 fb8e ffac 001c 1400 ---- 02d6: 8914          MOV [SI], DX ;[001c]03fa->03f9
+000a 0008 0000 03f9 fb8e ffac 001c 1400 ---- 02d8: 7c10          JL 02ea
+000a 0008 0000 03f9 fb8e ffac 001c 1400 ---- 02da: 8b56f8        MOV DX, [BP-8] ;[ffa4]000a
+000a 0008 0000 000a fb8e ffac 001c 1400 ---- 02dd: 30f6          XOR DH, DH
+000a 0008 0000 000a fb8e ffac 001c 1400 ---Z 02df: 8b5c0a        MOV BX, [SI+a] ;[0026]027a
+000a 027a 0000 000a fb8e ffac 001c 1400 ---Z 02e2: ff440a        INC [SI+a] ;[0026]027a ;[0026]027a->027b
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 02e5: 8817          MOV [BX], DL ;[027a]0000->000a
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 02e7: 52            PUSH DX
+000a 027a 0000 000a fb8c ffac 001c 1400 ---- 02e8: eb0a          JMP Short 02f4
+000a 027a 0000 000a fb8c ffac 001c 1400 ---- 02f4: 5a            POP DX
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 255
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 02f5: 83faff        CMP DX, -1
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 02f8: 7514          JNE 030e
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 030e: ff46ec        INC [BP-14] ;[ff98]0006 ;[ff98]0006->0007
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 0311: eba7          JMP Short 02ba
+000a 027a 0000 000a fb8e ffac 001c 1400 ---- 02ba: 8b5e04        MOV BX, [BP+4] ;[ffb0]0009
+000a 0009 0000 000a fb8e ffac 001c 1400 ---- 02bd: ff4604        INC [BP+4] ;[ffb0]0009 ;[ffb0]0009->000a
+000a 0009 0000 000a fb8e ffac 001c 1400 ---- 02c0: 8a07          MOV AL, [BX] ;[0009]0000
+0000 0009 0000 000a fb8e ffac 001c 1400 ---- 02c2: 98            CBW
+0000 0009 0000 000a fb8e ffac 001c 1400 ---- 02c3: 8946f8        MOV [BP-8], AX ;[ffa4]000a->0000
+0000 0009 0000 000a fb8e ffac 001c 1400 ---- 02c6: 09c0          OR AX, AX
+0000 0009 0000 000a fb8e ffac 001c 1400 ---Z 02c8: 7503          JNE 02cd
+0000 0009 0000 000a fb8e ffac 001c 1400 ---Z 02ca: e93805        JMP 0805
+0000 0009 0000 000a fb8e ffac 001c 1400 ---Z 0805: 8b46ec        MOV AX, [BP-14] ;[ff98]0007
+0007 0009 0000 000a fb8e ffac 001c 1400 ---Z 0808: e99909        JMP 11a4
+0007 0009 0000 000a fb8e ffac 001c 1400 ---Z 11a4: 5f            POP DI
+0007 0009 0000 000a fb90 ffac 001c 0000 ---Z 11a5: 5e            POP SI
+0007 0009 0000 000a fb92 ffac 0000 0000 ---Z 11a6: 89ec          MOV SP, BP
+0007 0009 0000 000a ffac ffac 0000 0000 ---Z 11a8: 5d            POP BP
+0007 0009 0000 000a ffae ffba 0000 0000 ---Z 11a9: c3            RET
+0007 0009 0000 000a ffb0 ffba 0000 0000 ---Z 009f: 83c406        ADD SP, 6
+0007 0009 0000 000a ffb6 ffba 0000 0000 --S- 00a2: e90111        JMP 11a6
+0007 0009 0000 000a ffb6 ffba 0000 0000 --S- 11a6: 89ec          MOV SP, BP
+0007 0009 0000 000a ffba ffba 0000 0000 --S- 11a8: 5d            POP BP
+0007 0009 0000 000a ffbc ffc4 0000 0000 --S- 11a9: c3            RET
+0007 0009 0000 000a ffbe ffc4 0000 0000 --S- 004b: 5b            POP BX
+0007 0004 0000 000a ffc0 ffc4 0000 0000 --S- 004c: 5b            POP BX
+0007 04d2 0000 000a ffc2 ffc4 0000 0000 --S- 004d: e95611        JMP 11a6
+0007 04d2 0000 000a ffc2 ffc4 0000 0000 --S- 11a6: 89ec          MOV SP, BP
+0007 04d2 0000 000a ffc4 ffc4 0000 0000 --S- 11a8: 5d            POP BP
+0007 04d2 0000 000a ffc6 0000 0000 0000 --S- 11a9: c3            RET
+0007 04d2 0000 000a ffc8 0000 0000 0000 --S- 0034: 50            PUSH AX
+0007 04d2 0000 000a ffc6 0000 0000 0000 --S- 0035: e83200        CALL 006a
+0007 04d2 0000 000a ffc4 0000 0000 0000 --S- 006a: 55            PUSH BP
+0007 04d2 0000 000a ffc2 0000 0000 0000 --S- 006b: 89e5          MOV BP, SP
+0007 04d2 0000 000a ffc2 ffc2 0000 0000 --S- 006d: e8e0ff        CALL 0050
+0007 04d2 0000 000a ffc0 ffc2 0000 0000 --S- 0050: 55            PUSH BP
+0007 04d2 0000 000a ffbe ffc2 0000 0000 --S- 0051: 89e5          MOV BP, SP
+0007 04d2 0000 000a ffbe ffbe 0000 0000 --S- 0053: 56            PUSH SI
+0007 04d2 0000 000a ffbc ffbe 0000 0000 --S- 0054: 8b360a00      MOV SI, [000a] ;[000a]0000
+0007 04d2 0000 000a ffbc ffbe 0000 0000 --S- 0058: 4e            DEC SI
+0007 04d2 0000 000a ffbc ffbe ffff 0000 --S- 0059: 7c0c          JL 0067
+0007 04d2 0000 000a ffbc ffbe ffff 0000 --S- 0067: e93b11        JMP 11a5
+0007 04d2 0000 000a ffbc ffbe ffff 0000 --S- 11a5: 5e            POP SI
+0007 04d2 0000 000a ffbe ffbe 0000 0000 --S- 11a6: 89ec          MOV SP, BP
+0007 04d2 0000 000a ffbe ffbe 0000 0000 --S- 11a8: 5d            POP BP
+0007 04d2 0000 000a ffc0 ffc2 0000 0000 --S- 11a9: c3            RET
+[src/machine.rs:579:9] left = 4160
+[src/machine.rs:579:9] right = 0
+0007 04d2 0000 000a ffc2 ffc2 0000 0000 --S- 0070: 833e0c0000    CMP [000c], 0 ;[000c]1040
+0007 04d2 0000 000a ffc2 ffc2 0000 0000 ---- 0075: 7406          JE 007d
+0007 04d2 0000 000a ffc2 ffc2 0000 0000 ---- 0077: 8b1e0c00      MOV BX, [000c] ;[000c]1040
+0007 1040 0000 000a ffc2 ffc2 0000 0000 ---- 007b: ffd3          CALL BX
+0007 1040 0000 000a ffc0 ffc2 0000 0000 ---- 1040: 55            PUSH BP
+0007 1040 0000 000a ffbe ffc2 0000 0000 ---- 1041: 89e5          MOV BP, SP
+0007 1040 0000 000a ffbe ffbe 0000 0000 ---- 1043: 56            PUSH SI
+0007 1040 0000 000a ffbc ffbe 0000 0000 ---- 1044: 31f6          XOR SI, SI
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 20
+0007 1040 0000 000a ffbc ffbe 0000 0000 ---Z 1046: 83fe14        CMP SI, 14
+0007 1040 0000 000a ffbc ffbe 0000 0000 C-S- 1049: 7d29          JNL 1074
+0007 1040 0000 000a ffbc ffbe 0000 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0000 0000 000a ffbc ffbe 0000 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 16
+[src/machine.rs:579:9] right = 0
+0007 0000 0000 000a ffbc ffbe 0000 0000 ---Z 104f: 83bf340000    CMP [BX+34], 0 ;[0034]0010
+0007 0000 0000 000a ffbc ffbe 0000 0000 ---- 1054: 741b          JE 1071
+0007 0000 0000 000a ffbc ffbe 0000 0000 ---- 1056: 89f3          MOV BX, SI
+0007 0000 0000 000a ffbc ffbe 0000 0000 ---- 1058: d1e3          SHL BX, 1
+0007 0000 0000 000a ffbc ffbe 0000 0000 ---Z 105a: 8b9f3400      MOV BX, [BX+34] ;[0034]0010
+0007 0010 0000 000a ffbc ffbe 0000 0000 ---Z 105e: f747040001    TEST [BX+4], 0100 ;[0014]0001
+0007 0010 0000 000a ffbc ffbe 0000 0000 ---Z 1063: 740c          JE 1071
+0007 0010 0000 000a ffbc ffbe 0000 0000 ---Z 1071: 46            INC SI
+0007 0010 0000 000a ffbc ffbe 0001 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 1
+[src/machine.rs:579:9] right = 20
+0007 0010 0000 000a ffbc ffbe 0001 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0010 0000 000a ffbc ffbe 0001 0000 C-S- 1049: 7d29          JNL 1074
+0007 0010 0000 000a ffbc ffbe 0001 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0001 0000 000a ffbc ffbe 0001 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 40
+[src/machine.rs:579:9] right = 0
+0007 0004 0000 000a ffbc ffbe 0001 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0038]0028
+0007 0004 0000 000a ffbc ffbe 0001 0000 ---- 1054: 741b          JE 1071
+0007 0004 0000 000a ffbc ffbe 0001 0000 ---- 1056: 89f3          MOV BX, SI
+0007 0001 0000 000a ffbc ffbe 0001 0000 ---- 1058: d1e3          SHL BX, 1
+0007 0004 0000 000a ffbc ffbe 0001 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[0038]0028
+0007 0028 0000 000a ffbc ffbe 0001 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[002c]0042
+0007 0028 0000 000a ffbc ffbe 0001 0000 ---Z 1063: 740c          JE 1071
+0007 0028 0000 000a ffbc ffbe 0001 0000 ---Z 1071: 46            INC SI
+0007 0028 0000 000a ffbc ffbe 0002 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 2
+[src/machine.rs:579:9] right = 20
+0007 0028 0000 000a ffbc ffbe 0002 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0028 0000 000a ffbc ffbe 0002 0000 C-S- 1049: 7d29          JNL 1074
+0007 0028 0000 000a ffbc ffbe 0002 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0002 0000 000a ffbc ffbe 0002 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0008 0000 000a ffbc ffbe 0002 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[003c]0000
+0007 0008 0000 000a ffbc ffbe 0002 0000 ---Z 1054: 741b          JE 1071
+0007 0008 0000 000a ffbc ffbe 0002 0000 ---Z 1071: 46            INC SI
+0007 0008 0000 000a ffbc ffbe 0003 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 3
+[src/machine.rs:579:9] right = 20
+0007 0008 0000 000a ffbc ffbe 0003 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0008 0000 000a ffbc ffbe 0003 0000 C-S- 1049: 7d29          JNL 1074
+0007 0008 0000 000a ffbc ffbe 0003 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0003 0000 000a ffbc ffbe 0003 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 000c 0000 000a ffbc ffbe 0003 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0040]0000
+0007 000c 0000 000a ffbc ffbe 0003 0000 ---Z 1054: 741b          JE 1071
+0007 000c 0000 000a ffbc ffbe 0003 0000 ---Z 1071: 46            INC SI
+0007 000c 0000 000a ffbc ffbe 0004 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 4
+[src/machine.rs:579:9] right = 20
+0007 000c 0000 000a ffbc ffbe 0004 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 000c 0000 000a ffbc ffbe 0004 0000 C-S- 1049: 7d29          JNL 1074
+0007 000c 0000 000a ffbc ffbe 0004 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0004 0000 000a ffbc ffbe 0004 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0010 0000 000a ffbc ffbe 0004 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0044]0000
+0007 0010 0000 000a ffbc ffbe 0004 0000 ---Z 1054: 741b          JE 1071
+0007 0010 0000 000a ffbc ffbe 0004 0000 ---Z 1071: 46            INC SI
+0007 0010 0000 000a ffbc ffbe 0005 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 5
+[src/machine.rs:579:9] right = 20
+0007 0010 0000 000a ffbc ffbe 0005 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0010 0000 000a ffbc ffbe 0005 0000 C-S- 1049: 7d29          JNL 1074
+0007 0010 0000 000a ffbc ffbe 0005 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0005 0000 000a ffbc ffbe 0005 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0014 0000 000a ffbc ffbe 0005 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0048]0000
+0007 0014 0000 000a ffbc ffbe 0005 0000 ---Z 1054: 741b          JE 1071
+0007 0014 0000 000a ffbc ffbe 0005 0000 ---Z 1071: 46            INC SI
+0007 0014 0000 000a ffbc ffbe 0006 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 6
+[src/machine.rs:579:9] right = 20
+0007 0014 0000 000a ffbc ffbe 0006 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0014 0000 000a ffbc ffbe 0006 0000 C-S- 1049: 7d29          JNL 1074
+0007 0014 0000 000a ffbc ffbe 0006 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0006 0000 000a ffbc ffbe 0006 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0018 0000 000a ffbc ffbe 0006 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[004c]0000
+0007 0018 0000 000a ffbc ffbe 0006 0000 ---Z 1054: 741b          JE 1071
+0007 0018 0000 000a ffbc ffbe 0006 0000 ---Z 1071: 46            INC SI
+0007 0018 0000 000a ffbc ffbe 0007 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 7
+[src/machine.rs:579:9] right = 20
+0007 0018 0000 000a ffbc ffbe 0007 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0018 0000 000a ffbc ffbe 0007 0000 C-S- 1049: 7d29          JNL 1074
+0007 0018 0000 000a ffbc ffbe 0007 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0007 0000 000a ffbc ffbe 0007 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 001c 0000 000a ffbc ffbe 0007 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0050]0000
+0007 001c 0000 000a ffbc ffbe 0007 0000 ---Z 1054: 741b          JE 1071
+0007 001c 0000 000a ffbc ffbe 0007 0000 ---Z 1071: 46            INC SI
+0007 001c 0000 000a ffbc ffbe 0008 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 8
+[src/machine.rs:579:9] right = 20
+0007 001c 0000 000a ffbc ffbe 0008 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 001c 0000 000a ffbc ffbe 0008 0000 C-S- 1049: 7d29          JNL 1074
+0007 001c 0000 000a ffbc ffbe 0008 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0008 0000 000a ffbc ffbe 0008 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0020 0000 000a ffbc ffbe 0008 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0054]0000
+0007 0020 0000 000a ffbc ffbe 0008 0000 ---Z 1054: 741b          JE 1071
+0007 0020 0000 000a ffbc ffbe 0008 0000 ---Z 1071: 46            INC SI
+0007 0020 0000 000a ffbc ffbe 0009 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 9
+[src/machine.rs:579:9] right = 20
+0007 0020 0000 000a ffbc ffbe 0009 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0020 0000 000a ffbc ffbe 0009 0000 C-S- 1049: 7d29          JNL 1074
+0007 0020 0000 000a ffbc ffbe 0009 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 0009 0000 000a ffbc ffbe 0009 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 0
+[src/machine.rs:579:9] right = 0
+0007 0024 0000 000a ffbc ffbe 0009 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0058]0000
+0007 0024 0000 000a ffbc ffbe 0009 0000 ---Z 1054: 741b          JE 1071
+0007 0024 0000 000a ffbc ffbe 0009 0000 ---Z 1071: 46            INC SI
+0007 0024 0000 000a ffbc ffbe 000a 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 10
+[src/machine.rs:579:9] right = 20
+0007 0024 0000 000a ffbc ffbe 000a 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0024 0000 000a ffbc ffbe 000a 0000 C-S- 1049: 7d29          JNL 1074
+0007 0024 0000 000a ffbc ffbe 000a 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 000a 0000 000a ffbc ffbe 000a 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 388
+[src/machine.rs:579:9] right = 0
+0007 0028 0000 000a ffbc ffbe 000a 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[005c]0184
+0007 0028 0000 000a ffbc ffbe 000a 0000 ---- 1054: 741b          JE 1071
+0007 0028 0000 000a ffbc ffbe 000a 0000 ---- 1056: 89f3          MOV BX, SI
+0007 000a 0000 000a ffbc ffbe 000a 0000 ---- 1058: d1e3          SHL BX, 1
+0007 0028 0000 000a ffbc ffbe 000a 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[005c]0184
+0007 0184 0000 000a ffbc ffbe 000a 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[0188]204d
+0007 0184 0000 000a ffbc ffbe 000a 0000 ---Z 1063: 740c          JE 1071
+0007 0184 0000 000a ffbc ffbe 000a 0000 ---Z 1071: 46            INC SI
+0007 0184 0000 000a ffbc ffbe 000b 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 11
+[src/machine.rs:579:9] right = 20
+0007 0184 0000 000a ffbc ffbe 000b 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0184 0000 000a ffbc ffbe 000b 0000 C-S- 1049: 7d29          JNL 1074
+0007 0184 0000 000a ffbc ffbe 000b 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 000b 0000 000a ffbc ffbe 000b 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 32
+[src/machine.rs:579:9] right = 0
+0007 002c 0000 000a ffbc ffbe 000b 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0060]0020
+0007 002c 0000 000a ffbc ffbe 000b 0000 ---- 1054: 741b          JE 1071
+0007 002c 0000 000a ffbc ffbe 000b 0000 ---- 1056: 89f3          MOV BX, SI
+0007 000b 0000 000a ffbc ffbe 000b 0000 ---- 1058: d1e3          SHL BX, 1
+0007 002c 0000 000a ffbc ffbe 000b 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[0060]0020
+0007 0020 0000 000a ffbc ffbe 000b 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[0024]0274
+0007 0020 0000 000a ffbc ffbe 000b 0000 ---Z 1063: 740c          JE 1071
+0007 0020 0000 000a ffbc ffbe 000b 0000 ---Z 1071: 46            INC SI
+0007 0020 0000 000a ffbc ffbe 000c 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 12
+[src/machine.rs:579:9] right = 20
+0007 0020 0000 000a ffbc ffbe 000c 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0020 0000 000a ffbc ffbe 000c 0000 C-S- 1049: 7d29          JNL 1074
+0007 0020 0000 000a ffbc ffbe 000c 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 000c 0000 000a ffbc ffbe 000c 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 64
+[src/machine.rs:579:9] right = 0
+0007 0030 0000 000a ffbc ffbe 000c 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0064]0040
+0007 0030 0000 000a ffbc ffbe 000c 0000 ---- 1054: 741b          JE 1071
+0007 0030 0000 000a ffbc ffbe 000c 0000 ---- 1056: 89f3          MOV BX, SI
+0007 000c 0000 000a ffbc ffbe 000c 0000 ---- 1058: d1e3          SHL BX, 1
+0007 0030 0000 000a ffbc ffbe 000c 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[0064]0040
+0007 0040 0000 000a ffbc ffbe 000c 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[0044]0000
+0007 0040 0000 000a ffbc ffbe 000c 0000 ---Z 1063: 740c          JE 1071
+0007 0040 0000 000a ffbc ffbe 000c 0000 ---Z 1071: 46            INC SI
+0007 0040 0000 000a ffbc ffbe 000d 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 13
+[src/machine.rs:579:9] right = 20
+0007 0040 0000 000a ffbc ffbe 000d 0000 ---- 1046: 83fe14        CMP SI, 14
+0007 0040 0000 000a ffbc ffbe 000d 0000 C-S- 1049: 7d29          JNL 1074
+0007 0040 0000 000a ffbc ffbe 000d 0000 C-S- 104b: 89f3          MOV BX, SI
+0007 000d 0000 000a ffbc ffbe 000d 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 623
+[src/machine.rs:579:9] right = 0
+0007 0034 0000 000a ffbc ffbe 000d 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[0068]026f
+0007 0034 0000 000a ffbc ffbe 000d 0000 ---- 1054: 741b          JE 1071
+0007 0034 0000 000a ffbc ffbe 000d 0000 ---- 1056: 89f3          MOV BX, SI
+0007 000d 0000 000a ffbc ffbe 000d 0000 ---- 1058: d1e3          SHL BX, 1
+0007 0034 0000 000a ffbc ffbe 000d 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[0068]026f
+0007 026f 0000 000a ffbc ffbe 000d 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[0273]6106
+0007 026f 0000 000a ffbc ffbe 000d 0000 ---- 1063: 740c          JE 1071
+0007 026f 0000 000a ffbc ffbe 000d 0000 ---- 1065: 89f3          MOV BX, SI
+0007 000d 0000 000a ffbc ffbe 000d 0000 ---- 1067: d1e3          SHL BX, 1
+0007 0034 0000 000a ffbc ffbe 000d 0000 -O-- 1069: ffb73400      PUSH [BX+34] ;[0068]026f
+0007 0034 0000 000a ffba ffbe 000d 0000 -O-- 106d: e892fe        CALL 0f02
+0007 0034 0000 000a ffb8 ffbe 000d 0000 -O-- 0f02: 55            PUSH BP
+0007 0034 0000 000a ffb6 ffbe 000d 0000 -O-- 0f03: 89e5          MOV BP, SP
+0007 0034 0000 000a ffb6 ffb6 000d 0000 -O-- 0f05: 83ec0a        SUB SP, a
+0007 0034 0000 000a ffac ffb6 000d 0000 --S- 0f08: 56            PUSH SI
+0007 0034 0000 000a ffaa ffb6 000d 0000 --S- 0f09: 57            PUSH DI
+0007 0034 0000 000a ffa8 ffb6 000d 0000 --S- 0f0a: 8b7604        MOV SI, [BP+4] ;[ffba]026f
+0007 0034 0000 000a ffa8 ffb6 026f 0000 --S- 0f0d: c746f80000    MOV [BP-8], 0000 ;[ffae]009f->0000
+0007 0034 0000 000a ffa8 ffb6 026f 0000 --S- 0f12: 09f6          OR SI, SI
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f14: 7530          JNE 0f46
+[src/machine.rs:579:9] left = 24929
+[src/machine.rs:579:9] right = 0
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f46: 837c0800      CMP [SI+8], 0 ;[0277]6161
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f4a: 740d          JE 0f59
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f4c: f6440480      TEST Byte [SI+4], 80 ;[0273]6106
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 0f50: 750c          JNE 0f5e
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 0f52: f744040001    TEST [SI+4], 0100 ;[0273]6106
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f57: 7505          JNE 0f5e
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0f5e: f6440480      TEST Byte [SI+4], 80 ;[0273]6106
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 0f62: 7457          JE 0fbb
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 0fbb: f6440404      TEST Byte [SI+4], 4 ;[0273]6106
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0fbf: 7405          JE 0fc6
+0007 0034 0000 000a ffa8 ffb6 026f 0000 ---- 0fc1: 31c0          XOR AX, AX
+0000 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 0fc3: e97700        JMP 103d
+0000 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 103d: e96401        JMP 11a4
+0000 0034 0000 000a ffa8 ffb6 026f 0000 ---Z 11a4: 5f            POP DI
+0000 0034 0000 000a ffaa ffb6 026f 0000 ---Z 11a5: 5e            POP SI
+0000 0034 0000 000a ffac ffb6 000d 0000 ---Z 11a6: 89ec          MOV SP, BP
+0000 0034 0000 000a ffb6 ffb6 000d 0000 ---Z 11a8: 5d            POP BP
+0000 0034 0000 000a ffb8 ffbe 000d 0000 ---Z 11a9: c3            RET
+0000 0034 0000 000a ffba ffbe 000d 0000 ---Z 1070: 5b            POP BX
+0000 026f 0000 000a ffbc ffbe 000d 0000 ---Z 1071: 46            INC SI
+0000 026f 0000 000a ffbc ffbe 000e 0000 ---- 1072: ebd2          JMP Short 1046
+[src/machine.rs:579:9] left = 14
+[src/machine.rs:579:9] right = 20
+0000 026f 0000 000a ffbc ffbe 000e 0000 ---- 1046: 83fe14        CMP SI, 14
+0000 026f 0000 000a ffbc ffbe 000e 0000 C-S- 1049: 7d29          JNL 1074
+0000 026f 0000 000a ffbc ffbe 000e 0000 C-S- 104b: 89f3          MOV BX, SI
+0000 000e 0000 000a ffbc ffbe 000e 0000 C-S- 104d: d1e3          SHL BX, 1
+[src/machine.rs:579:9] left = 88
+[src/machine.rs:579:9] right = 0
+0000 0038 0000 000a ffbc ffbe 000e 0000 -O-- 104f: 83bf340000    CMP [BX+34], 0 ;[006c]0058
+0000 0038 0000 000a ffbc ffbe 000e 0000 ---- 1054: 741b          JE 1071
+0000 0038 0000 000a ffbc ffbe 000e 0000 ---- 1056: 89f3          MOV BX, SI
+0000 000e 0000 000a ffbc ffbe 000e 0000 ---- 1058: d1e3          SHL BX, 1
+0000 0038 0000 000a ffbc ffbe 000e 0000 -O-- 105a: 8b9f3400      MOV BX, [BX+34] ;[006c]0058
+0000 0058 0000 000a ffbc ffbe 000e 0000 -O-- 105e: f747040001    TEST [BX+4], 0100 ;[005c]0184
+0000 0058 0000 000a ffbc ffbe 000e 0000 ---- 1063: 740c          JE 1071
+0000 0058 0000 000a ffbc ffbe 000e 0000 ---- 1065: 89f3          MOV BX, SI
+0000 000e 0000 000a ffbc ffbe 000e 0000 ---- 1067: d1e3          SHL BX, 1
+0000 0038 0000 000a ffbc ffbe 000e 0000 -O-- 1069: ffb73400      PUSH [BX+34] ;[006c]0058
+0000 0038 0000 000a ffba ffbe 000e 0000 -O-- 106d: e892fe        CALL 0f02
+0000 0038 0000 000a ffb8 ffbe 000e 0000 -O-- 0f02: 55            PUSH BP
+0000 0038 0000 000a ffb6 ffbe 000e 0000 -O-- 0f03: 89e5          MOV BP, SP
+0000 0038 0000 000a ffb6 ffb6 000e 0000 -O-- 0f05: 83ec0a        SUB SP, a
+0000 0038 0000 000a ffac ffb6 000e 0000 --S- 0f08: 56            PUSH SI
+0000 0038 0000 000a ffaa ffb6 000e 0000 --S- 0f09: 57            PUSH DI
+0000 0038 0000 000a ffa8 ffb6 000e 0000 --S- 0f0a: 8b7604        MOV SI, [BP+4] ;[ffba]0058
+0000 0038 0000 000a ffa8 ffb6 0058 0000 --S- 0f0d: c746f80000    MOV [BP-8], 0000 ;[ffae]0000->0000
+0000 0038 0000 000a ffa8 ffb6 0058 0000 --S- 0f12: 09f6          OR SI, SI
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f14: 7530          JNE 0f46
+[src/machine.rs:579:9] left = 32
+[src/machine.rs:579:9] right = 0
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f46: 837c0800      CMP [SI+8], 0 ;[0060]0020
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f4a: 740d          JE 0f59
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f4c: f6440480      TEST Byte [SI+4], 80 ;[005c]0184
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f50: 750c          JNE 0f5e
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f5e: f6440480      TEST Byte [SI+4], 80 ;[005c]0184
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f62: 7457          JE 0fbb
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f64: c746f60000    MOV [BP-a], 0000 ;[ffac]ffba->0000
+[src/machine.rs:579:9] left = 32
+[src/machine.rs:579:9] right = 0
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f69: 837c0800      CMP [SI+8], 0 ;[0060]0020
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f6d: 740d          JE 0f7c
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f6f: f6440404      TEST Byte [SI+4], 4 ;[005c]0184
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f73: 7507          JNE 0f7c
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f7c: c7040000      MOV [SI], 0000 ;[0058]0000->0000
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f80: 8b46f6        MOV AX, [BP-a] ;[ffac]0000
+0000 0038 0000 000a ffa8 ffb6 0058 0000 ---- 0f83: 99            CWD
+0000 0038 0000 0000 ffa8 ffb6 0058 0000 ---- 0f84: bb0100        MOV BX, 0001
+0000 0001 0000 0000 ffa8 ffb6 0058 0000 ---- 0f87: 53            PUSH BX
+0000 0001 0000 0000 ffa6 ffb6 0058 0000 ---- 0f88: 52            PUSH DX
+0000 0001 0000 0000 ffa4 ffb6 0058 0000 ---- 0f89: 50            PUSH AX
+0000 0001 0000 0000 ffa2 ffb6 0058 0000 ---- 0f8a: ff7402        PUSH [SI+2] ;[005a]0000
+0000 0001 0000 0000 ffa0 ffb6 0058 0000 ---- 0f8d: e8e6fe        CALL 0e76
+0000 0001 0000 0000 ff9e ffb6 0058 0000 ---- 0e76: 55            PUSH BP
+0000 0001 0000 0000 ff9c ffb6 0058 0000 ---- 0e77: 89e5          MOV BP, SP
+0000 0001 0000 0000 ff9c ff9c 0058 0000 ---- 0e79: 83ec18        SUB SP, 18
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e7c: 8b5604        MOV DX, [BP+4] ;[ffa0]0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e7f: 8956ec        MOV [BP-14], DX ;[ff88]0000->0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e82: 8b5606        MOV DX, [BP+6] ;[ffa2]0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e85: 8b4e08        MOV CX, [BP+8] ;[ffa4]0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e88: 8956f2        MOV [BP-e], DX ;[ff8e]0000->0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e8b: 894ef4        MOV [BP-c], CX ;[ff90]0000->0000
+0000 0001 0000 0000 ff84 ff9c 0058 0000 --S- 0e8e: 8b560a        MOV DX, [BP+a] ;[ffa6]0001
+0000 0001 0000 0001 ff84 ff9c 0058 0000 --S- 0e91: 8956ee        MOV [BP-12], DX ;[ff8a]0000->0001
+0000 0001 0000 0001 ff84 ff9c 0058 0000 --S- 0e94: 8d46e8        LEA AX, [BP-18] ;[ff84]0000
+ff84 0001 0000 0001 ff84 ff9c 0058 0000 --S- 0e97: 50            PUSH AX
+ff84 0001 0000 0001 ff82 ff9c 0058 0000 --S- 0e98: b81300        MOV AX, 0013
+0013 0001 0000 0001 ff82 ff9c 0058 0000 --S- 0e9b: 50            PUSH AX
+0013 0001 0000 0001 ff80 ff9c 0058 0000 --S- 0e9c: b80100        MOV AX, 0001
+0001 0001 0000 0001 ff80 ff9c 0058 0000 --S- 0e9f: 50            PUSH AX
+0001 0001 0000 0001 ff7e ff9c 0058 0000 --S- 0ea0: e87bff        CALL 0e1e
+0001 0001 0000 0001 ff7c ff9c 0058 0000 --S- 0e1e: 55            PUSH BP
+0001 0001 0000 0001 ff7a ff9c 0058 0000 --S- 0e1f: 89e5          MOV BP, SP
+0001 0001 0000 0001 ff7a ff7a 0058 0000 --S- 0e21: 56            PUSH SI
+0001 0001 0000 0001 ff78 ff7a 0058 0000 --S- 0e22: 57            PUSH DI
+0001 0001 0000 0001 ff76 ff7a 0058 0000 --S- 0e23: 8b7608        MOV SI, [BP+8] ;[ff82]ff84
+0001 0001 0000 0001 ff76 ff7a ff84 0000 --S- 0e26: 8b5606        MOV DX, [BP+6] ;[ff80]0013
+0001 0001 0000 0013 ff76 ff7a ff84 0000 --S- 0e29: 895402        MOV [SI+2], DX ;[ff86]0000->0013
+0001 0001 0000 0013 ff76 ff7a ff84 0000 --S- 0e2c: 56            PUSH SI
+0001 0001 0000 0013 ff74 ff7a ff84 0000 --S- 0e2d: ff7604        PUSH [BP+4] ;[ff7e]0001
+0001 0001 0000 0013 ff72 ff7a ff84 0000 --S- 0e30: e86b02        CALL 109e
+0001 0001 0000 0013 ff70 ff7a ff84 0000 --S- 109e: b90300        MOV CX, 0003
+0001 0001 0003 0013 ff70 ff7a ff84 0000 --S- 10a1: eb00          JMP Short 10a3
+0001 0001 0003 0013 ff70 ff7a ff84 0000 --S- 10a3: 55            PUSH BP
+0001 0001 0003 0013 ff6e ff7a ff84 0000 --S- 10a4: 89e5          MOV BP, SP
+0001 0001 0003 0013 ff6e ff6e ff84 0000 --S- 10a6: 8b4604        MOV AX, [BP+4] ;[ff72]0001
+0001 0001 0003 0013 ff6e ff6e ff84 0000 --S- 10a9: 8b5e06        MOV BX, [BP+6] ;[ff74]ff84
+thread 'main' panicked at src/machine.rs:481:17:
+
+Unhandled interrupt type: 19
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+0001 ff84 0003 0013 ff6e ff6e ff84 0000 --S- 10ac: cd20          INT 20

@@ -2,10 +2,10 @@ use crate::{
     disassembler,
     dump::Dump,
     flag::Flag,
-    message::Message,
+    message::{Message, MESSAGE_SIZE},
     metadata::{self},
     operation::{OperandType, Operation, OperationType},
-    register::{self, Register, Register16Bit, RegisterType},
+    register::{self, Register, RegisterType},
 };
 
 pub struct Machine {
@@ -15,33 +15,52 @@ pub struct Machine {
     metadata: metadata::Metadata,
     flag: Flag,
     dump: Dump,
+    text: Vec<u8>,
+
+    // For debugging
+    stop_count: u16,
+}
+
+fn read_16(memory: &[u8], addr: usize) -> u16 {
+    if addr + 1 >= memory.len() {
+        panic!("Memory access out of bounds at address {}", addr + 1);
+    }
+    u16::from_le_bytes([memory[addr], memory[addr + 1]])
+}
+
+fn write_16(memory: &mut [u8], addr: usize, value: u16) {
+    if addr + 1 >= memory.len() {
+        panic!("Memory access out of bounds at address {}", addr + 1);
+    }
+    memory[addr..addr + 2].copy_from_slice(&value.to_le_bytes());
 }
 
 impl Machine {
-    pub fn new<R: std::io::Read>(
-        mut reader: R,
-        metadata: metadata::Metadata,
-        args: &[String],
-        envs: &[String],
-        debug: bool,
-    ) -> Self {
-        let mut text = vec![0; metadata.text_size];
-        reader
-            .read_exact(&mut text)
-            .expect("Failed to read text segment");
+    pub fn new(executable: &Vec<u8>, args: &[String], envs: &[String], debug: bool) -> Self {
+        let metadata = metadata::Metadata::from_bytes(executable);
 
-        let mut data: Vec<u8> = vec![0; metadata.data_size];
-        reader
-            .read_exact(&mut data)
-            .expect("Failed to read data segment");
+        dbg!(&metadata);
+
+        let text_begin = metadata.hdr_len as usize;
+        let text = executable[text_begin..text_begin + metadata.text_size].to_vec();
 
         let mut memory = vec![0; metadata.total];
-        memory[0..metadata.text_size].copy_from_slice(&text);
-        memory[metadata.text_size..metadata.text_size + metadata.data_size].copy_from_slice(&data);
+        let data_begin = metadata.hdr_len as usize + metadata.text_size;
+        memory[0..metadata.data_size]
+            .copy_from_slice(&executable[data_begin..data_begin + metadata.data_size]);
 
         let args_frame = Self::create_args_frame(args, envs, metadata.total);
         let frame_base = metadata.total - args_frame.len();
         memory[frame_base..metadata.total].copy_from_slice(&args_frame);
+
+        // dump args
+        for i in 0xffcc..metadata.total {
+            if (i == 0xffcc) || (i % 16 == 0) {
+                print!("\n{:04x}: ", i);
+            }
+            print!("{:02x} ", memory[i]);
+        }
+        println!();
 
         let mut register = Register::new();
         register.sp = frame_base as u16;
@@ -53,51 +72,71 @@ impl Machine {
             metadata,
             flag: Flag::new(),
             dump: Dump::new(debug),
+            text,
+
+            stop_count: 0,
         }
     }
 
     fn create_args_frame(args: &[String], envs: &[String], total_memory: usize) -> Vec<u8> {
-        // argc(u16) + args_address(u16) * n + 0(u16) + env_address(u16) * m
-        let mut frame_size = 2 + args.len() * 2 + 2 + envs.len() * 2;
-
         let mut args_offset = Vec::new();
         let mut args_seg = Vec::new();
-        for (i, arg) in args.iter().enumerate() {
+        for arg in args {
             let buf = arg.as_bytes();
-            args_offset.push(frame_size + i * 2);
+            args_offset.push(args_seg.len());
             args_seg.extend_from_slice(buf);
-            args_seg.push(0);
-            frame_size += buf.len() + 1;
+            if !arg.ends_with("\0") {
+                args_seg.push(0);
+            }
         }
 
         let mut env_offset = Vec::new();
         let mut env_seg: Vec<u8> = Vec::new();
-        for (i, env) in envs.iter().enumerate() {
-            env_offset.push(frame_size + i * 2);
+        for env in envs {
+            env_offset.push(env_seg.len());
             env_seg.extend_from_slice(env.as_bytes());
-            env_seg.push(0);
-            frame_size += env.as_bytes().len() + 1;
+            if !env.ends_with("\0") {
+                env_seg.push(0);
+            }
+        }
+
+        let header_size = 2 + // argc
+            args_offset.len() * 2 + // args address
+            2 + // 0u16
+            env_offset.len() * 2 + // env address
+            2; // 0u16
+
+        let mut frame_size = header_size
+            + args_seg.len() // args string
+            + env_seg.len(); // env string
+
+        let last_0_required = frame_size % 2 != 0;
+
+        if last_0_required {
+            frame_size += 1; // align to even size
         }
 
         let frame_base = total_memory - frame_size;
-        let mut frame = Vec::new();
+        let args_begin = frame_base + header_size;
+        let env_begin = args_begin + args_seg.len() + 2;
 
         // argc
-        frame.extend_from_slice(&(args.len() as u16).to_le_bytes());
+        let mut frame = (args.len() as u16).to_le_bytes().to_vec();
+
         // args address
         for offset in args_offset {
-            let addr = (frame_base + offset) as u16;
+            let addr = (args_begin + offset) as u16;
             frame.extend_from_slice(&addr.to_le_bytes());
         }
-        // 0u16
+        // padding
         frame.extend_from_slice(&0u16.to_le_bytes());
 
         // env address
         for offset in env_offset {
-            let addr = (frame_base + offset) as u16;
+            let addr = (env_begin + offset) as u16;
             frame.extend_from_slice(&addr.to_le_bytes());
         }
-        // 0u16
+        // padding
         frame.extend_from_slice(&0u16.to_le_bytes());
 
         // args string
@@ -105,14 +144,19 @@ impl Machine {
         // env string
         frame.extend_from_slice(&env_seg);
 
-        // padding
-        // frame.extend_from_slice(&0u16.to_le_bytes());
-        frame.push(0);
+        if last_0_required {
+            frame.push(0);
+        }
 
         frame
     }
 
     fn calc_effective_address(&self, op: &Operation) -> usize {
+        if op.mod_rm == 0b11 {
+            let addr = self.register.get(RegisterType::new(op.rm, op.w)) as usize;
+            return addr;
+        }
+
         match op.raws[0] {
             0b1110_1000 | 0b1110_1001 => {
                 let offset = op.get_next_operation_pos();
@@ -124,14 +168,14 @@ impl Machine {
             }
             _ => {
                 let base = match op.rm {
-                    0b000 => self.register.bx + self.register.si,
-                    0b001 => self.register.bx + self.register.di,
+                    0b000 => self.register.get_bx() + self.register.si,
+                    0b001 => self.register.get_bx() + self.register.di,
                     0b010 => self.register.bp + self.register.si,
                     0b011 => self.register.bp + self.register.di,
                     0b100 => self.register.si,
                     0b101 => self.register.di,
                     0b110 => self.register.bp,
-                    0b111 => self.register.bx,
+                    0b111 => self.register.get_bx(),
                     _ => panic!("Invalid effective address"),
                 };
                 match op.mod_rm {
@@ -176,17 +220,10 @@ impl Machine {
                 }
 
                 let addr = self.calc_effective_address(op);
-                if addr >= self.memory.len() {
-                    panic!("Memory access out of bounds at address {}", addr);
+                if addr + 1 >= self.memory.len() {
+                    panic!("Memory access out of bounds at address {}", addr + 1);
                 }
-                let value = if op.w == 0 {
-                    self.memory[addr] as u16
-                } else {
-                    if addr + 1 >= self.memory.len() {
-                        panic!("Memory access out of bounds at address {}", addr + 1);
-                    }
-                    u16::from_le_bytes([self.memory[addr], self.memory[addr + 1]])
-                };
+                let value = u16::from_le_bytes([self.memory[addr], self.memory[addr + 1]]);
                 self.dump.address_value(addr, value);
                 value
             }
@@ -213,8 +250,11 @@ impl Machine {
                 }
 
                 let addr = self.calc_effective_address(op);
-                self.dump
-                    .address_value_change(addr, self.memory[addr] as u16, value);
+                let prev = u16::from_le_bytes([
+                    self.memory[addr],
+                    if op.w == 0 { 0 } else { self.memory[addr + 1] },
+                ]);
+                self.dump.address_value_change(addr, prev, value);
                 if addr >= self.memory.len() {
                     panic!("Memory access out of bounds at address {}", addr);
                 }
@@ -231,12 +271,9 @@ impl Machine {
         }
     }
 
-    fn get_text_segment(&self) -> &[u8] {
-        &self.memory[0..self.metadata.text_size]
-    }
     fn get_data_segment(&self) -> &[u8] {
-        let begin = self.metadata.text_size;
-        let end = begin + self.metadata.data_size;
+        let begin = 0;
+        let end = begin + self.metadata.total;
         &self.memory[begin..end]
     }
 
@@ -253,20 +290,24 @@ impl Machine {
                 let res = left + right;
                 let res_u8 = left as u8 + right as u8;
                 self.flag
-                    .setCOSZ(res >= 0x100, res >= 0x100, false, res == 0);
+                    .set_cosz(res >= 0x100, res >= 0x100, false, res == 0);
                 res_u8 as u16
             }
             0b01 => {
                 let res = left as u16 as i32 + right as u16 as i32;
-                let res_i16 = left + right;
-                self.flag
-                    .setCOSZ(res > 0x10000, res != res_i16 as i32, false, res_i16 == 0);
-                res_i16 as u16
+                let res_u16 = left + right;
+                self.flag.set_cosz(
+                    res > 0x10000,
+                    res != res_u16 as i32,
+                    (res_u16 as i16) < 0,
+                    res_u16 == 0,
+                );
+                res_u16 as u16
             }
             0b11 => {
                 let res = left as i16 as i32 + right as i16 as i32;
                 let res_i16 = left as i16 + right as i16;
-                self.flag.setCOSZ(
+                self.flag.set_cosz(
                     res > 0x10000,
                     res != res_i16 as i32,
                     res_i16 < 0,
@@ -315,44 +356,150 @@ impl Machine {
         self.write_operand(op, op.first, result);
     }
 
-    fn int(&mut self) {
-        // let msg = Message::load(self.get_data_segment(), self.register.bx as usize);
-        let addr = self.register.bx as usize;
-        let msg = if addr <= self.metadata.text_size + self.metadata.data_size {
-            Message::load(self.get_data_segment(), addr)
+    fn div(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.second);
+        let numerator = self.register.get_ax() as u32 | ((self.register.get_dx() as u32) << 16);
+        match op.w {
+            0 => {
+                let quot_i32 = numerator as i32 / left as i32;
+                let quot_u8 = (quot_i32 & 0xff) as u8;
+                let rem = numerator % left as u32;
+                self.register.al = quot_u8;
+                self.register.ah = (rem & 0xff) as u8;
+            }
+            1 => {
+                let quot_i32 = numerator as i32 / left as i32;
+                let quot_u16 = (quot_i32 & 0xffff) as u16;
+                let rem = numerator % left as u32;
+                self.register.set_ax(quot_u16);
+                self.register.set_dx((rem & 0xffff) as u16);
+            }
+            _ => unreachable!("Invalid w"),
+        }
+    }
+
+    fn neg(&mut self, op: &Operation) {
+        let value = self.read_operand(op, op.first);
+        if op.w == 1 {
+            let val_i32 = value as i32;
+            let res_i16 = -val_i32 as i16;
+            self.flag
+                .set_cosz(value != 0, false, res_i16 < 0, res_i16 == 0);
+            self.write_operand(op, op.first, res_i16 as u16);
         } else {
-            Message::load(&self.memory, addr)
-        };
+            let val_u8 = value as u8;
+            let res_i8 = -(val_u8 as i8);
+            self.flag
+                .set_cosz(value != 0, false, res_i8 < 0, res_i8 == 0);
+            self.write_operand(op, op.first, res_i8 as u16);
+        }
+    }
+
+    fn inc(&mut self, op: &Operation) {
+        let value = self.read_operand(op, op.first) as i16;
+        let result = value as i32 + 1;
+
+        if op.w == 0 {
+            let res_u8 = (result & 0xff) as u8;
+            self.flag
+                .set_cosz(self.flag.carry, res_u8 as i32 != result, false, res_u8 == 0);
+            self.write_operand(op, op.first, res_u8 as u16);
+        } else {
+            let res_i16 = (result & 0xffff) as i16;
+            self.flag.set_cosz(
+                self.flag.carry,
+                result != res_i16 as i32,
+                res_i16 < 0,
+                res_i16 == 0,
+            );
+            self.write_operand(op, op.first, res_i16 as u16);
+        }
+    }
+
+    fn dec(&mut self, op: &Operation) {
+        let value = self.read_operand(op, op.first) as i16;
+        let result = value.wrapping_sub(1);
+        self.flag.set_cosz(false, false, value < 1, result == 0);
+        self.write_operand(op, op.first, result as u16);
+    }
+
+    fn int(&mut self) {
+        let bx = self.register.get_bx() as usize;
+        let msg = Message::load(self.get_data_segment(), bx);
         match msg.message_type {
             1 => {
-                // Exit
-                let status = msg.load_detail1(self.get_data_segment()).detail[0];
-                self.exit(status);
+                // exit
+                let detail = msg.load_detail1(self.get_data_segment());
+                self.exit(detail.m1i1());
             }
             4 => {
-                // Write
-                let detail = msg.load_detail1(&self.memory);
+                // write
+                let detail = msg.load_detail1(self.get_data_segment());
                 let fd = detail.m1i1();
                 let addr = detail.m1p1();
                 let len = detail.m1i2();
                 self.write(fd, addr as usize, len);
+
+                // Write errno and return value to memory
+                // res
+                write_16(&mut self.memory, bx, 0);
+                // errno
+                write_16(&mut self.memory, bx + 2, len);
+
+                self.register.set_ax(0);
+            }
+            17 => {
+                // brk
+                let addr = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 6);
+                let res = self.brk(addr);
+                self.register.set_ax(0);
+                write_16(&mut self.memory, bx, 0);
+                if res {
+                    write_16(&mut self.memory, bx + 2, 0);
+                } else {
+                    write_16(&mut self.memory, bx + 2, 12); // EINVAL
+                }
+            }
+            // 19 => {
+            //     // lseek
+            //     let fd = read_16(self.get_data_segment(), bx + MESSAGE_SIZE);
+            //     let offset = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 6);
+            //     let whence = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 2);
+            // }
+            54 => {
+                // ioctl
+                let fd = read_16(self.get_data_segment(), bx + MESSAGE_SIZE);
+                let req = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 4);
+                let addr = read_16(self.get_data_segment(), bx + MESSAGE_SIZE + 14);
+                self.ioctl(fd, req, addr);
+                self.register.set_ax(0);
+                write_16(&mut self.memory, bx, 0);
+                let errno = -22 as i16;
+                write_16(&mut self.memory, bx + 2, errno as u16);
             }
             _ => {
-                println!("Unhandled interrupt type: {}", msg.message_type);
+                panic!("\nUnhandled interrupt type: {}", msg.message_type);
             }
         }
-        // なんで必要?
-        self.register.ax = 0;
     }
 
     fn push(&mut self, op: &Operation) {
-        let value = self.read_operand(op, op.first).to_le_bytes();
-        self.stack_push(&value);
+        let value = self.read_operand(op, op.first);
+        if op.w == 0 {
+            self.stack_push_u8((value & 0xff) as u8);
+        } else {
+            self.stack_push_u16(value);
+        }
     }
 
     fn pop(&mut self, op: &Operation) {
-        let res = self.stack_pop_u16();
-        self.write_operand(op, op.first, res);
+        if op.w == 0 {
+            let res = self.stack_pop_u8();
+            self.write_operand(op, op.first, res as u16);
+        } else {
+            let res = self.stack_pop_u16();
+            self.write_operand(op, op.first, res);
+        }
     }
 
     fn call(&mut self, op: &Operation) {
@@ -361,24 +508,23 @@ impl Machine {
             panic!("Memory access out of bounds at address {}", addr);
         }
         let return_addr = self.register.ip as u16;
-        self.stack_push(&return_addr.to_le_bytes());
-        self.register.ip = addr as u16;
-    }
-
-    fn jmp(&mut self, op: &Operation) {
-        let addr = self.calc_effective_address(op);
-        if addr >= self.memory.len() {
-            panic!("Memory access out of bounds at address {}", addr);
-        }
+        self.stack_push_u16(return_addr);
         self.register.ip = addr as u16;
     }
 
     fn lea(&mut self, op: &Operation) {
         let addr = self.calc_effective_address(op);
-        self.dump.address_value(addr, self.memory[addr] as u16);
-        if addr >= self.memory.len() {
-            panic!("Memory access out of bounds at address {}", addr);
-        }
+        let val = match op.w {
+            0 => self.memory[addr] as u16,
+            1 => {
+                if addr + 1 >= self.memory.len() {
+                    panic!("Memory access out of bounds at address {}", addr + 1);
+                }
+                u16::from_le_bytes([self.memory[addr], self.memory[addr + 1]])
+            }
+            _ => unreachable!("Invalid operand width"),
+        };
+        self.dump.address_value(addr, val);
         self.register.set(op.get_register(), addr as u16);
     }
 
@@ -390,6 +536,19 @@ impl Machine {
         self.register.ip = return_addr;
     }
 
+    fn and(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        let result = match op.w {
+            0 => (left as u8 & right as u8) as u16,
+            1 => left & right,
+            _ => unreachable!("Invalid operand width"),
+        };
+        self.flag
+            .set_cosz(false, false, (result as i16) < 0, result == 0);
+        self.write_operand(op, op.first, result);
+    }
+
     fn or(&mut self, op: &Operation) {
         let left = self.read_operand(op, op.first);
         let right = self.read_operand(op, op.second);
@@ -398,8 +557,112 @@ impl Machine {
             1 => left | right,
             _ => unreachable!("Invalid operand width"),
         };
-        self.flag.setCOSZ(false, false, false, result == 0);
+        self.flag.set_cosz(false, false, false, result == 0);
         self.write_operand(op, op.first, result);
+    }
+
+    fn xor(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        let result = match op.w {
+            0 => (left as u8 ^ right as u8) as u16,
+            1 => left ^ right,
+            _ => unreachable!("Invalid operand width"),
+        };
+        self.flag.set_cosz(false, false, false, result == 0);
+        self.write_operand(op, op.first, result);
+    }
+
+    fn cmp(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        dbg!(left, right);
+        match op.s << 1 | op.w {
+            0b00 => {
+                let res = (left & 0xff) as i32 - (right & 0xff) as i32;
+                self.flag
+                    .set_cosz(left < right, res > 0xff, res < 0, res == 0);
+            }
+            0b01 => {
+                let res_u16 = (left as i16 - right as i16) as u16;
+                let res = left as i32 - right as i32;
+                self.flag
+                    .set_cosz(left < right, res > 0xffff, res < 0, res_u16 == 0);
+            }
+            0b11 => {
+                if op.second == OperandType::Imm {
+                    let right = right as i8;
+                    let res_i16 = left as i16 - right as i16;
+                    let res = left as i16 as i32 - right as i16 as i32;
+                    self.flag.set_cosz(
+                        (left as i32) < (right as i32),
+                        res > 0xffff,
+                        res < 0,
+                        res_i16 == 0,
+                    );
+                } else {
+                    let res_i16 = left as i16 - right as i16;
+                    let res = left as i16 as i32 - right as i16 as i32;
+                    self.flag
+                        .set_cosz(left < right, res > 0xffff, res < 0, res_i16 == 0);
+                }
+            }
+            _ => unreachable!("Invalid operand width"),
+        };
+    }
+
+    fn shl(&mut self, op: &Operation) {
+        let value = self.read_operand(op, op.first);
+        let result = match op.v << 1 | op.w {
+            0b00 => {
+                let res = (value as i32) << 1;
+                let res_u8 = (res as u8) << 1;
+                self.flag
+                    .set_cosz(res > 0xff, res_u8 as i32 != res, false, res_u8 == 0);
+                res_u8 as u16
+            }
+            0b10 => {
+                let cl = self.register.cl;
+                let res = (value as i32) << (cl & 0x1f);
+                let res_u8 = (res as u8) << (cl & 0x1f);
+                self.flag
+                    .set_cosz(res > 0xff, res != res_u8 as i32, res < 0, res_u8 == 0);
+                res_u8 as u16
+            }
+            0b01 => {
+                let res = (value as i32) << 1;
+                let res_u16 = (res as u16) << 1;
+                self.flag.set_cosz(
+                    res > 0xffff,
+                    res_u16 as i32 != res,
+                    (res_u16 as i16) < 0,
+                    res_u16 == 0,
+                );
+                res_u16
+            }
+            0b11 => {
+                let cl = self.register.cl;
+                let res = (value as i32) << (cl & 0x1f);
+                let res_u16 = (res as u16) << (cl & 0x1f);
+                self.flag.set_cosz(
+                    res > 0xffff,
+                    res != res_u16 as i32,
+                    (res_u16 as i16) < 0,
+                    res_u16 == 0,
+                );
+                res_u16
+            }
+            _ => unreachable!("Invalid operation"),
+        };
+        self.write_operand(op, op.first, result);
+    }
+
+    fn jmp(&mut self, op: &Operation) {
+        let addr = self.calc_effective_address(op);
+        if addr >= self.memory.len() {
+            panic!("Memory access out of bounds at address {}", addr);
+        }
+        self.register.ip = addr as u16;
     }
 
     fn je(&mut self, op: &Operation) {
@@ -412,41 +675,7 @@ impl Machine {
         }
     }
 
-    fn cmp(&mut self, op: &Operation) {
-        let left = self.read_operand(op, op.first);
-        let right = self.read_operand(op, op.second);
-        match op.s << 1 | op.w {
-            0b00 => {
-                let res_u8 = left as u8 - right as u8;
-                let res = res_u8 as i32;
-                self.flag
-                    .setCOSZ(left < right, res != res_u8 as i32, false, res_u8 == 0);
-            }
-            0b01 => {
-                let res_i16: i16 = left as i16 - right as i16;
-                let res = res_i16 as i32;
-                self.flag.setCOSZ(
-                    left < right as u8 as u16,
-                    res != res_i16 as i32,
-                    res < 0,
-                    res_i16 == 0,
-                );
-            }
-            0b11 => {
-                let res_i16: i16 = left as i16 - right as i16;
-                let res = (left as i16 - (right as u8 as i16)) as i32;
-                self.flag.setCOSZ(
-                    left < right as u8 as u16,
-                    res != res_i16 as i32,
-                    res < 0,
-                    res_i16 == 0,
-                );
-            }
-            _ => unreachable!("Invalid operand width"),
-        };
-    }
-
-    pub fn jnl(&mut self, op: &Operation) {
+    fn jnl(&mut self, op: &Operation) {
         if !self.flag.sign {
             let addr = self.calc_effective_address(op);
             if addr >= self.memory.len() {
@@ -456,15 +685,136 @@ impl Machine {
         }
     }
 
+    fn jnb(&mut self, op: &Operation) {
+        if !self.flag.carry {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jne(&mut self, op: &Operation) {
+        if !self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jl(&mut self, op: &Operation) {
+        if self.flag.sign {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jb(&mut self, op: &Operation) {
+        if self.flag.carry {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jbe(&mut self, op: &Operation) {
+        if self.flag.carry || self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jle(&mut self, op: &Operation) {
+        if self.flag.sign || self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jnbe(&mut self, op: &Operation) {
+        if !self.flag.carry && !self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn jnle(&mut self, op: &Operation) {
+        if !self.flag.sign && !self.flag.zero {
+            let addr = self.calc_effective_address(op);
+            if addr >= self.memory.len() {
+                panic!("Memory access out of bounds at address {}", addr);
+            }
+            self.register.ip = addr as u16;
+        }
+    }
+
+    fn test(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+        let right = self.read_operand(op, op.second);
+        let result = match op.w {
+            0 => (left as u8 & right as u8) as u16,
+            1 => left & right,
+            _ => unreachable!("Invalid operand width"),
+        };
+        self.flag
+            .set_cosz(false, false, (result as i16) < 0, result == 0);
+    }
+
+    fn cbw(&mut self) {
+        let al = self.register.al as i8;
+        let ah = if al < 0 { 0xff } else { 0x00 };
+        self.register.ah = ah as u8;
+    }
+
+    fn cwd(&mut self) {
+        let ax = self.register.get_ax() as i16;
+        let dx = if ax < 0 { 0xffff } else { 0x0000 };
+        self.register.set_dx(dx);
+    }
+
+    fn xchg(&mut self, op: &Operation) {
+        let left = self.read_operand(op, op.first);
+
+        if op.second == OperandType::None {
+            // XCHG with AX
+            let right = self.register.get_ax();
+            self.register.set_ax(left);
+            self.write_operand(op, op.first, right);
+            return;
+        } else {
+            let right = self.read_operand(op, op.second);
+            dbg!(left, right);
+            self.write_operand(op, op.first, right);
+            self.write_operand(op, op.second, left);
+        }
+    }
+
     pub fn run(&mut self) {
-        let mut disassembler = disassembler::Disassembler::new(
-            self.get_text_segment().to_vec(),
-            &self.metadata,
-            self.dump.enabled,
-        );
+        let mut disassembler =
+            disassembler::Disassembler::new(self.text.clone(), &self.metadata, self.dump.enabled);
         self.dump.labels();
+
+        let mut debug_count = 0;
+
         loop {
-            if self.stop {
+            if self.stop || self.register.ip > self.metadata.text_size as u16 {
                 break;
             }
             self.dump.state(&self.register, &self.flag);
@@ -488,22 +838,52 @@ impl Machine {
                 OperationType::JeJz => self.je(&op),
                 OperationType::Cmp => self.cmp(&op),
                 OperationType::JnlJge => self.jnl(&op),
+                OperationType::Xor => self.xor(&op),
+                OperationType::JnbJae => self.jnb(&op),
+                OperationType::Test => self.test(&op),
+                OperationType::JneJnz => self.jne(&op),
+                OperationType::Dec => self.dec(&op),
+                OperationType::JlJnge => self.jl(&op),
+                OperationType::Cbw => self.cbw(),
+                OperationType::Inc => self.inc(&op),
+                OperationType::And => self.and(&op),
+                OperationType::JbJnae => self.jb(&op),
+                OperationType::JleJng => self.jle(&op),
+                OperationType::JnbeJa => self.jnbe(&op),
+                OperationType::ShlSal => self.shl(&op),
+                OperationType::JnleJg => self.jnle(&op),
+                OperationType::Cwd => self.cwd(),
+                OperationType::Div => self.div(&op),
+                OperationType::Xchg => self.xchg(&op),
+                OperationType::Neg => self.neg(&op),
+                OperationType::JbeJna => self.jbe(&op),
+                OperationType::Undefined => {
+                    panic!("\nUndefined operation: {:?}", op.operation_type);
+                }
                 _ => {
                     println!("\nUnknown operation: {:?}", op.operation_type);
                     self.stop = true;
                 }
             }
             self.dump.eol();
+
+            if self.stop_count > 0 {
+                debug_count += 1;
+                if debug_count >= self.stop_count {
+                    self.stop = true;
+                    println!("\nStopping execution after {} operations", debug_count);
+                }
+            }
         }
     }
 
-    pub fn exit(&mut self, status: u16) {
-        println!("\n<exit({})>", status);
+    fn exit(&mut self, status: u16) {
+        self.dump.exit(status);
         self.stop = true;
     }
 
-    pub fn write(&self, fd: u16, addr: usize, len: u16) {
-        if addr >= self.metadata.data_size {
+    fn write(&self, fd: u16, addr: usize, len: u16) {
+        if addr >= self.metadata.total {
             panic!("Memory access out of bounds at address {}", addr);
         }
         let data = self.get_data_segment();
@@ -511,13 +891,23 @@ impl Machine {
         let end = begin + len as usize;
         let str = String::from_utf8(data[begin..end].to_vec())
             .unwrap_or_else(|_| panic!("Failed to convert memory to string at address {}", addr));
-        print!(
-            "\n<write(fd={}, addr=0x{:04x}, len={})>{}",
-            fd, addr, len, str
-        );
+        self.dump.write(fd, addr, len);
+        print!("{}", str);
     }
 
-    fn stack_push(&mut self, value: &[u8]) {
+    fn ioctl(&self, fd: u16, req: u16, addr: u16) {
+        self.dump.ioctl(fd, req, addr);
+    }
+
+    fn brk(&mut self, addr: u16) -> bool {
+        let ok = !(addr < self.metadata.data_size as u16
+            || addr >= ((self.register.sp & !0x3ff) - 0x400));
+        self.dump.brk(addr, ok);
+        ok
+    }
+
+    fn stack_push_u16(&mut self, value: u16) {
+        let value = value.to_le_bytes();
         let sp = self.register.sp as usize;
         let sp_new = sp
             .checked_sub(value.len())
@@ -525,7 +915,6 @@ impl Machine {
         self.memory[sp_new..sp].copy_from_slice(&value);
         self.register.sp = sp_new as u16;
     }
-
     fn stack_pop_u16(&mut self) -> u16 {
         let sp = self.register.sp as usize;
         let sp_new = sp
@@ -536,6 +925,24 @@ impl Machine {
                 .try_into()
                 .expect("Failed to read value from stack"),
         );
+        self.register.sp = sp_new as u16;
+        value
+    }
+
+    fn stack_push_u8(&mut self, value: u8) {
+        let sp = self.register.sp as usize;
+        let sp_new = sp
+            .checked_sub(1)
+            .unwrap_or_else(|| panic!("Stack overflow: SP is too low to push value"));
+        self.memory[sp_new] = value;
+        self.register.sp = sp_new as u16;
+    }
+    fn stack_pop_u8(&mut self) -> u8 {
+        let sp = self.register.sp as usize;
+        let sp_new = sp
+            .checked_add(1)
+            .unwrap_or_else(|| panic!("Stack overflow: SP is too high to pop value"));
+        let value = self.memory[sp];
         self.register.sp = sp_new as u16;
         value
     }

@@ -402,7 +402,7 @@ impl Dump {
 
         dump_op_info(op);
         dump_space();
-        if op.w == 0 {
+        if op.w == 0 && op.mod_rm != 0b11 {
             dump_byte();
             dump_space();
         }
@@ -521,10 +521,10 @@ impl Dump {
         }
         print!(
             "{ax:04x} {bx:04x} {cx:04x} {dx:04x} {sp:04x} {bp:04x} {si:04x} {di:04x} {flags} ",
-            ax = reg.ax,
-            bx = reg.bx,
-            cx = reg.cx,
-            dx = reg.dx,
+            ax = reg.get_ax(),
+            bx = reg.get_bx(),
+            cx = reg.get_cx(),
+            dx = reg.get_dx(),
             sp = reg.sp,
             bp = reg.bp,
             si = reg.si,
@@ -550,5 +550,38 @@ impl Dump {
             prev_value = prev_value,
             new_value = new_value
         );
+    }
+
+    pub fn write(&self, fd: u16, addr: usize, len: u16) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!("\n<write(fd={}, addr=0x{:04x}, len={})>", fd, addr, len);
+    }
+
+    pub fn exit(&self, status: u16) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!("\n<exit({})>\n", status);
+    }
+
+    pub fn ioctl(&self, fd: u16, req: u16, addr: u16) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!("\n<ioctl(fd={}, req=0x{:04x}, addr=0x{:04x})>", fd, req, addr);
+    }
+
+    pub fn brk(&self, addr: u16, ok: bool) {
+        if !self.is_enabled() {
+            return;
+        }
+        print!("\n<brk(0x{:04x}) => ", addr);
+        if ok {
+            print!("0>");
+        } else {
+            print!("ENOMEM>");
+        }
     }
 }

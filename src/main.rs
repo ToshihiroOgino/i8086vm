@@ -1,4 +1,4 @@
-use std::process::exit;
+use std::io::Read;
 
 mod args;
 mod disassembler;
@@ -27,21 +27,18 @@ fn main() {
         }
     };
 
-    let metadata = match metadata::Metadata::load_from_stream(&mut stream) {
-        Ok(meta) => meta,
-        Err(e) => {
-            eprintln!("Failed to load metadata: {}", e);
-            std::process::exit(1);
-        }
-    };
+    let mut executable = Vec::new();
+    stream
+        .read_to_end(&mut executable)
+        .expect("Failed to read executable file");
 
     match config.mode {
         args::AppMode::Disassemble => {
-            disassembler::disassemble(stream, &metadata, true);
+            disassembler::disassemble(&executable, true);
         }
         args::AppMode::Execute => {
             let mut machine =
-                machine::Machine::new(stream, metadata, &config.argv, &config.envs, config.debug);
+                machine::Machine::new(&executable, &config.argv, &config.envs, config.debug);
             machine.run();
         }
     }

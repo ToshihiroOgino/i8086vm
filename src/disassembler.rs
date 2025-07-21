@@ -1,7 +1,7 @@
 use crate::{
     dump::Dump,
     metadata::Metadata,
-    operation::{self, OperandType, Operation, OperationType},
+    operation::{OperandType, Operation, OperationType},
 };
 use core::panic;
 use std::mem::swap;
@@ -12,17 +12,12 @@ pub struct Disassembler {
     text_pos: usize,
 }
 
-pub fn disassemble<R: std::io::Read>(
-    mut stream: R,
-    metadata: &Metadata,
-    dump_enabled: bool,
-) -> Vec<Operation> {
-    let mut text: Vec<u8> = vec![0; metadata.text_size];
-    stream
-        .read_exact(&mut text)
-        .expect("Failed to read text segment from stream");
-
-    let mut disassembler = Disassembler::new(text, metadata, dump_enabled);
+pub fn disassemble(executable: &Vec<u8>, dump_enabled: bool) -> Vec<Operation> {
+    let metadata = Metadata::from_bytes(executable);
+    let text = executable
+        [metadata.hdr_len as usize..metadata.text_size + metadata.hdr_len as usize]
+        .to_vec();
+    let mut disassembler = Disassembler::new(text, &metadata, dump_enabled);
     disassembler.disassemble_all()
 }
 
@@ -153,6 +148,11 @@ impl Disassembler {
                 let mod_reg_rm = self.next_byte(&mut op);
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
+                op.first = OperandType::SegReg;
+                op.second = OperandType::Reg;
+                if op.raws[0] & 0b10 == 0 {
+                    swap(&mut op.first, &mut op.second);
+                }
                 if op.reg & 0b100 != 0 {
                     panic!("Invalid operation. reg must be 0b0xx in this operation");
                 }
@@ -207,12 +207,15 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
                 self.dump.xchg1(&op);
             }
             0b1001_0000..=0b1001_0111 => {
                 // Register with Accumulator
                 op.operation_type = OperationType::Xchg;
                 op.reg = instruction & 0b111;
+                op.first = OperandType::Reg;
                 self.dump.xchg2(&op);
             }
             // In
@@ -352,12 +355,14 @@ impl Disassembler {
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
                 self.dump.inc_dec1(&op);
             }
             0b0100_0000..=0b0100_0111 => {
                 // Register
                 op.operation_type = OperationType::Inc;
                 op.reg = instruction & 0b111;
+                op.first = OperandType::Reg;
                 self.dump.inc_dec2(&op);
             }
             // Aaa
@@ -430,6 +435,7 @@ impl Disassembler {
                 // Register
                 op.operation_type = OperationType::Dec;
                 op.reg = instruction & 0b111;
+                op.first = OperandType::Reg;
                 self.dump.inc_dec2(&op);
             }
             // Cmp
@@ -492,6 +498,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.bit_op1(&op);
             }
             0b0010_0100 | 0b0010_0101 => {
@@ -503,6 +514,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.bit_op3(&op);
             }
             // Test
@@ -512,6 +525,11 @@ impl Disassembler {
                 let mod_reg_rm = self.next_byte(&mut op);
                 op.set_mod_reg_rm(mod_reg_rm);
                 self.disp(&mut op);
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.bit_op1(&op);
             }
             0b1010_1000 | 0b1010_1001 => {
@@ -523,6 +541,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.bit_op3(&op);
             }
             // Or
@@ -550,6 +570,8 @@ impl Disassembler {
                 } else {
                     self.next_byte(&mut op) as u16
                 };
+                op.first = OperandType::Reg;
+                op.second = OperandType::Imm;
                 self.dump.bit_op3(&op);
             }
             // Xor
@@ -561,6 +583,11 @@ impl Disassembler {
                 self.disp(&mut op);
                 op.d = (instruction >> 1) & 1;
                 op.w = instruction & 1;
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.d == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
                 self.dump.bit_op1(&op);
             }
             0b0011_0100 | 0b0011_0101 => {
@@ -862,7 +889,21 @@ impl Disassembler {
                         panic!("Invalid operation. reg is invalid");
                     }
                 };
+
+                op.first = OperandType::EA;
+                op.second = OperandType::Reg;
+                if op.w == 1 {
+                    swap(&mut op.second, &mut op.first);
+                }
+
+                if op.operation_type == OperationType::Neg {
+                    op.first = OperandType::EA;
+                    op.second = OperandType::None;
+                }
+
                 if op.operation_type == OperationType::Test {
+                    op.first = OperandType::EA;
+                    op.second = OperandType::Imm;
                     self.dump.test2(&op);
                 } else {
                     self.dump.complicate_calc(&op);
@@ -907,9 +948,10 @@ impl Disassembler {
                         panic!("Invalid operation. reg is invalid");
                     }
                 };
+                op.first = OperandType::EA;
+                op.second = OperandType::Imm;
                 self.dump.shift_rotate(&op);
             }
-
             _ => {
                 panic!("Unknown operation: {:02x}", instruction);
             }

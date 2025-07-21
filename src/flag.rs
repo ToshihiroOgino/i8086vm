@@ -19,7 +19,7 @@ impl Flag {
         }
     }
 
-    pub fn setCOSZ(&mut self, carry: bool, overflow: bool, sign: bool, zero: bool) {
+    pub fn set_cosz(&mut self, carry: bool, overflow: bool, sign: bool, zero: bool) {
         self.carry = carry;
         self.overflow = overflow;
         self.sign = sign;

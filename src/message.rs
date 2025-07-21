@@ -1,24 +1,22 @@
 #[allow(unused)]
+#[derive(Debug)]
 pub struct Message {
     offset: usize,
     source: u16,
     pub message_type: u16,
 }
 
+#[derive(Debug)]
 pub struct Detail1 {
     pub detail: [u16; 6],
 }
 
-const MESSAGE_SIZE: usize = 2 * 2;
-const DETAIL1_SIZE: usize = 2 * 6;
+pub const MESSAGE_SIZE: usize = 2 * 2;
 
 impl Message {
-    pub fn load(data_memory: &[u8], offset: usize) -> Self {
-        // if offset + MESSAGE_SIZE > data_memory.len() {
-        //     panic!("Memory access out of bounds at offset {}", offset);
-        // }
-        let source = u16::from_le_bytes([data_memory[offset], data_memory[offset + 1]]);
-        let message_type = u16::from_le_bytes([data_memory[offset + 2], data_memory[offset + 3]]);
+    pub fn load(data: &[u8], offset: usize) -> Self {
+        let source = u16::from_le_bytes([data[offset], data[offset + 1]]);
+        let message_type = u16::from_le_bytes([data[offset + 2], data[offset + 3]]);
         Message {
             offset,
             source,
@@ -26,25 +24,19 @@ impl Message {
         }
     }
 
-    pub fn load_detail1(&self, data_memory: &[u8]) -> Detail1 {
-        // if self.offset + MESSAGE_SIZE + DETAIL1_SIZE > data_memory.len() {
-        //     panic!(
-        //         "Memory access out of bounds at offset 0x{:04x}",
-        //         self.offset
-        //     );
-        // }
+    pub fn load_detail1(&self, data: &[u8]) -> Detail1 {
         let mut detail = [0u16; 6];
         for i in 0..6 {
             detail[i] = u16::from_le_bytes([
-                data_memory[self.offset + MESSAGE_SIZE + i * 2],
-                data_memory[self.offset + MESSAGE_SIZE + i * 2 + 1],
+                data[self.offset + MESSAGE_SIZE + i * 2],
+                data[self.offset + MESSAGE_SIZE + i * 2 + 1],
             ]);
         }
         Detail1 { detail }
     }
 }
 
-#[allow(dead_code)]
+#[allow(unused)]
 impl Detail1 {
     pub fn m1i1(&self) -> u16 {
         self.detail[0]

@@ -16,7 +16,11 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    fn from_bytes(data: [u8; 32]) -> Self {
+    pub fn from_bytes(executable: &Vec<u8>) -> Self {
+        if executable.len() < 32 {
+            panic!("File too short to contain metadata");
+        }
+        let data = &executable[0..32];
         Metadata {
             magic: [data[0], data[1]],
             flags: data[2],
@@ -31,11 +35,5 @@ impl Metadata {
             total: u32::from_le_bytes([data[24], data[25], data[26], data[27]]) as usize,
             syms: u32::from_le_bytes([data[28], data[29], data[30], data[31]]) as usize,
         }
-    }
-
-    pub fn load_from_stream<R: std::io::Read>(mut stream: R) -> std::io::Result<Self> {
-        let mut buffer = [0u8; 32];
-        stream.read_exact(&mut buffer)?;
-        Ok(Metadata::from_bytes(buffer))
     }
 }
