@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-#[allow(unused)]
 #[derive(Debug)]
 pub struct Flag {
     pub carry: bool,
