@@ -40,7 +40,6 @@
         "xzvf"
     ],
     "files.exclude": {
-        "**/.*": true,
         "**/*~": true
     }
 }
