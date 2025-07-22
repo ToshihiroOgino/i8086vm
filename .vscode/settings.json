@@ -30,6 +30,7 @@
         "MOVSW",
         "Popf",
         "Pushf",
+        "RUSTFLAGS",
         "Sahf",
         "Scas",
         "setuptools",

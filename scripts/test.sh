@@ -2,6 +2,15 @@
 TARGET=$1
 FILES=$(find ./setuptools/tests -maxdepth 1 -name '*.c' -type f | xargs -I x basename x)
 
+function is_skip() {
+    local file="$1"
+    # ignore file that starts with a dot
+    if [[ "$file" == .* ]]; then
+        return 1
+    fi
+    return 0
+}
+
 mkdir -p ./test/binary
 mkdir -p ./test/mmvm
 mkdir -p ./test/res
@@ -19,11 +28,17 @@ elif [ "$1" = "-l" ] || [ "$1" = "--list" ]; then
     echo "Usage: $0 <target>"
     echo "available targets:"
     for FILE in $(sort <<<"$FILES"); do
+        if ! is_skip "$FILE"; then
+            continue
+        fi
         echo "  - $FILE"
     done
     exit 0
 elif [ "$1" = "--all" ] || [ "$1" = "-a" ]; then
     for FILE in $(sort <<<"$FILES"); do
+        if ! is_skip "$FILE"; then
+            continue
+        fi
         TARGET=${FILE}
         echo "Testing $TARGET"
         ./scripts/test.sh $TARGET
